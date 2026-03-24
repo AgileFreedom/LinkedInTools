@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Profile Optimiser – Agile Freedom Consulting</title>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+:root {
+  --bg:#0a0a0f; --surface:#111118; --surface2:#18181f; --border:#2a2a35;
+  --accent:#4f8ef7; --accent2:#f7934f; --green:#3ecf7a; --red:#f75a5a;
+  --text:#e8e8f0; --muted:#6b6b80; --card:#14141c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'Lora',Georgia,serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(79,142,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(79,142,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+header{position:relative;z-index:10;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(10,10,15,.95);backdrop-filter:blur(10px);}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:34px;height:34px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Epilogue',sans-serif;font-weight:900;font-size:12px;color:white;}
+.logo h1{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;color:var(--text);}
+.logo p{font-size:11px;color:var(--muted);font-family:'Epilogue',sans-serif;}
+.powered-by{font-family:'Epilogue',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.powered-by span{color:var(--accent);font-weight:700;}
+
+main{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:44px 24px 80px;}
+
+.hero{text-align:center;margin-bottom:36px;animation:fadeUp .5s ease both;}
+.hero-tag{display:inline-block;padding:4px 14px;border:1px solid rgba(79,142,247,.3);background:rgba(79,142,247,.07);color:var(--accent);font-family:'Epilogue',sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
+.hero h2{font-family:'Epilogue',sans-serif;font-size:32px;font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:10px;}
+.hero h2 em{font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{font-size:14px;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto;}
+
+.how-to{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px;animation:fadeUp .5s ease .05s both;}
+.step-card{background:var(--card);border:1px solid var(--border);padding:16px;display:flex;gap:10px;align-items:flex-start;}
+.step-num{font-family:'Epilogue',sans-serif;font-size:20px;font-weight:900;color:rgba(79,142,247,.3);line-height:1;flex-shrink:0;}
+.step-text{font-family:'Epilogue',sans-serif;font-size:11px;line-height:1.5;color:var(--muted);}
+.step-text strong{color:var(--text);display:block;margin-bottom:3px;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.88);backdrop-filter:blur(4px);overflow-y:auto;}
+.modal-overlay.open{display:block;}
+.modal-box{max-width:580px;margin:48px auto 48px;background:var(--card);border:1px solid var(--border);padding:36px;position:relative;}
+.modal-close{position:absolute;top:14px;right:14px;background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;font-family:'Epilogue',sans-serif;}
+.modal-close:hover{border-color:var(--text);color:var(--text);}
+.modal-title{font-family:'Epilogue',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:18px;}
+.modal-body{font-size:12.5px;line-height:1.75;color:var(--muted);}
+.modal-body h4{font-family:'Epilogue',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text);margin-top:16px;margin-bottom:4px;}
+.modal-body h4:first-child{margin-top:0;}
+.modal-body strong{color:var(--text);}
+.modal-btn{margin-top:24px;width:100%;padding:12px;background:var(--accent);border:none;color:white;font-family:'Epilogue',sans-serif;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;}
+
+/* INPUT CARD */
+.input-card{background:var(--card);border:1px solid var(--border);padding:32px;animation:fadeUp .5s ease .1s both;position:relative;overflow:hidden;}
+.input-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.form-group{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+.form-group:last-of-type{margin-bottom:0;}
+label{font-family:'Epilogue',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);}
+input[type="url"],select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 14px;font-family:'Lora',serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;}
+input:focus,select:focus{border-color:var(--accent);}
+select{cursor:pointer;}
+select option{background:var(--surface2);}
+.url-hint{font-family:'Epilogue',sans-serif;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.url-hint a{color:var(--accent);text-decoration:underline;cursor:pointer;}
+
+.tc-row{display:flex;align-items:flex-start;gap:10px;margin-top:20px;margin-bottom:4px;}
+.tc-row input[type="checkbox"]{width:15px;height:15px;flex-shrink:0;margin-top:2px;accent-color:var(--accent);cursor:pointer;padding:0;border:none;}
+.tc-row span{font-family:'Epilogue',sans-serif;font-size:12px;color:var(--muted);line-height:1.5;cursor:pointer;}
+.tc-row a{color:var(--accent);text-decoration:underline;}
+
+.error-box{background:rgba(247,90,90,.08);border:1px solid rgba(247,90,90,.3);padding:11px 15px;font-size:12.5px;color:var(--red);line-height:1.6;margin-top:14px;display:none;}
+.error-box.visible{display:block;}
+
+.analyse-btn{width:100%;padding:15px;background:var(--accent);border:none;color:white;font-family:'Epilogue',sans-serif;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:20px;}
+.analyse-btn:hover:not(:disabled){background:#3a7ce8;transform:translateY(-1px);}
+.analyse-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+/* LOADING */
+.loading-section{display:none;text-align:center;padding:64px 0;}
+.loading-section.visible{display:block;animation:fadeUp .3s ease;}
+.pulse-ring{width:56px;height:56px;border-radius:50%;border:2px solid rgba(79,142,247,.15);border-top-color:var(--accent);animation:spin .9s linear infinite;margin:0 auto 18px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-msg{font-family:'Epilogue',sans-serif;font-size:15px;color:var(--text);margin-bottom:5px;}
+.loading-sub{font-size:12px;color:var(--muted);}
+
+/* RESULTS */
+.results-section{display:none;}
+.results-section.visible{display:block;animation:fadeUp .4s ease;}
+.success-notice{background:rgba(62,207,122,.07);border:1px solid rgba(62,207,122,.25);padding:10px 16px;font-family:'Epilogue',sans-serif;font-size:12px;color:var(--green);margin-bottom:18px;display:none;}
+.success-notice.visible{display:block;}
+
+.score-hero{background:var(--card);border:1px solid var(--border);padding:26px;margin-bottom:18px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;position:relative;overflow:hidden;}
+.score-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));}
+.score-big{font-family:'Epilogue',sans-serif;font-size:62px;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--accent2);}
+.score-big span{font-size:22px;color:var(--muted);}
+.score-info h3{font-family:'Epilogue',sans-serif;font-size:17px;font-weight:800;margin-bottom:5px;}
+.score-info p{font-size:13px;color:var(--muted);line-height:1.6;}
+.score-bar-track{height:3px;background:var(--border);margin-top:12px;}
+.score-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0%;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+
+.result-section{margin-bottom:18px;}
+.section-title{font-family:'Epilogue',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:11px;display:flex;align-items:center;gap:10px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+.comp-card{background:var(--surface);border:1px solid var(--border);padding:18px;}
+.comp-card.optimised{border-color:rgba(79,142,247,.35);background:rgba(79,142,247,.03);}
+.comp-label{font-family:'Epilogue',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;}
+.comp-text{font-size:13px;line-height:1.7;color:#bbb;font-style:italic;}
+.comp-text.clean{font-style:normal;color:var(--text);white-space:pre-line;font-size:12.5px;}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+.tag{padding:3px 8px;font-family:'Epilogue',sans-serif;font-size:10px;font-weight:700;}
+.tag-add{background:rgba(62,207,122,.1);color:var(--green);}
+.tag-rem{background:rgba(247,90,90,.1);color:var(--red);text-decoration:line-through;}
+.rationale{background:rgba(79,142,247,.05);border-left:3px solid var(--accent);padding:12px 15px;font-size:13px;line-height:1.65;color:#aaa;margin-bottom:18px;}
+.rationale strong{color:var(--text);}
+.copy-btn{margin-top:11px;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid rgba(79,142,247,.35);background:transparent;color:var(--accent);font-family:'Epilogue',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:rgba(79,142,247,.1);}
+.copy-btn svg{width:12px;height:12px;}
+
+.insights{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.insight-card{background:var(--surface);border:1px solid var(--border);padding:15px;}
+.insight-label{font-family:'Epilogue',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;}
+.insight-text{font-size:12.5px;line-height:1.6;color:#bbb;}
+
+.reset-btn{margin-top:26px;padding:11px 22px;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Epilogue',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;transition:all .2s;}
+.reset-btn:hover{border-color:var(--text);color:var(--text);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:640px){
+  .how-to{grid-template-columns:1fr;}
+  .comparison{grid-template-columns:1fr;}
+  .insights{grid-template-columns:1fr;}
+  .score-hero{grid-template-columns:1fr;}
+  .hero h2{font-size:26px;}
+  header{padding:16px 20px;}
+  main{padding:28px 16px 60px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">AF</div>
+    <div>
+      <h1>LinkedIn Profile Optimiser</h1>
+      <p>by Agile Freedom Consulting Ltd</p>
+    </div>
+  </div>
+  <div class="powered-by">Powered by <span>Claude AI</span></div>
+</header>
+
+<!-- T&Cs MODAL -->
+<div class="modal-overlay" id="tcModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeTc()">&#x2715;</button>
+    <div class="modal-title">Terms &amp; Conditions of Use</div>
+    <div class="modal-body">
+      <p>These Terms and Conditions govern your use of the LinkedIn Profile Optimiser tool provided by <strong>Agile Freedom Consulting Ltd</strong>, registered in England and Wales, company number <strong>15529145</strong>, at 4 Hawkins Avenue, Stanford in the Vale, Faringdon, Oxfordshire, SN7 8FY.</p>
+      <h4>1. Acceptance</h4>
+      <p>By ticking the acceptance checkbox and using this tool, you confirm you have read and agree to these Terms. If you do not agree, please do not use this tool.</p>
+      <h4>2. Nature of the Tool</h4>
+      <p>This tool is provided free of charge. It uses Claude AI (Anthropic) to analyse your public LinkedIn profile and generate positioning recommendations. All outputs are AI-generated suggestions and do not constitute professional advice. Use your own judgement before implementing any recommendations.</p>
+      <h4>3. Data You Provide</h4>
+      <p>By using this tool you agree that: (a) your LinkedIn URL will be used to generate your report; (b) your LinkedIn URL and the generated report will be sent to Agile Freedom Consulting Ltd at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e78e898188a786808e8b828195828283888ac98488c9928c">[email&#160;protected]</a> for service improvement and potential follow-up; (c) you consent to being contacted by Agile Freedom Consulting Ltd regarding services at agilefreedom.co.uk.</p>
+      <h4>4. Data Protection</h4>
+      <p>We process your data under UK GDPR and the Data Protection Act 2018. Your data will not be sold to third parties. To access, correct, or delete your data contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="10797e767f507177797c7576627575747f7d3e737f3e657b">[email&#160;protected]</a>.</p>
+      <h4>5. Intellectual Property</h4>
+      <p>The tool and its underlying prompts are the intellectual property of Agile Freedom Consulting Ltd. You may not reproduce or distribute the tool without our written permission.</p>
+      <h4>6. Limitation of Liability</h4>
+      <p>This tool is provided "as is". Agile Freedom Consulting Ltd is not liable for any loss arising from reliance on AI-generated recommendations. Results are not guaranteed.</p>
+      <h4>7. Governing Law</h4>
+      <p>These Terms are governed by the laws of England and Wales.</p>
+      <h4>8. Contact</h4>
+      <p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1b72757d745b7a7c72777e7d697e7e7f7476357874356e70">[email&#160;protected]</a> | Agile Freedom Consulting Ltd, 4 Hawkins Avenue, Stanford in the Vale, Faringdon, Oxfordshire, SN7 8FY.</p>
+      <p style="margin-top:14px;font-size:11px;color:#444;">Last updated: March 2026. To be reviewed by a qualified solicitor before public deployment.</p>
+    </div>
+    <button class="modal-btn" onclick="closeTc()">Close</button>
+  </div>
+</div>
+
+<main>
+
+  <div class="hero">
+    <div class="hero-tag">Free AI-Powered Tool</div>
+    <h2>Turn your LinkedIn into a<br><em>consulting lead machine</em></h2>
+    <p>Enter your LinkedIn URL, select your target market and niche, and get a scored AI analysis with an optimised headline, rewritten About section, and actionable insights.</p>
+  </div>
+
+  <div class="how-to">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div class="step-text"><strong>Enter your URL</strong>Paste your public LinkedIn profile URL below.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div class="step-text"><strong>Set your target</strong>Select your market, niche, and engagement type.</div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div class="step-text"><strong>Get your report</strong>Receive a scored report with ready-to-use rewrites.</div>
+    </div>
+  </div>
+
+  <div class="input-card" id="inputCard">
+
+    <div class="form-group">
+      <label>Your LinkedIn Profile URL</label>
+      <input type="url" id="linkedinUrl" placeholder="https://www.linkedin.com/in/yourname">
+      <div class="url-hint">Your URL is used to identify and analyse your profile. See our <a onclick="openTc();return false;" href="#">Terms &amp; Conditions</a> for how your data is handled.</div>
+      <div style="margin-top:10px;padding:10px 14px;background:rgba(247,147,79,.06);border:1px solid rgba(247,147,79,.2);font-family:'Epilogue',sans-serif;font-size:11px;color:#b87840;line-height:1.6;">
+        &#9889; Use this tool to generate your optimised profile content — and unlock the option to get your own <strong>autonomous AI lead gen engine</strong> that finds prospects, sends personalised outreach, and books appointments for you automatically.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Target Market</label>
+      <select id="targetMarket">
+        <option value="North America (US &amp; Canada)">North America (US &amp; Canada)</option>
+        <option value="UK &amp; Europe">UK &amp; Europe</option>
+        <option value="Global / International">Global / International</option>
+        <option value="GCC / Middle East">GCC / Middle East</option>
+        <option value="APAC">APAC</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Consulting Niche</label>
+      <select id="niche">
+        <option value="AI &amp; Digital Transformation">AI &amp; Digital Transformation</option>
+        <option value="Business Strategy &amp; Operations">Business Strategy &amp; Operations</option>
+        <option value="Agile &amp; Project Delivery">Agile &amp; Project Delivery</option>
+        <option value="Technology &amp; Cloud">Technology &amp; Cloud</option>
+        <option value="Marketing &amp; Growth">Marketing &amp; Growth</option>
+        <option value="Finance &amp; Fundraising">Finance &amp; Fundraising</option>
+        <option value="Leadership &amp; Executive Coaching">Leadership &amp; Executive Coaching</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Engagement Types Offered</label>
+      <select id="engagementType">
+        <option value="Consulting, Coaching &amp; Fractional CxO">Consulting, Coaching &amp; Fractional CxO</option>
+        <option value="Consulting only">Consulting only</option>
+        <option value="Coaching &amp; Training">Coaching &amp; Training</option>
+        <option value="Fractional / Part-time roles">Fractional / Part-time roles</option>
+        <option value="Advisory &amp; Board roles">Advisory &amp; Board roles</option>
+      </select>
+    </div>
+
+    <div class="tc-row">
+      <input type="checkbox" id="tcAccept">
+      <span>I have read and agree to the <a onclick="openTc();return false;" href="#">Terms &amp; Conditions</a> of Agile Freedom Consulting Ltd, including consent to be contacted following my use of this tool.</span>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <button class="analyse-btn" id="analyseBtn" onclick="runAnalysis()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Analyse My Profile
+    </button>
+
+  </div>
+
+  <div class="loading-section" id="loadingSection">
+    <div class="pulse-ring"></div>
+    <div class="loading-msg" id="loadingMsg">Fetching your profile...</div>
+    <div class="loading-sub">Claude AI is analysing your positioning and generating recommendations</div>
+  </div>
+
+  <div class="results-section" id="resultsSection">
+
+    <div class="score-hero">
+      <div class="score-big" id="scoreNum">-<span>/100</span></div>
+      <div class="score-info">
+        <h3 id="scoreLabel">-</h3>
+        <p id="scoreSummary">-</p>
+        <div class="score-bar-track"><div class="score-bar-fill" id="scoreBar"></div></div>
+      </div>
+    </div>
+
+    <div class="result-section">
+      <div class="section-title">Headline</div>
+      <div class="comparison">
+        <div class="comp-card">
+          <div class="comp-label"><span class="dot" style="background:var(--red)"></span>Current</div>
+          <div class="comp-text" id="currentHeadlineDisp">-</div>
+          <div class="tags" id="headlineIssues"></div>
+        </div>
+        <div class="comp-card optimised">
+          <div class="comp-label"><span class="dot" style="background:var(--green)"></span>Optimised</div>
+          <div class="comp-text clean" id="newHeadline">-</div>
+          <div class="tags" id="headlineStrengths"></div>
+          <button class="copy-btn" onclick="copyEl('newHeadline',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="rationale" id="headlineRationale"></div>
+    </div>
+
+    <div class="result-section">
+      <div class="section-title">About Section</div>
+      <div class="comparison">
+        <div class="comp-card">
+          <div class="comp-label"><span class="dot" style="background:var(--red)"></span>What to Fix</div>
+          <div class="comp-text" id="aboutIssues">-</div>
+          <div class="tags" id="aboutIssueTags"></div>
+        </div>
+        <div class="comp-card optimised">
+          <div class="comp-label"><span class="dot" style="background:var(--green)"></span>Optimised Version</div>
+          <div class="comp-text clean" id="newAbout">-</div>
+          <div class="tags" id="aboutStrengths"></div>
+          <button class="copy-btn" onclick="copyEl('newAbout',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="rationale" id="aboutRationale"></div>
+    </div>
+
+    <div class="result-section">
+      <div class="section-title">Positioning Insights</div>
+      <div class="insights">
+        <div class="insight-card">
+          <div class="insight-label">Your Biggest Asset</div>
+          <div class="insight-text" id="assetInsight">-</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Your Biggest Gap</div>
+          <div class="insight-text" id="gapInsight">-</div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Quick Win</div>
+          <div class="insight-text" id="quickWinInsight">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div id="ctaBlock" style="background:var(--card);border:1px solid var(--border);padding:36px;margin-top:20px;position:relative;overflow:hidden;text-align:center;">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
+
+      <div style="font-family:'Epilogue',sans-serif;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent2);margin-bottom:14px;">Your profile is optimised. Now let's fill your pipeline.</div>
+
+      <h3 style="font-family:'Epilogue',sans-serif;font-size:22px;font-weight:900;letter-spacing:-.02em;line-height:1.2;margin-bottom:14px;">Stop doing lead gen manually.<br>Let an AI agent do it for you.</h3>
+
+      <p style="font-size:13.5px;color:var(--muted);line-height:1.8;max-width:500px;margin:0 auto 20px;">I build <strong style="color:var(--text)">autonomous AI agentic systems</strong> for consultants and independent professionals — tools that identify your ideal prospects, craft hyper-personalised outreach in your voice, follow up intelligently, and land qualified appointments in your calendar. While you sleep.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:500px;margin:0 auto 28px;text-align:left;">
+        <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;">
+          <div style="font-family:'Epilogue',sans-serif;font-size:18px;font-weight:900;color:var(--accent2);margin-bottom:4px;">01</div>
+          <div style="font-family:'Epilogue',sans-serif;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Prospect</div>
+          <div style="font-family:'Epilogue',sans-serif;font-size:11px;color:var(--muted);line-height:1.5;">AI finds and qualifies your ideal clients automatically</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;">
+          <div style="font-family:'Epilogue',sans-serif;font-size:18px;font-weight:900;color:var(--accent2);margin-bottom:4px;">02</div>
+          <div style="font-family:'Epilogue',sans-serif;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Outreach</div>
+          <div style="font-family:'Epilogue',sans-serif;font-size:11px;color:var(--muted);line-height:1.5;">Personalised messages sent in your voice at scale</div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;">
+          <div style="font-family:'Epilogue',sans-serif;font-size:18px;font-weight:900;color:var(--accent2);margin-bottom:4px;">03</div>
+          <div style="font-family:'Epilogue',sans-serif;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Book</div>
+          <div style="font-family:'Epilogue',sans-serif;font-size:11px;color:var(--muted);line-height:1.5;">Qualified appointments land in your calendar automatically</div>
+        </div>
+      </div>
+
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;max-width:460px;margin:0 auto 24px;">I also work with consultants, Agile and project delivery practitioners, AI-enabled business ops leaders, and start-ups on strategy, delivery, and building custom AI tools. If any of that resonates — let's talk.</p>
+
+      <a href="https://www.cal.eu/hassan-khadra/30min" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:15px 36px;background:var(--accent);color:white;font-family:'Epilogue',sans-serif;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;transition:background .2s;" onmouseover="this.style.background='#3a7ce8'" onmouseout="this.style.background='var(--accent)'">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Book a Free Discovery Call
+      </a>
+      <p style="margin-top:12px;font-family:'Epilogue',sans-serif;font-size:11px;color:var(--muted);">30 minutes. No pitch. Just a real conversation about what's possible.</p>
+    </div>
+
+    <button class="reset-btn" onclick="resetForm()" style="margin-top:16px;">Analyse Another Profile</button>
+
+  </div>
+
+</main>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';
+const EMAILJS_SERVICE_ID  = 'YOUR_EMAILJS_SERVICE_ID';
+const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';
+
+function openTc() { document.getElementById('tcModal').classList.add('open'); }
+function closeTc() { document.getElementById('tcModal').classList.remove('open'); }
+
+const msgs = ['Fetching your profile...','Extracting positioning signals...','Crafting your optimised headline...','Rewriting your About section...','Generating positioning insights...'];
+let mi = 0, mint = null;
+function cycleMsg() { mi = (mi+1) % msgs.length; document.getElementById('loadingMsg').textContent = msgs[mi]; }
+
+async function runAnalysis() {
+  const url    = document.getElementById('linkedinUrl').value.trim();
+  const market = document.getElementById('targetMarket').value;
+  const niche  = document.getElementById('niche').value;
+  const engage = document.getElementById('engagementType').value;
+  const tc     = document.getElementById('tcAccept').checked;
+  const errBox = document.getElementById('errorBox');
+  errBox.classList.remove('visible');
+
+  if (!url || !url.includes('linkedin.com')) {
+    errBox.textContent = 'Please enter a valid LinkedIn profile URL (e.g. https://www.linkedin.com/in/yourname).';
+    errBox.classList.add('visible'); return;
+  }
+  if (!tc) {
+    errBox.textContent = 'Please accept the Terms & Conditions to continue.';
+    errBox.classList.add('visible'); return;
+  }
+
+  document.getElementById('inputCard').style.display = 'none';
+  document.getElementById('loadingSection').classList.add('visible');
+  document.getElementById('resultsSection').classList.remove('visible');
+  document.getElementById('analyseBtn').disabled = true;
+  mi = 0;
+  document.getElementById('loadingMsg').textContent = msgs[0];
+  mint = setInterval(cycleMsg, 2000);
+
+  const prompt = `You are an expert LinkedIn profile strategist who helps independent consultants attract premium clients.
+
+A user has provided their LinkedIn URL: ${url}
+
+Based on the URL and the context below, generate a realistic and detailed LinkedIn profile optimisation report. Infer the person's likely background, current positioning, and gaps from the URL slug and context provided. Generate a plausible current headline to critique and a strong optimised version.
+
+Return ONLY a valid JSON object with this exact structure and nothing else outside it:
+
+{
+  "extractedName": "<infer full name from URL slug>",
+  "extractedHeadline": "<plausible current headline based on URL and context>",
+  "score": <integer 35-70 for most profiles>,
+  "scoreLabel": "<2-5 word positioning label>",
+  "scoreSummary": "<1-2 sentences on the core positioning gap for this type of consultant>",
+  "currentHeadlineIssues": ["<issue 1>", "<issue 2>", "<issue 3>"],
+  "newHeadline": "<optimised headline max 220 chars, value-first, proprietary framework if relevant, named clients if known, outcome-led>",
+  "newHeadlineStrengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "headlineRationale": "<2-3 sentences on why the changes work for ${market} buyers>",
+  "aboutIssues": "<1 paragraph on typical weaknesses in About sections for this niche and target market>",
+  "aboutIssueTags": ["<tag 1>", "<tag 2>", "<tag 3>"],
+  "newAbout": "<rewritten About section max 200 words, opens with client pain, names buyer types like CTOs or ops leaders, weaves in credibility naturally, states engagement types, ends with strong CTA pointing to agilefreedom.co.uk or direct contact>",
+  "aboutStrengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "aboutRationale": "<2-3 sentences on the key structural changes>",
+  "biggestAsset": "<2-3 sentences on the strongest differentiator for a consultant in this niche>",
+  "biggestGap": "<2-3 sentences on the most common thing holding consultants in this niche back>",
+  "quickWin": "<2-3 sentences on the single fastest improvement they can make today>"
+}
+
+CONTEXT:
+LinkedIn URL: ${url}
+Target Market: ${market}
+Consulting Niche: ${niche}
+Engagement Types: ${engage}
+
+RULES:
+- Score honestly. Most consultants score 35-65. Only exceed 72 if the URL slug strongly implies premium positioning.
+- The optimised headline must be value-first and outcome-led for ${market} buyers.
+- The rewritten About must open with the client pain, not a biography.
+- Keep all text strings JSON-safe: escape any quotes inside strings, no unescaped newlines inside string values (use \\n if needed).
+- Return ONLY the JSON object. No markdown fences, no explanation, nothing outside the braces.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    clearInterval(mint);
+    if (!res.ok || !data.content) throw new Error(data.error?.message || 'API error');
+    let raw = data.content.map(b => b.text || '').join('');
+    raw = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
+    if (f === -1 || l === -1) throw new Error('Could not parse the AI response. Please try again.');
+    raw = raw.slice(f, l+1);
+    const result = JSON.parse(raw);
+    renderResults(result, url);
+    sendEmail(result, url, market, niche, engage);
+  } catch(err) {
+    clearInterval(mint);
+    document.getElementById('inputCard').style.display = 'block';
+    document.getElementById('loadingSection').classList.remove('visible');
+    document.getElementById('analyseBtn').disabled = false;
+    const errBox = document.getElementById('errorBox');
+    errBox.textContent = 'Something went wrong: ' + err.message + '. Please try again.';
+    errBox.classList.add('visible');
+  }
+}
+
+function renderResults(r, url) {
+  document.getElementById('loadingSection').classList.remove('visible');
+  document.getElementById('resultsSection').classList.add('visible');
+  document.getElementById('scoreNum').innerHTML = r.score + '<span>/100</span>';
+  document.getElementById('scoreLabel').textContent = r.scoreLabel;
+  document.getElementById('scoreSummary').textContent = r.scoreSummary;
+  setTimeout(() => { document.getElementById('scoreBar').style.width = r.score + '%'; }, 100);
+  document.getElementById('currentHeadlineDisp').textContent = '"' + (r.extractedHeadline || 'See your profile') + '"';
+  document.getElementById('newHeadline').textContent = '"' + r.newHeadline + '"';
+  tags('headlineIssues', r.currentHeadlineIssues, 'tag-rem');
+  tags('headlineStrengths', r.newHeadlineStrengths, 'tag-add');
+  document.getElementById('headlineRationale').innerHTML = '<strong>Why this works:</strong> ' + r.headlineRationale;
+  document.getElementById('aboutIssues').textContent = r.aboutIssues;
+  document.getElementById('newAbout').textContent = r.newAbout;
+  tags('aboutIssueTags', r.aboutIssueTags, 'tag-rem');
+  tags('aboutStrengths', r.aboutStrengths, 'tag-add');
+  document.getElementById('aboutRationale').innerHTML = '<strong>Key changes:</strong> ' + r.aboutRationale;
+  document.getElementById('assetInsight').textContent = r.biggestAsset;
+  document.getElementById('gapInsight').textContent = r.biggestGap;
+  document.getElementById('quickWinInsight').textContent = r.quickWin;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function tags(id, arr, cls) {
+  const el = document.getElementById(id); el.innerHTML = '';
+  if (!arr) return;
+  arr.forEach(t => { const s = document.createElement('span'); s.className = 'tag ' + cls; s.textContent = t; el.appendChild(s); });
+}
+
+function copyEl(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '&#x2713; Copied!';
+    btn.style.cssText = 'background:rgba(62,207,122,.15);border-color:var(--green);color:var(--green)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.cssText = ''; }, 2000);
+  });
+}
+
+function sendEmail(r, url, market, niche, engage) {
+  if (EMAILJS_PUBLIC_KEY === 'YOUR_EMAILJS_PUBLIC_KEY') return;
+  try {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: 'info@agilefreedom.co.uk',
+      linkedin_url: url,
+      person_name: r.extractedName || 'Unknown',
+      target_market: market,
+      niche: niche,
+      engagement: engage,
+      profile_score: r.score + '/100',
+      score_label: r.scoreLabel,
+      new_headline: r.newHeadline,
+      new_about: r.newAbout,
+      biggest_asset: r.biggestAsset,
+      biggest_gap: r.biggestGap,
+      quick_win: r.quickWin,
+      timestamp: new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' })
+    });
+  } catch(e) { console.warn('Email silent fail:', e); }
+}
+
+function resetForm() {
+  document.getElementById('resultsSection').classList.remove('visible');
+  document.getElementById('inputCard').style.display = 'block';
+  document.getElementById('analyseBtn').disabled = false;
+  document.getElementById('scoreBar').style.width = '0%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
