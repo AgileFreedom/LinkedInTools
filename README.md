@@ -1,6 +1,6 @@
 # LinkedInTools
 
-**AI-powered LinkedIn profile optimisation and lead generation tools, built by [Agile Freedom Consulting Ltd](https://agilefreedom.co.uk)**
+**AI-powered LinkedIn profile optimisation and lead generation tools, built by [Agile Freedom Consulting Ltd](https://www.agilefreedom.co.uk/)**
 
 ---
 
