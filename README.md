@@ -137,7 +137,7 @@ Planned additions to this repository:
 
 Built by **Hassan Khadra** — Senior Transformation Consultant, Founder of Agile Freedom Consulting Ltd, and builder of AI-powered tools and agents for consultants and independent professionals.
 
-- Website: [agilefreedom.co.uk](https://agilefreedom.co.uk)
+- Website: [agilefreedom.co.uk](https://www.agilefreedom.co.uk/)
 - LinkedIn: [linkedin.com/in/hassankhadra](https://www.linkedin.com/in/hassankhadra/)
 - Book a call: [cal.eu/hassan-khadra/30min](https://www.cal.eu/hassan-khadra/30min)
 
