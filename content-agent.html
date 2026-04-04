@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#142850">
+<title>AFC Content Agent</title>
+<link rel="manifest" href="#" id="manifestLink">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy:#142850; --navy-mid:#1e3a6e; --teal:#50788c; --teal-light:#7aaabb;
+  --teal-pale:#e6f0f3; --teal-pale2:#cfe3e9; --silver:#f4f5f7; --silver-2:#e8eaed;
+  --border:rgba(20,40,80,0.13); --text:#142850; --text-mid:#3a5070; --text-soft:#7a8fa8;
+  --white:#ffffff; --green:#1a6e3a; --green-bg:#eaf5ee;
+  --red:#b83232; --red-bg:#fdecea; --gold:#c9993a; --gold-bg:#fdf6e8;
+  --sans:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif; --radius:8px;
+}
+html, body { height:100%; overflow:hidden; }
+body { font-family:var(--sans); background:var(--silver); color:var(--text); display:flex; flex-direction:column; }
+
+/* HEADER */
+.app-header { background:var(--navy); border-bottom:3px solid var(--teal); padding:0 16px; height:56px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; z-index:100; }
+.app-logo { display:flex; align-items:center; gap:10px; }
+.app-logo-mark { width:30px; height:30px; background:var(--teal); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; flex-shrink:0; }
+.app-logo-text { font-size:13px; font-weight:800; color:#fff; }
+.app-logo-sub { font-size:10px; color:rgba(255,255,255,.5); }
+.header-status { display:flex; align-items:center; gap:6px; font-size:11px; color:rgba(255,255,255,.5); }
+.status-dot { width:7px; height:7px; border-radius:50%; background:var(--teal-light); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+/* TAB BAR */
+.tab-bar { background:var(--navy-mid); display:flex; border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
+.tab-bar::-webkit-scrollbar { display:none; }
+.tab { flex:1; min-width:70px; padding:10px 8px; text-align:center; font-size:11px; font-weight:700; color:rgba(255,255,255,.45); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+.tab.active { color:#fff; border-bottom-color:var(--teal-light); }
+.tab:hover:not(.active) { color:rgba(255,255,255,.7); }
+
+/* MAIN SCROLL AREA */
+.main { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.panel { display:none; padding:16px; animation:fadeUp .3s ease; }
+.panel.active { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+/* CARDS */
+.card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:0 2px 8px rgba(20,40,80,.06); }
+.card-title { font-size:14px; font-weight:800; color:var(--navy); margin-bottom:4px; }
+.card-sub { font-size:12px; color:var(--text-soft); margin-bottom:14px; line-height:1.5; }
+.section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--teal); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--teal-pale2); }
+
+/* FORM ELEMENTS */
+.form-group { margin-bottom:14px; }
+label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-mid); display:block; margin-bottom:5px; }
+input[type="text"], input[type="url"], select, textarea {
+  width:100%; background:var(--silver); border:1.5px solid var(--border); color:var(--text);
+  padding:11px 13px; font-family:var(--sans); font-size:14px; outline:none;
+  transition:border-color .2s; border-radius:var(--radius);
+}
+input:focus, select:focus, textarea:focus { border-color:var(--teal); background:#fff; }
+select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8fa8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; background-color:var(--silver); }
+textarea { resize:vertical; min-height:100px; line-height:1.6; }
+.field-hint { font-size:11px; color:var(--text-soft); margin-top:4px; line-height:1.4; }
+
+/* VOICE INPUT */
+.voice-section { background:var(--teal-pale); border:1px solid var(--teal-pale2); border-radius:var(--radius); padding:14px; margin-bottom:14px; }
+.voice-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.voice-btn { width:48px; height:48px; border-radius:50%; background:var(--navy); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; transition:all .2s; }
+.voice-btn.recording { background:var(--red); animation:recordPulse .8s infinite; }
+.voice-btn:hover:not(.recording) { background:var(--teal); }
+@keyframes recordPulse { 0%,100%{box-shadow:0 0 0 0 rgba(184,50,50,.4);} 50%{box-shadow:0 0 0 10px rgba(184,50,50,0);} }
+.voice-info { flex:1; }
+.voice-label { font-size:12px; font-weight:700; color:var(--navy); margin-bottom:2px; }
+.voice-status { font-size:11px; color:var(--text-soft); }
+.voice-status.active { color:var(--red); font-weight:600; }
+.voice-toggle { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-soft); }
+.voice-toggle input { accent-color:var(--navy); }
+.whisper-badge { background:var(--silver-2); color:var(--text-soft); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; }
+
+/* BUTTONS */
+.btn { width:100%; padding:13px; border:none; font-family:var(--sans); font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:var(--radius); }
+.btn-navy { background:var(--navy); color:#fff; }
+.btn-navy:hover:not(:disabled) { background:var(--navy-mid); }
+.btn-teal { background:var(--teal); color:#fff; }
+.btn-teal:hover:not(:disabled) { background:var(--teal-light); }
+.btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-mid); }
+.btn-outline:hover { border-color:var(--teal); color:var(--teal); }
+.btn-sm { padding:9px 16px; font-size:12px; width:auto; }
+.btn-green { background:var(--green); color:#fff; }
+.btn-red { background:var(--red); color:#fff; }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+.btn-row { display:flex; gap:8px; }
+.btn-row .btn { flex:1; }
+
+/* TAGS */
+.tags-wrap { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.tag { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.tag-teal { background:var(--teal-pale); border:1px solid var(--teal-pale2); color:var(--teal); }
+.tag-navy { background:var(--navy); color:rgba(255,255,255,.8); }
+.tag-green { background:var(--green-bg); color:var(--green); }
+.tag-gold { background:var(--gold-bg); color:var(--gold); }
+.tag btn, .tag button { background:none; border:none; cursor:pointer; color:inherit; opacity:.6; font-size:13px; padding:0; }
+.tag button:hover { opacity:1; }
+
+/* NOTICE BOXES */
+.notice { padding:12px 14px; border-radius:var(--radius); font-size:13px; line-height:1.55; margin-bottom:14px; }
+.notice-teal { background:var(--teal-pale); border-left:3px solid var(--teal); color:var(--text-mid); }
+.notice-gold { background:var(--gold-bg); border-left:3px solid var(--gold); color:#7a5c10; }
+.notice-navy { background:var(--navy); color:rgba(255,255,255,.8); }
+.notice strong { color:var(--navy); }
+.notice-navy strong { color:#fff; }
+
+/* LOADING SPINNER */
+.spinner { width:40px; height:40px; border:3px solid var(--teal-pale2); border-top-color:var(--navy); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to{transform:rotate(360deg);} }
+.loading-card { text-align:center; padding:32px 16px; }
+.loading-msg { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+.loading-sub { font-size:12px; color:var(--text-soft); }
+
+/* DRAFT CARD */
+.draft-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; box-shadow:0 2px 12px rgba(20,40,80,.08); }
+.draft-header { padding:12px 16px; background:var(--silver); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.draft-label { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--navy); }
+.draft-badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; }
+.draft-body { padding:16px; font-size:14px; line-height:1.75; color:var(--text); white-space:pre-line; min-height:80px; }
+.draft-actions { padding:12px 16px; border-top:1px solid var(--border); background:var(--silver); }
+.draft-feedback { width:100%; background:var(--silver); border:1.5px solid var(--border); color:var(--text); padding:10px 13px; font-family:var(--sans); font-size:13px; border-radius:var(--radius); outline:none; resize:none; min-height:60px; margin-bottom:10px; }
+.draft-feedback:focus { border-color:var(--teal); background:#fff; }
+
+/* INPUT HISTORY */
+.input-item { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:13px; margin-bottom:10px; position:relative; }
+.input-item-type { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--teal); margin-bottom:4px; }
+.input-item-content { font-size:13px; color:var(--text-mid); line-height:1.5; max-height:60px; overflow:hidden; }
+.input-item-date { font-size:11px; color:var(--text-soft); margin-top:5px; }
+.input-item-status { position:absolute; top:10px; right:10px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+
+/* QUEUE ITEM */
+.queue-item { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:13px; margin-bottom:10px; }
+.queue-item-title { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+.queue-item-meta { font-size:11px; color:var(--text-soft); margin-bottom:6px; }
+.queue-item-summary { font-size:12px; color:var(--text-mid); line-height:1.5; }
+.priority-high { color:var(--red); font-weight:700; }
+.priority-medium { color:var(--gold); font-weight:700; }
+.priority-low { color:var(--text-soft); }
+
+/* SEARCH PANEL */
+.search-topics { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+.topic-chip { padding:6px 13px; border-radius:20px; border:1.5px solid var(--border); background:#fff; font-size:12px; font-weight:600; color:var(--text-mid); cursor:pointer; transition:all .15s; }
+.topic-chip.selected { background:var(--navy); color:#fff; border-color:var(--navy); }
+.topic-chip:hover:not(.selected) { border-color:var(--teal); color:var(--teal); }
+
+/* ERROR */
+.error-box { background:var(--red-bg); border-left:3px solid var(--red); padding:11px 14px; font-size:13px; color:var(--red); border-radius:0 var(--radius) var(--radius) 0; margin-bottom:12px; display:none; }
+.error-box.visible { display:block; }
+
+/* EMPTY STATE */
+.empty-state { text-align:center; padding:40px 20px; color:var(--text-soft); }
+.empty-state-icon { font-size:40px; margin-bottom:12px; }
+.empty-state-title { font-size:14px; font-weight:700; color:var(--text-mid); margin-bottom:6px; }
+.empty-state-body { font-size:13px; line-height:1.6; }
+
+/* CHAR COUNT */
+.char-count { font-size:11px; color:var(--text-soft); text-align:right; margin-top:3px; }
+.char-count.over { color:var(--red); font-weight:700; }
+
+@media(min-width:600px) {
+  .panel { max-width:600px; margin:0 auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-logo">
+    <div class="app-logo-mark">AF</div>
+    <div>
+      <div class="app-logo-text">Content Agent</div>
+      <div class="app-logo-sub">Agile Freedom Consulting</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    <span id="headerStatus">Ready</span>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('input')" id="tab-input">&#9997; Input</div>
+  <div class="tab" onclick="switchTab('draft')" id="tab-draft">&#9997; Draft</div>
+  <div class="tab" onclick="switchTab('queue')" id="tab-queue">&#128240; Queue</div>
+  <div class="tab" onclick="switchTab('history')" id="tab-history">&#128196; History</div>
+  <div class="tab" onclick="switchTab('search')" id="tab-search">&#128269; Search</div>
+</div>
+
+<div class="main">
+
+  <!-- ===== INPUT TAB ===== -->
+  <div class="panel active" id="panel-input">
+
+    <div class="card">
+      <div class="card-title">Drop an input</div>
+      <div class="card-sub">Add a thought, URL, style note, or strategy update. Claude will classify and store it automatically.</div>
+
+      <!-- VOICE INPUT -->
+      <div class="voice-section">
+        <div class="voice-row">
+          <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
+          <div class="voice-info">
+            <div class="voice-label">Voice Input</div>
+            <div class="voice-status" id="voiceStatus">Tap microphone to speak</div>
+          </div>
+        </div>
+        <div class="voice-toggle">
+          <input type="checkbox" id="whisperToggle" disabled>
+          <label for="whisperToggle" style="text-transform:none;letter-spacing:0;font-size:11px;color:var(--text-soft);font-weight:400;">Use Whisper (OpenAI)</label>
+          <span class="whisper-badge">Coming soon</span>
+        </div>
+      </div>
+
+      <!-- INPUT TYPE -->
+      <div class="form-group">
+        <label>Input Type</label>
+        <select id="inputType">
+          <option value="Random Thought">Random Thought</option>
+          <option value="Article URL">Article URL</option>
+          <option value="Style Preference">Style Preference</option>
+          <option value="Strategy Note">Strategy Note</option>
+          <option value="Previous Post Extract">Previous Post Extract</option>
+          <option value="Anti-Repetition Note">Anti-Repetition Note</option>
+          <option value="Topic Signal">Topic Signal</option>
+          <option value="Document Extract">Document Extract</option>
+        </select>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="form-group">
+        <label>Content</label>
+        <textarea id="inputContent" placeholder="Type your thought, paste a URL, drop in an extract..." oninput="updateCharCount('inputContent','inputCharCount')"></textarea>
+        <div class="char-count" id="inputCharCount">0 characters</div>
+        <div class="field-hint">Claude will automatically classify this and store it in the right category.</div>
+      </div>
+
+      <div class="error-box" id="inputError"></div>
+
+      <button class="btn btn-navy" onclick="saveInput()" id="saveInputBtn">
+        <span>&#10003;</span> Save Input
+      </button>
+    </div>
+
+    <!-- RECENT INPUTS PREVIEW -->
+    <div class="section-label">Recent Inputs</div>
+    <div id="recentInputsList">
+      <div class="empty-state">
+        <div class="empty-state-icon">&#128221;</div>
+        <div class="empty-state-title">No inputs yet</div>
+        <div class="empty-state-body">Your saved inputs will appear here</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== DRAFT TAB ===== -->
+  <div class="panel" id="panel-draft">
+
+    <div class="card">
+      <div class="card-title">Generate today's posts</div>
+      <div class="card-sub">Claude will pull your recent inputs, content queue, and style history to draft two posts in your voice.</div>
+
+      <div class="notice notice-teal" id="draftContextNotice">
+        Loading your content context...
+      </div>
+
+      <div class="form-group">
+        <label>Additional focus for today (optional)</label>
+        <textarea id="draftFocus" placeholder="e.g. I want one post about the NemoClaw announcement and one about how most leaders still don't have an AI strategy..." style="min-height:80px;"></textarea>
+      </div>
+
+      <button class="btn btn-navy" onclick="generateDrafts()" id="generateDraftsBtn">
+        <span>&#9889;</span> Generate Two Drafts
+      </button>
+    </div>
+
+    <!-- DRAFTS OUTPUT -->
+    <div id="draftsOutput"></div>
+
+  </div>
+
+  <!-- ===== QUEUE TAB ===== -->
+  <div class="panel" id="panel-queue">
+
+    <div class="card">
+      <div class="card-title">Content Queue</div>
+      <div class="card-sub">Articles and topics ready to be turned into posts. Add manually or let the Search tab populate this automatically.</div>
+
+      <button class="btn btn-teal btn-sm" onclick="loadQueue()" style="margin-bottom:14px;">
+        &#8635; Refresh Queue
+      </button>
+    </div>
+
+    <div id="queueList">
+      <div class="empty-state">
+        <div class="empty-state-icon">&#128240;</div>
+        <div class="empty-state-title">Queue is empty</div>
+        <div class="empty-state-body">Use the Search tab to find articles or add a URL via the Input tab</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== HISTORY TAB ===== -->
+  <div class="panel" id="panel-history">
+
+    <div class="card">
+      <div class="card-title">Published Posts</div>
+      <div class="card-sub">Your post history. Claude reads this before drafting to avoid repetition and learn your evolving style.</div>
+      <button class="btn btn-outline btn-sm" onclick="loadHistory()">&#8635; Refresh</button>
+    </div>
+
+    <div id="historyList">
+      <div class="empty-state">
+        <div class="empty-state-icon">&#128196;</div>
+        <div class="empty-state-title">No published posts yet</div>
+        <div class="empty-state-body">Approved and published posts will appear here</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== SEARCH TAB ===== -->
+  <div class="panel" id="panel-search">
+
+    <div class="card">
+      <div class="card-title">Autonomous Content Search</div>
+      <div class="card-sub">Select topics and Claude will search for the latest relevant articles and news to add to your queue.</div>
+
+      <div class="section-label">Topic Areas</div>
+      <div class="search-topics" id="searchTopics">
+        <div class="topic-chip selected" data-topic="Agentic AI">Agentic AI</div>
+        <div class="topic-chip selected" data-topic="AI Strategy">AI Strategy</div>
+        <div class="topic-chip selected" data-topic="Agile Delivery">Agile Delivery</div>
+        <div class="topic-chip" data-topic="Digital Transformation">Digital Transformation</div>
+        <div class="topic-chip" data-topic="Startup Advisory">Startup Advisory</div>
+        <div class="topic-chip" data-topic="Future of Work">Future of Work</div>
+        <div class="topic-chip" data-topic="OpenClaw / NemoClaw">OpenClaw / NemoClaw</div>
+        <div class="topic-chip" data-topic="Leadership">Leadership</div>
+        <div class="topic-chip" data-topic="Product Management">Product Management</div>
+        <div class="topic-chip" data-topic="LinkedIn Growth">LinkedIn Growth</div>
+      </div>
+
+      <div class="form-group" style="margin-top:14px;">
+        <label>Custom search angle (optional)</label>
+        <input type="text" id="customSearchAngle" placeholder="e.g. AI adoption in financial services, enterprise Agile failures...">
+      </div>
+
+      <button class="btn btn-navy" onclick="runSearch()" id="searchBtn">
+        <span>&#128269;</span> Search for Content Now
+      </button>
+    </div>
+
+    <div id="searchResults"></div>
+
+  </div>
+
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────
+const AIRTABLE_BASE_ID = 'appgvCXmVfUxxiTDM'; // Base ID only - token is server-side
+const AT_INPUTS        = 'Inputs';
+const AT_QUEUE         = 'Content Queue';
+const AT_DRAFTS        = 'Drafts';
+const AT_PUBLISHED     = 'Published Posts';
+
+// Hassan's style guide — built from 30 posts + CV + profile analysis
+const HASSAN_STYLE_GUIDE = `
+HASSAN KHADRA — LINKEDIN STYLE GUIDE
+
+VOICE & TONE:
+- Confident, direct, warm. Never corporate or stiff.
+- Human and imperfect rhythm — not polished AI symmetry.
+- First person always. Conversational but authoritative.
+- Occasional informal phrases ("Let's be honest", "Read that again", "Here's the thing")
+- Uses real-world examples, named companies, specific data points from credible sources.
+- Never preachy. Makes the reader feel seen, not lectured.
+
+STRUCTURE PATTERNS:
+- Opens with a hook: provocative statement, contrarian take, or a specific scenario that creates instant recognition
+- Never opens with "I" as the first word
+- Short punchy paragraphs. Mix of 1-liners and 2-3 line paragraphs.
+- Uses white space generously — LinkedIn posts need to breathe
+- Ends with a question that invites genuine engagement, not a generic "what do you think?"
+- Occasionally ends with a direct CTA to DM or connect
+
+FORMATTING RULES:
+- NO em-dashes (use " - " with spaces instead)
+- NO bullet point lists in the opening paragraph
+- Bullets used sparingly and only mid-post, never to open or close
+- Numbers and stats written as numerals (4x, £130M, 13,000)
+- Bold used rarely and only for genuine emphasis
+
+CONTENT PILLARS (in order of frequency):
+1. Agentic AI and AI-enabled delivery — Hassan's primary expertise signal
+2. Agile delivery and leadership — credibility and depth
+3. Compounding improvement philosophy — distinctive brand idea
+4. Startup advisory and founder lessons — personal credibility
+5. Future of work and workforce AI adoption — broad audience appeal
+6. LinkedIn / personal brand — meta-content that resonates with his audience
+
+WHAT TO AVOID:
+- Generic AI hype without substance
+- Symmetrical "3 things I learned" formats
+- Inspirational quotes as the main point
+- Repeating the compound interest analogy (used recently)
+- Repeating the EY 4x productivity example (used recently)
+- Any content that sounds like it was written by AI
+- Em-dashes
+
+HASSAN'S SIGNATURE MOVES:
+- Starts with a real case study or recent news item, then pivots to the broader lesson
+- Uses a "but here's what most people miss" structural beat
+- Shares genuine opinions, not safe takes
+- References his own experience without bragging ("In my experience delivering £130M+ in programmes...")
+- Connects disparate ideas (e.g. compound interest and business improvement)
+- Occasional Arabic/Lebanese cultural reference when genuine and relevant
+
+POST LENGTH TARGET: 150-280 words. LinkedIn rewards medium-length posts over walls of text.
+`;
+
+// ─── AIRTABLE HELPERS (via Cloudflare proxy) ──────────────────────────────
+async function atGet(table, maxRecords = 20, filterFormula = '') {
+  let path = `${AIRTABLE_BASE_ID}/${encodeURIComponent(table)}?maxRecords=${maxRecords}&sort[0][field]=Created Time&sort[0][direction]=desc`;
+  if (filterFormula) path += `&filterByFormula=${encodeURIComponent(filterFormula)}`;
+  const res = await fetch('/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, method: 'GET' })
+  });
+  const data = await res.json();
+  return data.records || [];
+}
+
+async function atCreate(table, fields) {
+  const path = `${AIRTABLE_BASE_ID}/${encodeURIComponent(table)}`;
+  const res = await fetch('/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, method: 'POST', data: { fields } })
+  });
+  return await res.json();
+}
+
+async function atUpdate(table, recordId, fields) {
+  const path = `${AIRTABLE_BASE_ID}/${encodeURIComponent(table)}/${recordId}`;
+  const res = await fetch('/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, method: 'PATCH', data: { fields } })
+  });
+  return await res.json();
+}
+
+// ─── CLAUDE API ───────────────────────────────────────────────────────────
+async function callClaude(prompt, maxTokens = 2000) {
+  const res = await fetch('/functions/anthropic-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (!data.content) throw new Error(data.error?.message || 'API error');
+  return data.content.map(b => b.text || '').join('');
+}
+
+// ─── TAB SWITCHING ────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'queue') loadQueue();
+  if (tab === 'history') loadHistory();
+  if (tab === 'draft') loadDraftContext();
+}
+
+// ─── VOICE INPUT ──────────────────────────────────────────────────────────
+let recognition = null;
+let isRecording = false;
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    showError('inputError', 'Voice input is not supported in this browser. Please use Chrome on Android.');
+    return;
+  }
+  if (isRecording) {
+    stopVoice();
+  } else {
+    startVoice();
+  }
+}
+
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-GB';
+
+  const existingText = document.getElementById('inputContent').value;
+
+  recognition.onstart = function() {
+    isRecording = true;
+    document.getElementById('voiceBtn').classList.add('recording');
+    document.getElementById('voiceBtn').textContent = '⏹';
+    document.getElementById('voiceStatus').textContent = 'Listening...';
+    document.getElementById('voiceStatus').classList.add('active');
+  };
+
+  recognition.onresult = function(e) {
+    let interim = '';
+    let final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    document.getElementById('inputContent').value = existingText + (existingText ? ' ' : '') + final + interim;
+    updateCharCount('inputContent', 'inputCharCount');
+  };
+
+  recognition.onerror = function(e) {
+    stopVoice();
+    showError('inputError', 'Voice input error: ' + e.error + '. Please try again.');
+  };
+
+  recognition.onend = function() {
+    if (isRecording) stopVoice();
+  };
+
+  recognition.start();
+}
+
+function stopVoice() {
+  if (recognition) recognition.stop();
+  isRecording = false;
+  document.getElementById('voiceBtn').classList.remove('recording');
+  document.getElementById('voiceBtn').textContent = '🎤';
+  document.getElementById('voiceStatus').textContent = 'Tap microphone to speak';
+  document.getElementById('voiceStatus').classList.remove('active');
+}
+
+// ─── SAVE INPUT ───────────────────────────────────────────────────────────
+async function saveInput() {
+  const content = document.getElementById('inputContent').value.trim();
+  const type = document.getElementById('inputType').value;
+  const err = document.getElementById('inputError');
+  err.classList.remove('visible');
+
+  if (!content) { showError('inputError', 'Please add some content before saving.'); return; }
+
+  const btn = document.getElementById('saveInputBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Saving...';
+  setStatus('Saving input...');
+
+  try {
+    // Ask Claude to classify the input
+    const classifyPrompt = `Classify this input from Hassan Khadra for his LinkedIn content agent.
+
+Input type selected: ${type}
+Content: "${content}"
+
+Return ONLY a JSON object:
+{
+  "classification": "<one of: Content Seed, Style Update, Topic Direction, Reference Material, Avoid / Anti-repeat, Strategy Update, Pending Review>",
+  "notes": "<1 sentence explaining what Claude should do with this input when drafting posts>"
+}`;
+
+    const raw = await callClaude(classifyPrompt, 300);
+    let classification = 'Content Seed';
+    let notes = '';
+    try {
+      const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
+      const parsed = JSON.parse(raw.slice(f, l + 1));
+      classification = parsed.classification || 'Content Seed';
+      notes = parsed.notes || '';
+    } catch(e) {}
+
+    const inputId = 'IN-' + Date.now();
+    await atCreate(AT_INPUTS, {
+      'Input ID': inputId,
+      'Input Type': type,
+      'Raw Content': content,
+      'Claude Classification': classification,
+      'Claude Notes': notes,
+      'Status': 'New',
+      'Used in Post': false
+    });
+
+    document.getElementById('inputContent').value = '';
+    updateCharCount('inputContent', 'inputCharCount');
+    setStatus('Input saved');
+    loadRecentInputs();
+
+    btn.innerHTML = '&#10003; Saved!';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>&#10003;</span> Save Input';
+      btn.style.background = '';
+    }, 2000);
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>&#10003;</span> Save Input';
+    showError('inputError', 'Save failed: ' + e.message);
+    setStatus('Error');
+  }
+}
+
+// ─── LOAD RECENT INPUTS ───────────────────────────────────────────────────
+async function loadRecentInputs() {
+  try {
+    const records = await atGet(AT_INPUTS, 8);
+    const el = document.getElementById('recentInputsList');
+    if (!records.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#128221;</div><div class="empty-state-title">No inputs yet</div><div class="empty-state-body">Your saved inputs will appear here</div></div>`;
+      return;
+    }
+    el.innerHTML = records.map(r => {
+      const f = r.fields;
+      const statusColor = f['Status'] === 'New' ? 'tag-teal' : f['Status'] === 'Used in Draft' ? 'tag-green' : 'tag-navy';
+      return `<div class="input-item">
+        <div class="input-item-type">${f['Input Type'] || 'Input'} · ${f['Claude Classification'] || ''}</div>
+        <div class="input-item-content">${(f['Raw Content'] || '').slice(0, 120)}${(f['Raw Content'] || '').length > 120 ? '...' : ''}</div>
+        <div class="input-item-date">${f['Date Added'] ? new Date(f['Date Added']).toLocaleDateString('en-GB') : 'Just now'}</div>
+        <span class="input-item-status tag ${statusColor}">${f['Status'] || 'New'}</span>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Could not load inputs:', e); }
+}
+
+// ─── LOAD DRAFT CONTEXT ───────────────────────────────────────────────────
+async function loadDraftContext() {
+  const notice = document.getElementById('draftContextNotice');
+  notice.textContent = 'Loading your content context...';
+  try {
+    const [inputs, queue, published] = await Promise.all([
+      atGet(AT_INPUTS, 10, "Status='New'"),
+      atGet(AT_QUEUE, 5, "Status='Available'"),
+      atGet(AT_PUBLISHED, 5)
+    ]);
+    const newInputs = inputs.length;
+    const queueItems = queue.length;
+    const recentPosts = published.length;
+    notice.innerHTML = `&#9989; Context loaded: <strong>${newInputs} new input${newInputs !== 1 ? 's' : ''}</strong>, <strong>${queueItems} queued article${queueItems !== 1 ? 's' : ''}</strong>, <strong>${recentPosts} recent post${recentPosts !== 1 ? 's' : ''}</strong> in memory. Ready to draft.`;
+  } catch(e) {
+    notice.textContent = 'Could not load context. Claude will draft from style guide only.';
+  }
+}
+
+// ─── GENERATE DRAFTS ──────────────────────────────────────────────────────
+async function generateDrafts() {
+  const focus = document.getElementById('draftFocus').value.trim();
+  const btn = document.getElementById('generateDraftsBtn');
+  const output = document.getElementById('draftsOutput');
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Generating...';
+  setStatus('Generating drafts...');
+
+  output.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Claude is drafting your posts...</div><div class="loading-sub">Pulling your inputs, queue and style history</div></div>`;
+
+  try {
+    // Fetch context
+    const [inputs, queue, published] = await Promise.all([
+      atGet(AT_INPUTS, 15, "Status='New'"),
+      atGet(AT_QUEUE, 8, "Status='Available'"),
+      atGet(AT_PUBLISHED, 10)
+    ]);
+
+    const inputContext = inputs.map(r => `[${r.fields['Input Type']}] ${r.fields['Raw Content'] || ''}`).join('\n');
+    const queueContext = queue.map(r => `Title: ${r.fields['Title'] || ''}\nURL: ${r.fields['Source URL'] || ''}\nSummary: ${r.fields['Summary'] || ''}`).join('\n\n');
+    const publishedContext = published.map(r => `Hook: ${r.fields['Post Title / Hook'] || ''}\nCore argument: ${r.fields['Core Argument'] || ''}\nTags: ${(r.fields['Topic Tags'] || []).join(', ')}`).join('\n\n');
+
+    const prompt = `You are Hassan Khadra's personal LinkedIn content strategist. Generate exactly two LinkedIn post drafts for today.
+
+${HASSAN_STYLE_GUIDE}
+
+RECENT INPUTS FROM HASSAN (thoughts, URLs, strategy notes saved since last session):
+${inputContext || 'No new inputs - use content queue and your knowledge of Hassan\'s topics'}
+
+CONTENT QUEUE (articles and topics available):
+${queueContext || 'No queued articles - draw from Hassan\'s topic areas and current AI/Agile news'}
+
+RECENT PUBLISHED POSTS (avoid repeating these angles):
+${publishedContext || 'No history yet - this is an early session'}
+
+TODAY'S FOCUS FROM HASSAN: ${focus || 'No specific focus - choose the two most timely and relevant topics from the above'}
+
+Generate TWO distinct post drafts. Return ONLY valid JSON:
+{
+  "draftA": {
+    "content": "<full post text, 150-280 words, in Hassan's voice>",
+    "hookType": "<Provocative statement|Question|Story / Personal|Data / Statistic|Contrarian take|News reaction>",
+    "topicTags": ["<tag1>","<tag2>"],
+    "sourceArticle": "<URL or title if based on a specific article, otherwise empty>",
+    "coreArgument": "<1 sentence summary of the main point>"
+  },
+  "draftB": {
+    "content": "<full post text, 150-280 words, in Hassan's voice - different topic and hook type from Draft A>",
+    "hookType": "<type>",
+    "topicTags": ["<tag1>","<tag2>"],
+    "sourceArticle": "<URL or title if applicable>",
+    "coreArgument": "<1 sentence summary>"
+  }
+}
+
+CRITICAL: Posts must sound like Hassan wrote them - imperfect rhythm, no em-dashes, direct and warm, real examples, end with engagement question. Do NOT produce symmetrical AI-sounding content.`;
+
+    const raw = await callClaude(prompt, 3000);
+    const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
+    const result = JSON.parse(raw.slice(f, l + 1));
+
+    // Save drafts to Airtable
+    const draftAId = 'DA-' + Date.now();
+    const draftBId = 'DB-' + Date.now();
+    const recA = await atCreate(AT_DRAFTS, { 'Draft ID': draftAId, 'Draft Number': 'Draft A', 'Post Content': result.draftA.content, 'Hook Type': result.draftA.hookType, 'Topic Tags': result.draftA.topicTags, 'Source Articles': result.draftA.sourceArticle, 'Status': 'Generated', 'Refinement Count': 0 });
+    const recB = await atCreate(AT_DRAFTS, { 'Draft ID': draftBId, 'Draft Number': 'Draft B', 'Post Content': result.draftB.content, 'Hook Type': result.draftB.hookType, 'Topic Tags': result.draftB.topicTags, 'Source Articles': result.draftB.sourceArticle, 'Status': 'Generated', 'Refinement Count': 0 });
+
+    renderDrafts(result, recA.id, recB.id);
+    setStatus('Drafts ready');
+
+    btn.disabled = false;
+    btn.innerHTML = '<span>&#9889;</span> Generate Two Drafts';
+
+  } catch(e) {
+    output.innerHTML = `<div class="card"><div class="error-box visible">Generation failed: ${e.message}. Please try again.</div></div>`;
+    btn.disabled = false;
+    btn.innerHTML = '<span>&#9889;</span> Generate Two Drafts';
+    setStatus('Error');
+  }
+}
+
+// ─── RENDER DRAFTS ────────────────────────────────────────────────────────
+function renderDrafts(result, recAId, recBId) {
+  const output = document.getElementById('draftsOutput');
+  output.innerHTML = [
+    { label: 'Draft A', data: result.draftA, recId: recAId, key: 'A' },
+    { label: 'Draft B', data: result.draftB, recId: recBId, key: 'B' }
+  ].map(d => `
+    <div class="draft-card" id="draftCard${d.key}">
+      <div class="draft-header">
+        <span class="draft-label">${d.label}</span>
+        <span class="draft-badge tag-teal">${d.data.hookType}</span>
+      </div>
+      <div class="draft-body" id="draftContent${d.key}">${d.data.content}</div>
+      <div style="padding:8px 16px 0;"><div class="tags-wrap">${(d.data.topicTags || []).map(t => `<span class="tag tag-teal">${t}</span>`).join('')}</div></div>
+      <div class="draft-actions">
+        <div class="char-count" style="margin-bottom:8px;">${d.data.content.length} characters</div>
+        <textarea class="draft-feedback" id="feedback${d.key}" placeholder="Give feedback to refine this draft... e.g. 'Make the opening punchier', 'Add a specific data point', 'Shorten it by 30 words'"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-outline btn-sm" onclick="refineDraft('${d.key}','${d.recId}')">&#8635; Refine</button>
+          <button class="btn btn-green btn-sm" onclick="approveDraft('${d.key}','${d.recId}','${d.data.coreArgument}',${JSON.stringify(d.data.topicTags)})">&#10003; Approve</button>
+          <button class="btn btn-red btn-sm" onclick="rejectDraft('${d.key}','${d.recId}')">&#10007;</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── REFINE DRAFT ─────────────────────────────────────────────────────────
+async function refineDraft(key, recId) {
+  const feedback = document.getElementById('feedback' + key).value.trim();
+  const currentContent = document.getElementById('draftContent' + key).textContent;
+  if (!feedback) { alert('Please add feedback before refining.'); return; }
+
+  const card = document.getElementById('draftCard' + key);
+  card.style.opacity = '0.5';
+  setStatus('Refining draft ' + key + '...');
+
+  try {
+    const prompt = `You are Hassan Khadra's LinkedIn content strategist. Refine this post based on his feedback.
+
+${HASSAN_STYLE_GUIDE}
+
+CURRENT DRAFT:
+${currentContent}
+
+HASSAN'S FEEDBACK:
+${feedback}
+
+Return ONLY the revised post text. No explanation, no JSON, just the improved post content.`;
+
+    const refined = await callClaude(prompt, 800);
+    document.getElementById('draftContent' + key).textContent = refined.trim();
+    document.getElementById('feedback' + key).value = '';
+
+    await atUpdate(AT_DRAFTS, recId, {
+      'Post Content': refined.trim(),
+      'Hassan Feedback': feedback,
+      'Status': 'Refined'
+    });
+
+    card.style.opacity = '1';
+    setStatus('Draft refined');
+  } catch(e) {
+    card.style.opacity = '1';
+    setStatus('Error refining');
+    alert('Refinement failed: ' + e.message);
+  }
+}
+
+// ─── APPROVE DRAFT ────────────────────────────────────────────────────────
+async function approveDraft(key, recId, coreArgument, topicTags) {
+  const content = document.getElementById('draftContent' + key).textContent;
+  setStatus('Saving approved post...');
+
+  try {
+    await atUpdate(AT_DRAFTS, recId, { 'Status': 'Approved', 'Approved': true });
+    await atCreate(AT_PUBLISHED, {
+      'Post Title / Hook': content.split('\n')[0].slice(0, 80),
+      'Full Post Content': content,
+      'Core Argument': coreArgument,
+      'Topic Tags': topicTags,
+      'Source Draft ID': recId,
+      'Style Notes': ''
+    });
+
+    const card = document.getElementById('draftCard' + key);
+    card.innerHTML = `<div style="padding:24px;text-align:center;"><div style="font-size:32px;margin-bottom:8px;">&#10003;</div><div style="font-size:14px;font-weight:700;color:var(--green);">Post approved and saved to Published Posts</div><div style="font-size:12px;color:var(--text-soft);margin-top:4px;">Copy and paste to LinkedIn when ready</div><div style="margin-top:16px;padding:16px;background:var(--green-bg);border-radius:var(--radius);font-size:13px;text-align:left;white-space:pre-line;">${content}</div></div>`;
+    setStatus('Post approved');
+  } catch(e) {
+    setStatus('Error saving');
+    alert('Could not save: ' + e.message);
+  }
+}
+
+// ─── REJECT DRAFT ─────────────────────────────────────────────────────────
+async function rejectDraft(key, recId) {
+  const reason = prompt('Optional: Why are you rejecting this draft? (helps Claude learn)');
+  try {
+    await atUpdate(AT_DRAFTS, recId, { 'Status': 'Rejected', 'Rejection Reason': reason || '' });
+    const card = document.getElementById('draftCard' + key);
+    card.style.opacity = '0.4';
+    card.innerHTML += `<div style="padding:12px 16px;text-align:center;font-size:12px;color:var(--red);font-weight:700;">&#10007; Draft rejected${reason ? ' - feedback saved' : ''}</div>`;
+    setStatus('Draft rejected');
+  } catch(e) { console.warn(e); }
+}
+
+// ─── LOAD QUEUE ───────────────────────────────────────────────────────────
+async function loadQueue() {
+  const el = document.getElementById('queueList');
+  el.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Loading queue...</div></div>`;
+  try {
+    const records = await atGet(AT_QUEUE, 20, "Status='Available'");
+    if (!records.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#128240;</div><div class="empty-state-title">Queue is empty</div><div class="empty-state-body">Use the Search tab to find articles or add a URL via the Input tab</div></div>`;
+      return;
+    }
+    el.innerHTML = records.map(r => {
+      const f = r.fields;
+      const p = f['Priority'];
+      const pClass = p === 'High' ? 'priority-high' : p === 'Medium' ? 'priority-medium' : 'priority-low';
+      return `<div class="queue-item">
+        <div class="queue-item-title">${f['Title'] || 'Untitled'}</div>
+        <div class="queue-item-meta"><span class="${pClass}">${p || 'Low'} priority</span> · ${f['Source'] || 'Manual'} · ${f['Date Found'] ? new Date(f['Date Found']).toLocaleDateString('en-GB') : ''}</div>
+        ${f['Summary'] ? `<div class="queue-item-summary">${f['Summary'].slice(0, 150)}...</div>` : ''}
+        <div class="tags-wrap" style="margin-top:7px;">${(f['Topic Tags'] || []).map(t => `<span class="tag tag-teal">${t}</span>`).join('')}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="card"><div class="error-box visible">Could not load queue: ${e.message}</div></div>`;
+  }
+}
+
+// ─── LOAD HISTORY ─────────────────────────────────────────────────────────
+async function loadHistory() {
+  const el = document.getElementById('historyList');
+  el.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Loading published posts...</div></div>`;
+  try {
+    const records = await atGet(AT_PUBLISHED, 20);
+    if (!records.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#128196;</div><div class="empty-state-title">No published posts yet</div><div class="empty-state-body">Approved posts will appear here</div></div>`;
+      return;
+    }
+    el.innerHTML = records.map(r => {
+      const f = r.fields;
+      return `<div class="input-item">
+        <div class="input-item-type">${(f['Topic Tags'] || []).join(' · ')}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">${f['Post Title / Hook'] || 'Post'}</div>
+        <div class="input-item-content">${(f['Core Argument'] || '').slice(0, 100)}</div>
+        <div class="input-item-date">${f['Published Date'] ? new Date(f['Published Date']).toLocaleDateString('en-GB') : ''}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="card"><div class="error-box visible">Could not load history: ${e.message}</div></div>`;
+  }
+}
+
+// ─── AUTONOMOUS SEARCH ────────────────────────────────────────────────────
+async function runSearch() {
+  const selectedTopics = [...document.querySelectorAll('.topic-chip.selected')].map(el => el.dataset.topic);
+  const customAngle = document.getElementById('customSearchAngle').value.trim();
+  const btn = document.getElementById('searchBtn');
+  const results = document.getElementById('searchResults');
+
+  if (!selectedTopics.length) { alert('Please select at least one topic.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Searching...';
+  setStatus('Searching for content...');
+  results.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Claude is searching for relevant content...</div><div class="loading-sub">This may take 20-30 seconds</div></div>`;
+
+  try {
+    const prompt = `You are Hassan Khadra's content research assistant. Search for and identify the most relevant recent news, articles, and insights across these topics for a LinkedIn thought leader in AI-enabled delivery, Agile transformation, and startup advisory.
+
+TOPICS TO SEARCH: ${selectedTopics.join(', ')}
+${customAngle ? `CUSTOM ANGLE: ${customAngle}` : ''}
+
+Hassan's audience: CTOs, ops leaders, consultants, founders, delivery practitioners. North American and UK market focus.
+
+Find 5 highly relevant, timely content items. Use your web search capability to find real, current articles.
+
+Return ONLY valid JSON:
+{
+  "items": [
+    {
+      "title": "<article title>",
+      "url": "<article URL>",
+      "source": "<publication name>",
+      "summary": "<2-3 sentences on what the article covers and why it matters to Hassan's audience>",
+      "angle": "<1 sentence on the specific post angle Hassan could take with this>",
+      "topicTags": ["<tag1>","<tag2>"],
+      "priority": "<High|Medium|Low>"
+    }
+  ]
+}`;
+
+    const raw = await callClaude(prompt, 2500);
+    const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
+    const parsed = JSON.parse(raw.slice(f, l + 1));
+    const items = parsed.items || [];
+
+    if (!items.length) throw new Error('No results found');
+
+    // Save to Airtable queue
+    for (const item of items) {
+      await atCreate(AT_QUEUE, {
+        'Title': item.title,
+        'Source URL': item.url,
+        'Source': 'Autonomous Search',
+        'Topic Tags': item.topicTags,
+        'Summary': item.summary + '\n\nHassan angle: ' + item.angle,
+        'Priority': item.priority,
+        'Status': 'Available',
+        'Used in Draft': false
+      });
+    }
+
+    results.innerHTML = `
+      <div class="notice notice-teal" style="margin-bottom:12px;">&#9989; Found ${items.length} items - all added to your Content Queue</div>
+      ${items.map(item => `
+        <div class="queue-item">
+          <div class="queue-item-title">${item.title}</div>
+          <div class="queue-item-meta"><span class="${item.priority === 'High' ? 'priority-high' : item.priority === 'Medium' ? 'priority-medium' : 'priority-low'}">${item.priority}</span> · ${item.source}</div>
+          <div class="queue-item-summary">${item.summary}</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--teal);font-weight:600;">Angle: ${item.angle}</div>
+          <div class="tags-wrap" style="margin-top:7px;">${item.topicTags.map(t => `<span class="tag tag-teal">${t}</span>`).join('')}</div>
+        </div>
+      `).join('')}
+    `;
+    setStatus(items.length + ' items found');
+
+  } catch(e) {
+    results.innerHTML = `<div class="card"><div class="error-box visible">Search failed: ${e.message}. Please try again.</div></div>`;
+    setStatus('Search failed');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>&#128269;</span> Search for Content Now';
+}
+
+// ─── TOPIC CHIP TOGGLE ────────────────────────────────────────────────────
+document.querySelectorAll('.topic-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('selected'));
+});
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function setStatus(msg) { document.getElementById('headerStatus').textContent = msg; }
+function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
+function updateCharCount(inputId, countId) {
+  const len = document.getElementById(inputId).value.length;
+  const el = document.getElementById(countId);
+  el.textContent = len + ' characters';
+  el.classList.toggle('over', len > 3000);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+loadRecentInputs();
+loadDraftContext();
+</script>
+</body>
+</html>
