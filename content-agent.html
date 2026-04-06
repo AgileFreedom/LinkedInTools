@@ -5,1005 +5,1485 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#142850">
 <title>AFC Content Agent</title>
-<link rel="manifest" href="#" id="manifestLink">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
-  --navy:#142850; --navy-mid:#1e3a6e; --teal:#50788c; --teal-light:#7aaabb;
-  --teal-pale:#e6f0f3; --teal-pale2:#cfe3e9; --silver:#f4f5f7; --silver-2:#e8eaed;
-  --border:rgba(20,40,80,0.13); --text:#142850; --text-mid:#3a5070; --text-soft:#7a8fa8;
-  --white:#ffffff; --green:#1a6e3a; --green-bg:#eaf5ee;
+  --navy:#142850; --navy-mid:#1e3a6e; --navy-light:#2a4a7f;
+  --teal:#50788c; --teal-light:#7aaabb; --teal-pale:#e6f0f3; --teal-pale2:#cfe3e9;
+  --silver:#f4f5f7; --silver-2:#e8eaed; --border:rgba(20,40,80,0.12);
+  --text:#142850; --text-mid:#3a5070; --text-soft:#7a8fa8;
+  --white:#fff; --green:#1a6e3a; --green-bg:#eaf5ee;
   --red:#b83232; --red-bg:#fdecea; --gold:#c9993a; --gold-bg:#fdf6e8;
-  --sans:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif; --radius:8px;
+  --sans:'Plus Jakarta Sans',system-ui,sans-serif;
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 2px 12px rgba(20,40,80,.08);
+  --shadow-md:0 4px 20px rgba(20,40,80,.13);
 }
-html, body { height:100%; overflow:hidden; }
-body { font-family:var(--sans); background:var(--silver); color:var(--text); display:flex; flex-direction:column; }
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--sans);background:var(--silver);color:var(--text);display:flex;flex-direction:column;font-size:16px;}
 
 /* HEADER */
-.app-header { background:var(--navy); border-bottom:3px solid var(--teal); padding:0 16px; height:56px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; z-index:100; }
-.app-logo { display:flex; align-items:center; gap:10px; }
-.app-logo-mark { width:30px; height:30px; background:var(--teal); clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; flex-shrink:0; }
-.app-logo-text { font-size:13px; font-weight:800; color:#fff; }
-.app-logo-sub { font-size:10px; color:rgba(255,255,255,.5); }
-.header-status { display:flex; align-items:center; gap:6px; font-size:11px; color:rgba(255,255,255,.5); }
-.status-dot { width:7px; height:7px; border-radius:50%; background:var(--teal-light); animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+.app-header{background:var(--navy);border-bottom:3px solid var(--teal);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100;}
+.header-left{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:30px;height:30px;background:var(--teal);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff;flex-shrink:0;}
+.header-title{font-size:15px;font-weight:800;color:#fff;}
+.header-sub{font-size:10px;color:rgba(255,255,255,.45);}
+.header-right{display:flex;align-items:center;gap:4px;}
+.hbtn{background:transparent;border:none;cursor:pointer;color:rgba(255,255,255,.6);padding:7px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);}
+.hbtn:hover{color:#fff;background:rgba(255,255,255,.1);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--teal-light);transition:background .3s;}
+.status-dot.busy{background:var(--gold);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-/* TAB BAR */
-.tab-bar { background:var(--navy-mid); display:flex; border-bottom:1px solid rgba(255,255,255,.08); flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
-.tab-bar::-webkit-scrollbar { display:none; }
-.tab { flex:1; min-width:70px; padding:10px 8px; text-align:center; font-size:11px; font-weight:700; color:rgba(255,255,255,.45); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
-.tab.active { color:#fff; border-bottom-color:var(--teal-light); }
-.tab:hover:not(.active) { color:rgba(255,255,255,.7); }
+/* NAV */
+.nav-bar{background:var(--white);border-top:1px solid var(--border);display:flex;flex-shrink:0;order:10;padding-bottom:env(safe-area-inset-bottom);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;gap:3px;cursor:pointer;color:var(--text-soft);transition:color .2s;border:none;background:transparent;font-family:var(--sans);position:relative;}
+.nav-item.active{color:var(--navy);}
+.nav-item.active::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--teal);}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.nav-badge{position:absolute;top:5px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;}
+.nav-badge.show{display:flex;}
 
-/* MAIN SCROLL AREA */
-.main { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-.panel { display:none; padding:16px; animation:fadeUp .3s ease; }
-.panel.active { display:block; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+/* MAIN */
+.main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen{display:none;min-height:100%;padding:16px;}
+.screen.active{display:block;}
+
+/* TYPOGRAPHY */
+.screen-title{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em;margin-bottom:4px;}
+.screen-sub{font-size:14px;color:var(--text-soft);line-height:1.5;margin-bottom:16px;}
+.sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--teal-pale2);}
 
 /* CARDS */
-.card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:0 2px 8px rgba(20,40,80,.06); }
-.card-title { font-size:14px; font-weight:800; color:var(--navy); margin-bottom:4px; }
-.card-sub { font-size:12px; color:var(--text-soft); margin-bottom:14px; line-height:1.5; }
-.section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--teal); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--teal-pale2); }
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+.card-title{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.card-sub{font-size:13px;color:var(--text-soft);line-height:1.5;}
 
-/* FORM ELEMENTS */
-.form-group { margin-bottom:14px; }
-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text-mid); display:block; margin-bottom:5px; }
-input[type="text"], input[type="url"], select, textarea {
-  width:100%; background:var(--silver); border:1.5px solid var(--border); color:var(--text);
-  padding:11px 13px; font-family:var(--sans); font-size:14px; outline:none;
-  transition:border-color .2s; border-radius:var(--radius);
-}
-input:focus, select:focus, textarea:focus { border-color:var(--teal); background:#fff; }
-select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8fa8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; background-color:var(--silver); }
-textarea { resize:vertical; min-height:100px; line-height:1.6; }
-.field-hint { font-size:11px; color:var(--text-soft); margin-top:4px; line-height:1.4; }
+/* ACCORDION CARDS */
+.accord-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s;}
+.accord-card.expanded{box-shadow:var(--shadow-md);border-color:var(--teal);}
+.accord-header{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+.accord-icon{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.accord-main{flex:1;min-width:0;}
+.accord-title{font-size:14px;font-weight:700;color:var(--navy);line-height:1.3;margin-bottom:2px;}
+.accord-meta{font-size:12px;color:var(--text-soft);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.accord-chevron{color:var(--text-soft);transition:transform .25s;flex-shrink:0;}
+.accord-card.expanded .accord-chevron{transform:rotate(180deg);}
+.accord-body{display:none;padding:0 16px 14px;border-top:1px solid var(--border);margin-top:0;}
+.accord-card.expanded .accord-body{display:block;padding-top:14px;}
+.accord-summary{font-size:14px;color:var(--text-mid);line-height:1.65;margin-bottom:12px;}
+.accord-actions{display:flex;gap:8px;flex-wrap:wrap;}
 
-/* VOICE INPUT */
-.voice-section { background:var(--teal-pale); border:1px solid var(--teal-pale2); border-radius:var(--radius); padding:14px; margin-bottom:14px; }
-.voice-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.voice-btn { width:48px; height:48px; border-radius:50%; background:var(--navy); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; transition:all .2s; }
-.voice-btn.recording { background:var(--red); animation:recordPulse .8s infinite; }
-.voice-btn:hover:not(.recording) { background:var(--teal); }
-@keyframes recordPulse { 0%,100%{box-shadow:0 0 0 0 rgba(184,50,50,.4);} 50%{box-shadow:0 0 0 10px rgba(184,50,50,0);} }
-.voice-info { flex:1; }
-.voice-label { font-size:12px; font-weight:700; color:var(--navy); margin-bottom:2px; }
-.voice-status { font-size:11px; color:var(--text-soft); }
-.voice-status.active { color:var(--red); font-weight:600; }
-.voice-toggle { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-soft); }
-.voice-toggle input { accent-color:var(--navy); }
-.whisper-badge { background:var(--silver-2); color:var(--text-soft); font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; }
+/* FORM */
+.form-group{margin-bottom:14px;}
+.field-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-mid);display:block;margin-bottom:6px;}
+input[type="text"],input[type="url"],select,textarea{width:100%;background:var(--silver);border:1.5px solid var(--border);color:var(--text);padding:12px 14px;font-family:var(--sans);font-size:15px;outline:none;transition:border-color .2s,background .2s;border-radius:var(--radius);}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);background:var(--white);box-shadow:0 0 0 3px rgba(80,120,140,.08);}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8fa8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;background-color:var(--silver);}
+select:focus{background-color:var(--white);}
+textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.field-hint{font-size:12px;color:var(--text-soft);margin-top:4px;line-height:1.45;}
+.field-hint a{color:var(--teal);}
+
+/* VOICE INPUT BOX */
+.voice-input-wrap{position:relative;}
+.voice-input-wrap textarea,.voice-input-wrap input[type="text"]{padding-right:46px;}
+.voice-input-btn{position:absolute;right:10px;bottom:10px;width:30px;height:30px;border-radius:50%;background:var(--navy);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.voice-input-btn:hover{background:var(--teal);}
+.voice-input-btn.recording{background:var(--red);animation:recPulse .8s infinite;}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(184,50,50,.4);}50%{box-shadow:0 0 0 8px rgba(184,50,50,0);}}
+.voice-confirm-row{display:flex;gap:6px;margin-top:6px;display:none;}
+.voice-confirm-row.show{display:flex;}
 
 /* BUTTONS */
-.btn { width:100%; padding:13px; border:none; font-family:var(--sans); font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:var(--radius); }
-.btn-navy { background:var(--navy); color:#fff; }
-.btn-navy:hover:not(:disabled) { background:var(--navy-mid); }
-.btn-teal { background:var(--teal); color:#fff; }
-.btn-teal:hover:not(:disabled) { background:var(--teal-light); }
-.btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-mid); }
-.btn-outline:hover { border-color:var(--teal); color:var(--teal); }
-.btn-sm { padding:9px 16px; font-size:12px; width:auto; }
-.btn-green { background:var(--green); color:#fff; }
-.btn-red { background:var(--red); color:#fff; }
-.btn:disabled { opacity:.4; cursor:not-allowed; }
-.btn-row { display:flex; gap:8px; }
-.btn-row .btn { flex:1; }
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 18px;border:none;border-radius:var(--radius);font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;}
+.btn:active{transform:scale(.98);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover:not(:disabled){background:var(--navy-mid);}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover:not(:disabled){background:var(--teal-light);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-pale);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-gold{background:var(--gold);color:#fff;}
+.btn-sm{padding:9px 14px;font-size:12px;width:auto;}
+.btn-xs{padding:6px 11px;font-size:11px;width:auto;}
+.btn-row{display:flex;gap:8px;}
+.btn-row .btn{flex:1;}
 
-/* TAGS */
-.tags-wrap { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
-.tag { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-.tag-teal { background:var(--teal-pale); border:1px solid var(--teal-pale2); color:var(--teal); }
-.tag-navy { background:var(--navy); color:rgba(255,255,255,.8); }
-.tag-green { background:var(--green-bg); color:var(--green); }
-.tag-gold { background:var(--gold-bg); color:var(--gold); }
-.tag btn, .tag button { background:none; border:none; cursor:pointer; color:inherit; opacity:.6; font-size:13px; padding:0; }
-.tag button:hover { opacity:1; }
+/* PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.pill-teal{background:var(--teal-pale);border:1px solid var(--teal-pale2);color:var(--teal);}
+.pill-navy{background:var(--navy);color:rgba(255,255,255,.85);}
+.pill-green{background:var(--green-bg);color:var(--green);}
+.pill-gold{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(201,153,58,.3);}
+.pill-red{background:var(--red-bg);color:var(--red);}
+.pill-silver{background:var(--silver-2);color:var(--text-soft);}
 
-/* NOTICE BOXES */
-.notice { padding:12px 14px; border-radius:var(--radius); font-size:13px; line-height:1.55; margin-bottom:14px; }
-.notice-teal { background:var(--teal-pale); border-left:3px solid var(--teal); color:var(--text-mid); }
-.notice-gold { background:var(--gold-bg); border-left:3px solid var(--gold); color:#7a5c10; }
-.notice-navy { background:var(--navy); color:rgba(255,255,255,.8); }
-.notice strong { color:var(--navy); }
-.notice-navy strong { color:#fff; }
+/* NOTICES */
+.notice{padding:12px 15px;border-radius:var(--radius);font-size:14px;line-height:1.55;margin-bottom:12px;}
+.notice-teal{background:var(--teal-pale);border-left:3px solid var(--teal);color:var(--text-mid);}
+.notice-gold{background:var(--gold-bg);border-left:3px solid var(--gold);color:#7a5c10;}
+.notice-green{background:var(--green-bg);border-left:3px solid var(--green);color:var(--green);}
+.notice strong{color:var(--navy);}
+.notice-green strong{color:inherit;}
 
-/* LOADING SPINNER */
-.spinner { width:40px; height:40px; border:3px solid var(--teal-pale2); border-top-color:var(--navy); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 12px; }
-@keyframes spin { to{transform:rotate(360deg);} }
-.loading-card { text-align:center; padding:32px 16px; }
-.loading-msg { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:4px; }
-.loading-sub { font-size:12px; color:var(--text-soft); }
-
-/* DRAFT CARD */
-.draft-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; box-shadow:0 2px 12px rgba(20,40,80,.08); }
-.draft-header { padding:12px 16px; background:var(--silver); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-.draft-label { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--navy); }
-.draft-badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:20px; }
-.draft-body { padding:16px; font-size:14px; line-height:1.75; color:var(--text); white-space:pre-line; min-height:80px; }
-.draft-actions { padding:12px 16px; border-top:1px solid var(--border); background:var(--silver); }
-.draft-feedback { width:100%; background:var(--silver); border:1.5px solid var(--border); color:var(--text); padding:10px 13px; font-family:var(--sans); font-size:13px; border-radius:var(--radius); outline:none; resize:none; min-height:60px; margin-bottom:10px; }
-.draft-feedback:focus { border-color:var(--teal); background:#fff; }
-
-/* INPUT HISTORY */
-.input-item { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:13px; margin-bottom:10px; position:relative; }
-.input-item-type { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--teal); margin-bottom:4px; }
-.input-item-content { font-size:13px; color:var(--text-mid); line-height:1.5; max-height:60px; overflow:hidden; }
-.input-item-date { font-size:11px; color:var(--text-soft); margin-top:5px; }
-.input-item-status { position:absolute; top:10px; right:10px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
-
-/* QUEUE ITEM */
-.queue-item { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:13px; margin-bottom:10px; }
-.queue-item-title { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:4px; }
-.queue-item-meta { font-size:11px; color:var(--text-soft); margin-bottom:6px; }
-.queue-item-summary { font-size:12px; color:var(--text-mid); line-height:1.5; }
-.priority-high { color:var(--red); font-weight:700; }
-.priority-medium { color:var(--gold); font-weight:700; }
-.priority-low { color:var(--text-soft); }
-
-/* SEARCH PANEL */
-.search-topics { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
-.topic-chip { padding:6px 13px; border-radius:20px; border:1.5px solid var(--border); background:#fff; font-size:12px; font-weight:600; color:var(--text-mid); cursor:pointer; transition:all .15s; }
-.topic-chip.selected { background:var(--navy); color:#fff; border-color:var(--navy); }
-.topic-chip:hover:not(.selected) { border-color:var(--teal); color:var(--teal); }
+/* LOADING */
+.spinner{width:32px;height:32px;border:3px solid var(--teal-pale2);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+.spinner-sm{width:18px;height:18px;border-width:2px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-row{display:flex;align-items:center;gap:12px;padding:20px;}
+.loading-text{font-size:14px;font-weight:700;color:var(--navy);}
+.loading-sub{font-size:12px;color:var(--text-soft);margin-top:2px;}
 
 /* ERROR */
-.error-box { background:var(--red-bg); border-left:3px solid var(--red); padding:11px 14px; font-size:13px; color:var(--red); border-radius:0 var(--radius) var(--radius) 0; margin-bottom:12px; display:none; }
-.error-box.visible { display:block; }
+.err-box{background:var(--red-bg);border-left:3px solid var(--red);padding:11px 14px;font-size:13px;color:var(--red);border-radius:0 var(--radius) var(--radius) 0;margin-bottom:12px;display:none;}
+.err-box.show{display:block;}
 
-/* EMPTY STATE */
-.empty-state { text-align:center; padding:40px 20px; color:var(--text-soft); }
-.empty-state-icon { font-size:40px; margin-bottom:12px; }
-.empty-state-title { font-size:14px; font-weight:700; color:var(--text-mid); margin-bottom:6px; }
-.empty-state-body { font-size:13px; line-height:1.6; }
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;}
+.empty-icon{color:var(--silver-2);margin-bottom:12px;}
+.empty-title{font-size:15px;font-weight:700;color:var(--text-mid);margin-bottom:5px;}
+.empty-body{font-size:13px;color:var(--text-soft);line-height:1.6;}
 
-/* CHAR COUNT */
-.char-count { font-size:11px; color:var(--text-soft); text-align:right; margin-top:3px; }
-.char-count.over { color:var(--red); font-weight:700; }
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;max-width:90vw;text-align:center;pointer-events:none;}
+.toast.show{opacity:1;}
 
-@media(min-width:600px) {
-  .panel { max-width:600px; margin:0 auto; }
-}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(20,40,80,.65);backdrop-filter:blur(4px);align-items:flex-end;}
+.modal-overlay.show{display:flex;}
+.modal-sheet{background:var(--white);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom));animation:slideUp .28s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;background:var(--silver-2);border-radius:2px;margin:0 auto 14px;}
+.modal-title{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:14px;}
+@media(min-width:600px){.modal-sheet{max-width:600px;margin:0 auto;border-radius:var(--radius);margin-bottom:20px;}.modal-overlay{align-items:center;}}
+
+/* HOME */
+.home-greeting{margin-bottom:16px;}
+.home-greeting h2{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.02em;}
+.home-greeting p{font-size:14px;color:var(--text-soft);margin-top:3px;}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);}
+.stat-num{font-size:28px;font-weight:800;color:var(--navy);line-height:1;}
+.stat-label{font-size:11px;color:var(--text-soft);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+.brief-btn-wrap{margin-bottom:16px;}
+.brief-btn{background:var(--navy);color:#fff;border:none;border-radius:var(--radius);padding:16px 20px;width:100%;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow-md);}
+.brief-btn:hover{background:var(--navy-mid);}
+.brief-btn-icon{width:44px;height:44px;background:var(--teal);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brief-btn-text h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:2px;}
+.brief-btn-text p{font-size:12px;color:rgba(255,255,255,.55);}
+.qa-grid{display:flex;flex-direction:column;gap:9px;}
+.qa-item{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);}
+.qa-item:hover{border-color:var(--teal);transform:translateY(-1px);}
+.qa-icon{width:38px;height:38px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.qa-text h4{font-size:14px;font-weight:700;color:var(--navy);}
+.qa-text p{font-size:12px;color:var(--text-soft);margin-top:1px;}
+
+/* FEED */
+.voice-hero{background:var(--navy);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:16px;cursor:pointer;transition:all .2s;}
+.voice-hero:active{transform:scale(.98);}
+.voice-circle{width:50px;height:50px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.voice-circle.recording{background:var(--red);animation:recPulse 1s infinite;}
+.voice-hero-text h3{font-size:15px;font-weight:800;color:#fff;margin-bottom:2px;}
+.voice-hero-text p{font-size:12px;color:rgba(255,255,255,.5);}
+.voice-transcript{background:var(--white);border:1.5px solid var(--teal);border-radius:var(--radius);padding:12px 14px;font-size:15px;color:var(--text);line-height:1.65;min-height:70px;margin-bottom:12px;display:none;}
+.voice-transcript.show{display:block;}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.type-btn{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:11px 10px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .2s;font-family:var(--sans);}
+.type-btn.sel{border-color:var(--navy);background:var(--teal-pale);}
+.type-btn:hover:not(.sel){border-color:var(--teal);}
+.type-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.type-label{font-size:12px;font-weight:700;color:var(--navy);}
+.type-sub{font-size:10px;color:var(--text-soft);margin-top:1px;}
+.encounter-box{background:var(--gold-bg);border:1px solid rgba(201,153,58,.3);border-radius:var(--radius);padding:13px;margin-bottom:12px;display:none;}
+.encounter-box.show{display:block;}
+.enc-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:7px;display:flex;align-items:center;gap:5px;}
+.feed-resp{background:var(--teal-pale);border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--text-mid);line-height:1.6;display:none;}
+.feed-resp.show{display:block;}
+.feed-resp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.fi-item{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;display:flex;gap:10px;}
+.fi-icon{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.fi-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-soft);margin-bottom:3px;}
+.fi-content{font-size:13px;color:var(--text-mid);line-height:1.45;max-height:42px;overflow:hidden;}
+.fi-meta{font-size:11px;color:var(--text-soft);margin-top:4px;display:flex;align-items:center;gap:6px;}
+
+/* LIBRARY */
+.suggest-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center;}
+.suggest-bar input{flex:1;}
+.filter-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
+.filter-scroll::-webkit-scrollbar{display:none;}
+.fchip{padding:7px 13px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);font-size:12px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--sans);}
+.fchip.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.fchip:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+.cleanup-bar{background:var(--gold-bg);border:1px solid rgba(201,153,58,.3);border-radius:var(--radius);padding:13px;margin-bottom:14px;display:none;}
+.cleanup-bar.show{display:flex;align-items:center;gap:12px;}
+.cleanup-bar-text{flex:1;font-size:13px;color:#7a5c10;line-height:1.4;}
+.series-card{background:var(--navy);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;transition:background .2s;}
+.series-card:hover{background:var(--navy-mid);}
+.sc-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-light);margin-bottom:5px;}
+.sc-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:3px;}
+.sc-meta{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:9px;}
+.sc-bar{height:3px;background:rgba(255,255,255,.15);border-radius:2px;}
+.sc-fill{height:100%;background:var(--teal-light);border-radius:2px;}
+
+/* STUDIO */
+#screen-studio{display:flex;flex-direction:column;min-height:100%;background:var(--white);padding:0;}
+.studio-header{padding:14px 16px 12px;background:var(--white);border-bottom:1px solid var(--border);}
+.studio-topic-label{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.studio-title{font-size:17px;font-weight:800;color:var(--navy);line-height:1.25;}
+.studio-draft-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 16px;}
+.draft-text{font-size:16px;line-height:1.78;color:var(--text);white-space:pre-line;min-height:180px;}
+.draft-text.placeholder{color:var(--text-soft);font-style:italic;}
+.draft-wc{font-size:11px;color:var(--text-soft);margin-top:10px;text-align:right;}
+.studio-footer{background:var(--white);border-top:1px solid var(--border);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+.copy-success{display:none;align-items:center;justify-content:center;gap:6px;padding:9px;background:var(--green-bg);border-radius:var(--radius);color:var(--green);font-size:13px;font-weight:700;margin-bottom:10px;}
+.copy-success.show{display:flex;}
+.studio-actions{display:flex;gap:7px;}
+.studio-actions .btn{flex:1;padding:12px;font-size:13px;}
+
+/* SETTINGS */
+.settings-section{margin-bottom:22px;}
+.settings-section-title{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+
+/* BRIEFING */
+.brief-phase-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-soft);margin:16px 0 10px;display:flex;align-items:center;gap:7px;}
+.discard-feedback{display:none;margin-top:10px;}
+.discard-feedback.show{display:block;}
+.discard-feedback textarea{min-height:70px;font-size:14px;}
+
+/* LOG */
+.log-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-mid);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.log-item:last-child{border-bottom:none;}
+.log-time{font-size:11px;color:var(--text-soft);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.log-icon{flex-shrink:0;margin-top:1px;}
 </style>
 </head>
 <body>
 
 <header class="app-header">
-  <div class="app-logo">
-    <div class="app-logo-mark">AF</div>
-    <div>
-      <div class="app-logo-text">Content Agent</div>
-      <div class="app-logo-sub">Agile Freedom Consulting</div>
-    </div>
+  <div class="header-left">
+    <div class="logo-mark">AF</div>
+    <div><div class="header-title">Content Agent</div><div class="header-sub">Agile Freedom</div></div>
   </div>
-  <div class="header-status">
-    <div class="status-dot"></div>
-    <span id="headerStatus">Ready</span>
+  <div class="header-right">
+    <div class="status-dot" id="statusDot"></div>
+    <button class="hbtn" onclick="openLog()" title="Activity Log"><i data-lucide="scroll-text" style="width:19px;height:19px;"></i></button>
+    <button class="hbtn" onclick="goScreen('settings')" title="Settings"><i data-lucide="settings" style="width:19px;height:19px;"></i></button>
   </div>
 </header>
 
-<div class="tab-bar">
-  <div class="tab active" onclick="switchTab('input')" id="tab-input">&#9997; Input</div>
-  <div class="tab" onclick="switchTab('draft')" id="tab-draft">&#9997; Draft</div>
-  <div class="tab" onclick="switchTab('queue')" id="tab-queue">&#128240; Queue</div>
-  <div class="tab" onclick="switchTab('history')" id="tab-history">&#128196; History</div>
-  <div class="tab" onclick="switchTab('search')" id="tab-search">&#128269; Search</div>
-</div>
-
 <div class="main">
 
-  <!-- ===== INPUT TAB ===== -->
-  <div class="panel active" id="panel-input">
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home-greeting">
+    <h2 id="homeGreeting">Good morning, Hassan</h2>
+    <p id="homeDate"></p>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="statTopics">—</div><div class="stat-label">Topics saved</div></div>
+    <div class="stat-card"><div class="stat-num" id="statPosts">—</div><div class="stat-label">Posts this month</div></div>
+  </div>
+  <div class="brief-btn-wrap">
+    <button class="brief-btn" onclick="runBriefing()" id="briefBtn">
+      <div class="brief-btn-icon"><i data-lucide="newspaper" style="width:22px;height:22px;color:#fff;"></i></div>
+      <div class="brief-btn-text"><h3>Get Today's Brief</h3><p>News + topic proposals, tailored to you</p></div>
+    </button>
+  </div>
+  <div id="briefingArea"></div>
+  <div class="sec-label" style="margin-top:4px;">Quick actions</div>
+  <div class="qa-grid">
+    <button class="qa-item" onclick="goScreen('feed')">
+      <div class="qa-icon" style="background:var(--teal-pale);"><i data-lucide="plus-circle" style="width:18px;height:18px;color:var(--teal);"></i></div>
+      <div class="qa-text"><h4>Feed the agent</h4><p>Drop a thought, link, voice note or document</p></div>
+      <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--text-soft);margin-left:auto;flex-shrink:0;"></i>
+    </button>
+    <button class="qa-item" onclick="goScreen('library')">
+      <div class="qa-icon" style="background:#eef2fb;"><i data-lucide="library" style="width:18px;height:18px;color:var(--navy);"></i></div>
+      <div class="qa-text"><h4>Browse Library</h4><p>Your topic repository and series</p></div>
+      <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--text-soft);margin-left:auto;flex-shrink:0;"></i>
+    </button>
+    <button class="qa-item" onclick="startFreshDraft()">
+      <div class="qa-icon" style="background:var(--green-bg);"><i data-lucide="pen-line" style="width:18px;height:18px;color:var(--green);"></i></div>
+      <div class="qa-text"><h4>Draft a post</h4><p>Jump straight into the Studio</p></div>
+      <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--text-soft);margin-left:auto;flex-shrink:0;"></i>
+    </button>
+  </div>
+</div>
 
-    <div class="card">
-      <div class="card-title">Drop an input</div>
-      <div class="card-sub">Add a thought, URL, style note, or strategy update. Claude will classify and store it automatically.</div>
+<!-- FEED -->
+<div class="screen" id="screen-feed">
+  <div class="screen-title">Feed</div>
+  <div class="screen-sub">Drop anything in. Claude classifies, clusters, and stores it.</div>
 
-      <!-- VOICE INPUT -->
-      <div class="voice-section">
-        <div class="voice-row">
-          <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🎤</button>
-          <div class="voice-info">
-            <div class="voice-label">Voice Input</div>
-            <div class="voice-status" id="voiceStatus">Tap microphone to speak</div>
-          </div>
-        </div>
-        <div class="voice-toggle">
-          <input type="checkbox" id="whisperToggle" disabled>
-          <label for="whisperToggle" style="text-transform:none;letter-spacing:0;font-size:11px;color:var(--text-soft);font-weight:400;">Use Whisper (OpenAI)</label>
-          <span class="whisper-badge">Coming soon</span>
-        </div>
-      </div>
-
-      <!-- INPUT TYPE -->
-      <div class="form-group">
-        <label>Input Type</label>
-        <select id="inputType">
-          <option value="Random Thought">Random Thought</option>
-          <option value="Article URL">Article URL</option>
-          <option value="Style Preference">Style Preference</option>
-          <option value="Strategy Note">Strategy Note</option>
-          <option value="Previous Post Extract">Previous Post Extract</option>
-          <option value="Anti-Repetition Note">Anti-Repetition Note</option>
-          <option value="Topic Signal">Topic Signal</option>
-          <option value="Document Extract">Document Extract</option>
-        </select>
-      </div>
-
-      <!-- CONTENT -->
-      <div class="form-group">
-        <label>Content</label>
-        <textarea id="inputContent" placeholder="Type your thought, paste a URL, drop in an extract..." oninput="updateCharCount('inputContent','inputCharCount')"></textarea>
-        <div class="char-count" id="inputCharCount">0 characters</div>
-        <div class="field-hint">Claude will automatically classify this and store it in the right category.</div>
-      </div>
-
-      <div class="error-box" id="inputError"></div>
-
-      <button class="btn btn-navy" onclick="saveInput()" id="saveInputBtn">
-        <span>&#10003;</span> Save Input
-      </button>
-    </div>
-
-    <!-- RECENT INPUTS PREVIEW -->
-    <div class="section-label">Recent Inputs</div>
-    <div id="recentInputsList">
-      <div class="empty-state">
-        <div class="empty-state-icon">&#128221;</div>
-        <div class="empty-state-title">No inputs yet</div>
-        <div class="empty-state-body">Your saved inputs will appear here</div>
-      </div>
-    </div>
-
+  <div class="voice-hero" id="voiceHero" onclick="toggleVoice()">
+    <div class="voice-circle" id="voiceCircle"><i data-lucide="mic" style="width:22px;height:22px;color:#fff;" id="voiceMainIcon"></i></div>
+    <div class="voice-hero-text"><h3 id="voiceHeroTitle">Tap to speak</h3><p id="voiceHeroSub">Voice note — powered by your device</p></div>
+  </div>
+  <div class="voice-transcript" id="voiceTranscript"></div>
+  <div class="voice-confirm-row" id="voiceConfirmRow">
+    <button class="btn btn-green btn-sm" onclick="confirmVoice()"><i data-lucide="check" style="width:14px;height:14px;"></i> Use this</button>
+    <button class="btn btn-outline btn-sm" onclick="clearVoice()"><i data-lucide="x" style="width:14px;height:14px;"></i> Clear</button>
   </div>
 
-  <!-- ===== DRAFT TAB ===== -->
-  <div class="panel" id="panel-draft">
-
-    <div class="card">
-      <div class="card-title">Generate today's posts</div>
-      <div class="card-sub">Claude will pull your recent inputs, content queue, and style history to draft two posts in your voice.</div>
-
-      <div class="notice notice-teal" id="draftContextNotice">
-        Loading your content context...
-      </div>
-
-      <div class="form-group">
-        <label>Additional focus for today (optional)</label>
-        <textarea id="draftFocus" placeholder="e.g. I want one post about the NemoClaw announcement and one about how most leaders still don't have an AI strategy..." style="min-height:80px;"></textarea>
-      </div>
-
-      <button class="btn btn-navy" onclick="generateDrafts()" id="generateDraftsBtn">
-        <span>&#9889;</span> Generate Two Drafts
-      </button>
+  <div class="form-group">
+    <label class="field-label">What are you sharing?</label>
+    <div class="type-grid" id="typeGrid">
+      <button class="type-btn sel" data-type="Random Thought" onclick="selType(this)"><div class="type-icon" style="background:var(--teal-pale);"><i data-lucide="lightbulb" style="width:14px;height:14px;color:var(--teal);"></i></div><div><div class="type-label">Thought</div><div class="type-sub">Idea or reflection</div></div></button>
+      <button class="type-btn" data-type="Article URL" onclick="selType(this)"><div class="type-icon" style="background:#eef2fb;"><i data-lucide="link" style="width:14px;height:14px;color:var(--navy);"></i></div><div><div class="type-label">Link</div><div class="type-sub">Article or video</div></div></button>
+      <button class="type-btn" data-type="Personal Encounter" onclick="selType(this)"><div class="type-icon" style="background:var(--green-bg);"><i data-lucide="users" style="width:14px;height:14px;color:var(--green);"></i></div><div><div class="type-label">Encounter</div><div class="type-sub">Meeting or convo</div></div></button>
+      <button class="type-btn" data-type="Strategy Note" onclick="selType(this)"><div class="type-icon" style="background:var(--gold-bg);"><i data-lucide="target" style="width:14px;height:14px;color:var(--gold);"></i></div><div><div class="type-label">Strategy</div><div class="type-sub">Direction or style</div></div></button>
+      <button class="type-btn" data-type="Anti-Repetition Note" onclick="selType(this)"><div class="type-icon" style="background:var(--red-bg);"><i data-lucide="ban" style="width:14px;height:14px;color:var(--red);"></i></div><div><div class="type-label">Avoid</div><div class="type-sub">Don't repeat this</div></div></button>
+      <button class="type-btn" data-type="Document Extract" onclick="selType(this)"><div class="type-icon" style="background:var(--silver-2);"><i data-lucide="file-text" style="width:14px;height:14px;color:var(--text-soft);"></i></div><div><div class="type-label">Document</div><div class="type-sub">Extract or report</div></div></button>
     </div>
-
-    <!-- DRAFTS OUTPUT -->
-    <div id="draftsOutput"></div>
-
   </div>
 
-  <!-- ===== QUEUE TAB ===== -->
-  <div class="panel" id="panel-queue">
-
-    <div class="card">
-      <div class="card-title">Content Queue</div>
-      <div class="card-sub">Articles and topics ready to be turned into posts. Add manually or let the Search tab populate this automatically.</div>
-
-      <button class="btn btn-teal btn-sm" onclick="loadQueue()" style="margin-bottom:14px;">
-        &#8635; Refresh Queue
-      </button>
-    </div>
-
-    <div id="queueList">
-      <div class="empty-state">
-        <div class="empty-state-icon">&#128240;</div>
-        <div class="empty-state-title">Queue is empty</div>
-        <div class="empty-state-body">Use the Search tab to find articles or add a URL via the Input tab</div>
-      </div>
-    </div>
-
+  <div class="encounter-box" id="encounterBox">
+    <div class="enc-title"><i data-lucide="tag" style="width:12px;height:12px;"></i> Tag opportunity</div>
+    <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px;">Tagging this person could benefit you both. Add their name and LinkedIn handle if you want to include them.</div>
+    <input type="text" id="encounterTag" placeholder="e.g. John Smith @johnsmith" style="font-size:14px;padding:10px 12px;">
   </div>
 
-  <!-- ===== HISTORY TAB ===== -->
-  <div class="panel" id="panel-history">
-
-    <div class="card">
-      <div class="card-title">Published Posts</div>
-      <div class="card-sub">Your post history. Claude reads this before drafting to avoid repetition and learn your evolving style.</div>
-      <button class="btn btn-outline btn-sm" onclick="loadHistory()">&#8635; Refresh</button>
+  <div class="form-group">
+    <label class="field-label">Content</label>
+    <div class="voice-input-wrap">
+      <textarea id="feedContent" rows="4" placeholder="Type your thought, paste a URL, describe what you heard..."></textarea>
+      <button class="voice-input-btn" id="feedVoiceBtn" onclick="toggleFieldVoice('feedContent','feedVoiceBtn')" title="Voice input"><i data-lucide="mic" style="width:14px;height:14px;"></i></button>
     </div>
-
-    <div id="historyList">
-      <div class="empty-state">
-        <div class="empty-state-icon">&#128196;</div>
-        <div class="empty-state-title">No published posts yet</div>
-        <div class="empty-state-body">Approved and published posts will appear here</div>
-      </div>
-    </div>
-
+    <div class="field-hint">Claude will tell you what it extracted and cluster this with related topics automatically.</div>
   </div>
 
-  <!-- ===== SEARCH TAB ===== -->
-  <div class="panel" id="panel-search">
-
-    <div class="card">
-      <div class="card-title">Autonomous Content Search</div>
-      <div class="card-sub">Select topics and Claude will search for the latest relevant articles and news to add to your queue.</div>
-
-      <div class="section-label">Topic Areas</div>
-      <div class="search-topics" id="searchTopics">
-        <div class="topic-chip selected" data-topic="Agentic AI">Agentic AI</div>
-        <div class="topic-chip selected" data-topic="AI Strategy">AI Strategy</div>
-        <div class="topic-chip selected" data-topic="Agile Delivery">Agile Delivery</div>
-        <div class="topic-chip" data-topic="Digital Transformation">Digital Transformation</div>
-        <div class="topic-chip" data-topic="Startup Advisory">Startup Advisory</div>
-        <div class="topic-chip" data-topic="Future of Work">Future of Work</div>
-        <div class="topic-chip" data-topic="OpenClaw / NemoClaw">OpenClaw / NemoClaw</div>
-        <div class="topic-chip" data-topic="Leadership">Leadership</div>
-        <div class="topic-chip" data-topic="Product Management">Product Management</div>
-        <div class="topic-chip" data-topic="LinkedIn Growth">LinkedIn Growth</div>
-      </div>
-
-      <div class="form-group" style="margin-top:14px;">
-        <label>Custom search angle (optional)</label>
-        <input type="text" id="customSearchAngle" placeholder="e.g. AI adoption in financial services, enterprise Agile failures...">
-      </div>
-
-      <button class="btn btn-navy" onclick="runSearch()" id="searchBtn">
-        <span>&#128269;</span> Search for Content Now
-      </button>
-    </div>
-
-    <div id="searchResults"></div>
-
+  <div class="err-box" id="feedErr"></div>
+  <div class="feed-resp" id="feedResp">
+    <div class="feed-resp-label"><i data-lucide="sparkles" style="width:11px;height:11px;"></i> Claude's response</div>
+    <div id="feedRespText"></div>
   </div>
 
+  <button class="btn btn-navy" id="feedSaveBtn" onclick="saveInput()">
+    <i data-lucide="save" style="width:17px;height:17px;"></i> Save Input
+  </button>
+
+  <div style="margin-top:20px;">
+    <div class="sec-label">Recent inputs</div>
+    <div id="recentFeedList"></div>
+  </div>
+</div>
+
+<!-- LIBRARY -->
+<div class="screen" id="screen-library">
+  <div class="screen-title">Library</div>
+  <div class="screen-sub">Your topic repository. Browse, filter, or get suggestions.</div>
+
+  <div class="cleanup-bar" id="cleanupBar">
+    <div class="cleanup-bar-text"><strong>Library at 80% capacity.</strong> Run a cleanup to retire old topics.</div>
+    <button class="btn btn-gold btn-sm" onclick="openCleanup()"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> Clean up</button>
+  </div>
+
+  <div class="suggest-bar">
+    <input type="text" id="suggestTheme" placeholder="Theme or domain..." style="font-size:14px;padding:11px 13px;">
+    <button class="btn btn-navy btn-sm" onclick="suggestTopics()" id="suggestBtn" style="white-space:nowrap;">
+      <i data-lucide="sparkles" style="width:14px;height:14px;"></i> Suggest 5
+    </button>
+  </div>
+
+  <div class="filter-scroll" id="filterScroll">
+    <button class="fchip active" data-f="all" onclick="filterLib(this)">All</button>
+    <button class="fchip" data-f="Agentic AI" onclick="filterLib(this)">Agentic AI</button>
+    <button class="fchip" data-f="AI Strategy" onclick="filterLib(this)">AI Strategy</button>
+    <button class="fchip" data-f="Agile Delivery" onclick="filterLib(this)">Agile Delivery</button>
+    <button class="fchip" data-f="Startup Advisory" onclick="filterLib(this)">Startup Advisory</button>
+    <button class="fchip" data-f="Leadership" onclick="filterLib(this)">Leadership</button>
+    <button class="fchip" data-f="Future of Work" onclick="filterLib(this)">Future of Work</button>
+  </div>
+
+  <div id="topicList"></div>
+
+  <div style="margin-top:20px;">
+    <div class="sec-label">Series</div>
+    <button class="btn btn-outline btn-sm" onclick="openSeriesModal()" style="margin-bottom:12px;"><i data-lucide="plus" style="width:13px;height:13px;"></i> New Series</button>
+    <div id="seriesList"></div>
+  </div>
+</div>
+
+<!-- STUDIO -->
+<div class="screen" id="screen-studio">
+  <div class="studio-header">
+    <div class="studio-topic-label" id="studioTopicLabel"><i data-lucide="pen-line" style="width:12px;height:12px;"></i><span>Studio</span></div>
+    <div class="studio-title" id="studioTitle">Ready to draft</div>
+  </div>
+  <div class="studio-draft-area" id="studioDraftArea">
+    <div class="draft-text placeholder" id="draftText">Your draft will appear here. Give Claude a topic or brief below, then tap Generate.</div>
+    <div class="draft-wc" id="draftWC"></div>
+  </div>
+  <div class="studio-footer">
+    <div class="copy-success" id="copySuccess"><i data-lucide="check-circle" style="width:15px;height:15px;"></i> Copied — paste into LinkedIn</div>
+    <div class="voice-input-wrap" style="margin-bottom:10px;">
+      <textarea class="feedback-input" id="studioFeedback" placeholder="Topic, brief, or feedback..." rows="2" style="padding:11px 44px 11px 13px;font-size:15px;resize:none;min-height:52px;max-height:110px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--silver);font-family:var(--sans);outline:none;width:100%;transition:border-color .2s;"></textarea>
+      <button class="voice-input-btn" id="studioVoiceBtn" onclick="toggleFieldVoice('studioFeedback','studioVoiceBtn')" title="Voice input"><i data-lucide="mic" style="width:14px;height:14px;"></i></button>
+    </div>
+    <div class="studio-actions">
+      <button class="btn btn-outline" id="studioGenBtn" onclick="generateDraft()"><i data-lucide="sparkles" style="width:15px;height:15px;"></i> Generate</button>
+      <button class="btn btn-teal" id="studioRefBtn" onclick="refineDraft()" style="display:none;"><i data-lucide="refresh-cw" style="width:15px;height:15px;"></i> Refine</button>
+      <button class="btn btn-outline" id="studioCopyBtn" onclick="copyDraft()" style="display:none;"><i data-lucide="copy" style="width:15px;height:15px;"></i> Copy</button>
+      <button class="btn btn-green" id="studioApprBtn" onclick="approveDraft()" style="display:none;"><i data-lucide="check" style="width:15px;height:15px;"></i> Approve</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="screen" id="screen-settings">
+  <div class="screen-title">Settings</div>
+  <div class="screen-sub">Your foundation layer. Claude reads this before every drafting session.</div>
+  <div class="settings-section">
+    <div class="settings-section-title"><i data-lucide="user" style="width:15px;height:15px;color:var(--teal);"></i> Profile</div>
+    <div class="form-group"><label class="field-label">LinkedIn URL</label><input type="url" id="sLinkedIn" placeholder="https://www.linkedin.com/in/hassankhadra"></div>
+    <div class="form-group"><label class="field-label">Website URL</label><input type="url" id="sWebsite" placeholder="https://agilefreedom.co.uk"></div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title"><i data-lucide="file-text" style="width:15px;height:15px;color:var(--teal);"></i> Foundation Documents</div>
+    <div class="form-group"><label class="field-label">CV / Background</label><textarea id="sCV" placeholder="Paste key highlights from your CV..." style="min-height:110px;"></textarea></div>
+    <div class="form-group"><label class="field-label">Strategy & Direction</label><textarea id="sStrategy" placeholder="Your thought leadership direction, target audience, key messages..." style="min-height:110px;"></textarea></div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title"><i data-lucide="sliders-horizontal" style="width:15px;height:15px;color:var(--teal);"></i> Style Preferences</div>
+    <div class="form-group"><label class="field-label">Always avoid</label><div class="voice-input-wrap"><textarea id="sAvoid" placeholder="Em-dashes, symmetrical lists, compound interest analogy (used recently)..." style="min-height:80px;padding-right:44px;"></textarea><button class="voice-input-btn" onclick="toggleFieldVoice('sAvoid',this)" title="Voice"><i data-lucide="mic" style="width:14px;height:14px;"></i></button></div></div>
+    <div class="form-group"><label class="field-label">Posting goals</label><div class="voice-input-wrap"><textarea id="sGoals" placeholder="5 posts per week, mix of news reactions and personal insights, always end with a question..." style="min-height:80px;padding-right:44px;"></textarea><button class="voice-input-btn" onclick="toggleFieldVoice('sGoals',this)" title="Voice"><i data-lucide="mic" style="width:14px;height:14px;"></i></button></div></div>
+  </div>
+  <button class="btn btn-navy" onclick="saveSettings()"><i data-lucide="save" style="width:16px;height:16px;"></i> Save Settings</button>
+  <div class="notice notice-teal" style="margin-top:14px;font-size:13px;">Settings are saved locally and injected into every Claude session.</div>
+</div>
+
+</div><!-- end main -->
+
+<!-- NAV BAR -->
+<nav class="nav-bar">
+  <button class="nav-item active" id="nav-home" onclick="goScreen('home')"><i data-lucide="home" style="width:20px;height:20px;"></i><span class="nav-label">Home</span></button>
+  <button class="nav-item" id="nav-feed" onclick="goScreen('feed')"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i><span class="nav-label">Feed</span><span class="nav-badge" id="feedBadge"></span></button>
+  <button class="nav-item" id="nav-library" onclick="goScreen('library')"><i data-lucide="library" style="width:20px;height:20px;"></i><span class="nav-label">Library</span></button>
+  <button class="nav-item" id="nav-studio" onclick="goScreen('studio')"><i data-lucide="pen-line" style="width:20px;height:20px;"></i><span class="nav-label">Studio</span></button>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOG MODAL -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Activity Log</div>
+    <div id="logList"><div class="empty"><div class="empty-title">No activity yet</div></div></div>
+    <button class="btn btn-outline" style="margin-top:14px;" onclick="closeModal('logModal')">Close</button>
+  </div>
+</div>
+
+<!-- SERIES MODAL -->
+<div class="modal-overlay" id="seriesModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">New Series</div>
+    <div class="form-group"><label class="field-label">Series Name</label><input type="text" id="seriesName" placeholder="e.g. The AI-Agility Model Explained"></div>
+    <div class="form-group"><label class="field-label">Theme</label><input type="text" id="seriesTheme" placeholder="e.g. AI Strategy, Agile Delivery..."></div>
+    <div class="form-group"><label class="field-label">Notes</label><textarea id="seriesNotes" placeholder="Describe the arc and key messages..." style="min-height:80px;"></textarea></div>
+    <div class="form-group"><label class="field-label">Planned Topics (one per line, max 20)</label><textarea id="seriesTopics" style="min-height:100px;" placeholder="Part 1: What the AI-Agility Model actually is&#10;Part 2: Why most AI strategies stall..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('seriesModal')">Cancel</button>
+      <button class="btn btn-navy" onclick="saveSeries()"><i data-lucide="save" style="width:15px;height:15px;"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DISCARD FEEDBACK MODAL -->
+<div class="modal-overlay" id="discardModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Why are you discarding this?</div>
+    <div style="font-size:14px;color:var(--text-soft);margin-bottom:14px;">Optional — helps the agent learn your preferences.</div>
+    <div class="voice-input-wrap" style="margin-bottom:14px;">
+      <textarea id="discardReason" rows="3" placeholder="e.g. Not relevant to my audience, too basic, wrong angle..." style="padding-right:44px;font-size:15px;"></textarea>
+      <button class="voice-input-btn" onclick="toggleFieldVoice('discardReason',this)"><i data-lucide="mic" style="width:14px;height:14px;"></i></button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="confirmDiscard(false)">Skip feedback</button>
+      <button class="btn btn-red" onclick="confirmDiscard(true)"><i data-lucide="trash-2" style="width:14px;height:14px;"></i> Discard</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLEANUP MODAL -->
+<div class="modal-overlay" id="cleanupModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Library Cleanup</div>
+    <div class="notice notice-gold" style="margin-bottom:14px;font-size:13px;">Showing lowest-priority topics. Keep what's still relevant, delete what isn't.</div>
+    <div id="cleanupList"></div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-outline" onclick="closeModal('cleanupModal')">Done</button>
+      <button class="btn btn-teal btn-sm" onclick="loadMoreCleanup()" id="cleanupMoreBtn"><i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Show 10 more</button>
+    </div>
+  </div>
 </div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────
-const AIRTABLE_BASE_ID = 'appgvCXmVfUxxiTDM'; // Base ID only - token is server-side
-const AT_INPUTS        = 'Inputs';
-const AT_QUEUE         = 'Content Queue';
-const AT_DRAFTS        = 'Drafts';
-const AT_PUBLISHED     = 'Published Posts';
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const AT_BASE = 'appgvCXmVfUxxiTDM';
+const AT = { IN:'Inputs', Q:'Content Queue', D:'Drafts', PUB:'Published Posts' };
+const MAX_TOPICS = 100;
+const CLEANUP_THRESHOLD = 0.8;
 
-// Hassan's style guide — built from 30 posts + CV + profile analysis
-const HASSAN_STYLE_GUIDE = `
-HASSAN KHADRA — LINKEDIN STYLE GUIDE
+const STYLE = `HASSAN KHADRA — LINKEDIN STYLE GUIDE
+VOICE: Confident, direct, warm. First-person. Human and imperfect rhythm. Never symmetrical AI structure.
+OPENING: Never start with "I". Hook first — bold statement, contrarian take, or specific scenario.
+FORMATTING: NO em-dashes (use " - " with spaces). No bullets to open or close. Generous white space. Numbers as numerals.
+TONE: Occasional informality ("Let's be honest", "Read that again"). Real examples, named companies, credible data.
+ENDINGS: Always end with a genuine engagement question or direct CTA.
+AVOID: Em-dashes, symmetric "3 things I learned" formats, generic AI phrases, compound interest analogy (used recently), EY 4x example (used recently).
+LENGTH: 150-280 words. Medium-length wins on LinkedIn.`;
 
-VOICE & TONE:
-- Confident, direct, warm. Never corporate or stiff.
-- Human and imperfect rhythm — not polished AI symmetry.
-- First person always. Conversational but authoritative.
-- Occasional informal phrases ("Let's be honest", "Read that again", "Here's the thing")
-- Uses real-world examples, named companies, specific data points from credible sources.
-- Never preachy. Makes the reader feel seen, not lectured.
-
-STRUCTURE PATTERNS:
-- Opens with a hook: provocative statement, contrarian take, or a specific scenario that creates instant recognition
-- Never opens with "I" as the first word
-- Short punchy paragraphs. Mix of 1-liners and 2-3 line paragraphs.
-- Uses white space generously — LinkedIn posts need to breathe
-- Ends with a question that invites genuine engagement, not a generic "what do you think?"
-- Occasionally ends with a direct CTA to DM or connect
-
-FORMATTING RULES:
-- NO em-dashes (use " - " with spaces instead)
-- NO bullet point lists in the opening paragraph
-- Bullets used sparingly and only mid-post, never to open or close
-- Numbers and stats written as numerals (4x, £130M, 13,000)
-- Bold used rarely and only for genuine emphasis
-
-CONTENT PILLARS (in order of frequency):
-1. Agentic AI and AI-enabled delivery — Hassan's primary expertise signal
-2. Agile delivery and leadership — credibility and depth
-3. Compounding improvement philosophy — distinctive brand idea
-4. Startup advisory and founder lessons — personal credibility
-5. Future of work and workforce AI adoption — broad audience appeal
-6. LinkedIn / personal brand — meta-content that resonates with his audience
-
-WHAT TO AVOID:
-- Generic AI hype without substance
-- Symmetrical "3 things I learned" formats
-- Inspirational quotes as the main point
-- Repeating the compound interest analogy (used recently)
-- Repeating the EY 4x productivity example (used recently)
-- Any content that sounds like it was written by AI
-- Em-dashes
-
-HASSAN'S SIGNATURE MOVES:
-- Starts with a real case study or recent news item, then pivots to the broader lesson
-- Uses a "but here's what most people miss" structural beat
-- Shares genuine opinions, not safe takes
-- References his own experience without bragging ("In my experience delivering £130M+ in programmes...")
-- Connects disparate ideas (e.g. compound interest and business improvement)
-- Occasional Arabic/Lebanese cultural reference when genuine and relevant
-
-POST LENGTH TARGET: 150-280 words. LinkedIn rewards medium-length posts over walls of text.
-`;
-
-// ─── AIRTABLE HELPERS (via Cloudflare proxy) ──────────────────────────────
-async function atGet(table, maxRecords = 20, filterFormula = '') {
-  let path = `${AIRTABLE_BASE_ID}/${encodeURIComponent(table)}?maxRecords=${maxRecords}&sort[0][field]=Created Time&sort[0][direction]=desc`;
-  if (filterFormula) path += `&filterByFormula=${encodeURIComponent(filterFormula)}`;
-  const res = await fetch('/functions/airtable-proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ path, method: 'GET' })
-  });
-  const data = await res.json();
-  return data.records || [];
+// ── AIRTABLE ──────────────────────────────────────────────────────────────
+async function atGet(table, max=20, filter='') {
+  let path = `${AT_BASE}/${encodeURIComponent(table)}?maxRecords=${max}&sort[0][field]=Created Time&sort[0][direction]=desc`;
+  if (filter) path += `&filterByFormula=${encodeURIComponent(filter)}`;
+  const r = await fetch('/functions/airtable-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path,method:'GET'})});
+  const d = await r.json(); return d.records||[];
+}
+async function atCreate(table,fields){
+  const r=await fetch('/functions/airtable-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:`${AT_BASE}/${encodeURIComponent(table)}`,method:'POST',data:{fields}})});
+  return r.json();
+}
+async function atUpdate(table,id,fields){
+  const r=await fetch('/functions/airtable-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:`${AT_BASE}/${encodeURIComponent(table)}/${id}`,method:'PATCH',data:{fields}})});
+  return r.json();
+}
+async function atDelete(table,id){
+  await fetch('/functions/airtable-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path:`${AT_BASE}/${encodeURIComponent(table)}/${id}`,method:'DELETE'})});
 }
 
-async function atCreate(table, fields) {
-  const path = `${AIRTABLE_BASE_ID}/${encodeURIComponent(table)}`;
-  const res = await fetch('/functions/airtable-proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ path, method: 'POST', data: { fields } })
-  });
-  return await res.json();
+// ── CLAUDE ────────────────────────────────────────────────────────────────
+async function claude(prompt,tokens=2500){
+  setBusy(true);
+  try{
+    const r=await fetch('/functions/anthropic-proxy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:tokens,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    if(!d.content) throw new Error(d.error?.message||'API error');
+    return d.content.map(b=>b.text||'').join('');
+  }finally{setBusy(false);}
+}
+function parseJSON(raw){
+  raw=raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  const f=raw.indexOf('{'),l=raw.lastIndexOf('}');
+  if(f===-1||l===-1) throw new Error('Could not parse response');
+  return JSON.parse(raw.slice(f,l+1));
 }
 
-async function atUpdate(table, recordId, fields) {
-  const path = `${AIRTABLE_BASE_ID}/${encodeURIComponent(table)}/${recordId}`;
-  const res = await fetch('/functions/airtable-proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ path, method: 'PATCH', data: { fields } })
-  });
-  return await res.json();
+// ── UI HELPERS ────────────────────────────────────────────────────────────
+function setBusy(b){document.getElementById('statusDot').classList.toggle('busy',b);}
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.add('show');}
+function hideErr(id){document.getElementById(id).classList.remove('show');}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+let toastTimer=null;
+function toast(msg,icon='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+  addLog(msg,icon);
 }
 
-// ─── CLAUDE API ───────────────────────────────────────────────────────────
-async function callClaude(prompt, maxTokens = 2000) {
-  const res = await fetch('/functions/anthropic-proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: maxTokens,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  const data = await res.json();
-  if (!data.content) throw new Error(data.error?.message || 'API error');
-  return data.content.map(b => b.text || '').join('');
+// ── ACTIVITY LOG ──────────────────────────────────────────────────────────
+const activityLog=[];
+function addLog(msg,icon='circle'){
+  const now=new Date();
+  const time=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  activityLog.unshift({msg,icon,time});
+  if(activityLog.length>100) activityLog.pop();
 }
-
-// ─── TAB SWITCHING ────────────────────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('panel-' + tab).classList.add('active');
-  if (tab === 'queue') loadQueue();
-  if (tab === 'history') loadHistory();
-  if (tab === 'draft') loadDraftContext();
-}
-
-// ─── VOICE INPUT ──────────────────────────────────────────────────────────
-let recognition = null;
-let isRecording = false;
-
-function toggleVoice() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    showError('inputError', 'Voice input is not supported in this browser. Please use Chrome on Android.');
-    return;
+function openLog(){
+  const el=document.getElementById('logList');
+  if(!activityLog.length){el.innerHTML='<div class="empty"><div class="empty-title">No activity yet</div></div>';}
+  else{
+    el.innerHTML=activityLog.map(e=>`<div class="log-item">
+      <span class="log-time">${e.time}</span>
+      <i data-lucide="${e.icon||'circle'}" style="width:13px;height:13px;color:var(--teal);flex-shrink:0;margin-top:1px;"></i>
+      <span>${e.msg}</span>
+    </div>`).join('');
+    lucide.createIcons();
   }
-  if (isRecording) {
-    stopVoice();
-  } else {
-    startVoice();
-  }
+  openModal('logModal');
 }
 
-function startVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'en-GB';
+// ── NAV ───────────────────────────────────────────────────────────────────
+function goScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sc=document.getElementById('screen-'+name);
+  if(sc) sc.classList.add('active');
+  const ni=document.getElementById('nav-'+name);
+  if(ni) ni.classList.add('active');
+  if(name==='library') loadLibrary();
+  if(name==='home') loadHomeStats();
+  if(name==='studio') resetStudioIfClean();
+}
+function goSettings(){goScreen('settings');}
 
-  const existingText = document.getElementById('inputContent').value;
-
-  recognition.onstart = function() {
-    isRecording = true;
-    document.getElementById('voiceBtn').classList.add('recording');
-    document.getElementById('voiceBtn').textContent = '⏹';
-    document.getElementById('voiceStatus').textContent = 'Listening...';
-    document.getElementById('voiceStatus').classList.add('active');
-  };
-
-  recognition.onresult = function(e) {
-    let interim = '';
-    let final = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    document.getElementById('inputContent').value = existingText + (existingText ? ' ' : '') + final + interim;
-    updateCharCount('inputContent', 'inputCharCount');
-  };
-
-  recognition.onerror = function(e) {
-    stopVoice();
-    showError('inputError', 'Voice input error: ' + e.error + '. Please try again.');
-  };
-
-  recognition.onend = function() {
-    if (isRecording) stopVoice();
-  };
-
-  recognition.start();
+// ── HOME ──────────────────────────────────────────────────────────────────
+async function loadHomeStats(){
+  const h=new Date().getHours();
+  document.getElementById('homeGreeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Hassan';
+  document.getElementById('homeDate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  try{
+    const [q,pub]=await Promise.all([atGet(AT.Q,100,"Status='Available'"),atGet(AT.PUB,100)]);
+    document.getElementById('statTopics').textContent=q.length;
+    const now=new Date();
+    document.getElementById('statPosts').textContent=pub.filter(r=>{
+      const d=r.fields['Published Date'];
+      if(!d)return false;
+      const pd=new Date(d);
+      return pd.getMonth()===now.getMonth()&&pd.getFullYear()===now.getFullYear();
+    }).length;
+    checkCleanupNeeded(q.length);
+  }catch(e){console.warn(e);}
 }
 
-function stopVoice() {
-  if (recognition) recognition.stop();
-  isRecording = false;
-  document.getElementById('voiceBtn').classList.remove('recording');
-  document.getElementById('voiceBtn').textContent = '🎤';
-  document.getElementById('voiceStatus').textContent = 'Tap microphone to speak';
-  document.getElementById('voiceStatus').classList.remove('active');
-}
+// ── BRIEFING ──────────────────────────────────────────────────────────────
+let discardTarget=null;
+let discardCallback=null;
+const seenArticleUrls=new Set();
 
-// ─── SAVE INPUT ───────────────────────────────────────────────────────────
-async function saveInput() {
-  const content = document.getElementById('inputContent').value.trim();
-  const type = document.getElementById('inputType').value;
-  const err = document.getElementById('inputError');
-  err.classList.remove('visible');
+async function runBriefing(){
+  const area=document.getElementById('briefingArea');
+  const btn=document.getElementById('briefBtn');
+  btn.disabled=true;
+  area.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Getting your brief...</div><div class="loading-sub">Searching for recent content</div></div></div>`;
+  addLog('Daily brief started','newspaper');
 
-  if (!content) { showError('inputError', 'Please add some content before saving.'); return; }
+  try{
+    // Get discarded URLs to exclude
+    const discarded=await atGet(AT.IN,50,"AND({Input Type}='Anti-Repetition Note',FIND('DISCARD:',{Raw Content})>0)");
+    const discardedUrls=new Set(discarded.map(r=>(r.fields['Raw Content']||'').replace('DISCARD:','').trim()));
 
-  const btn = document.getElementById('saveInputBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Saving...';
-  setStatus('Saving input...');
+    // Search for articles
+    const settings=getSettings();
+    const prompt=`You are Hassan Khadra's content research agent. Search for the 5 most relevant recent articles published in the last 7 days.
 
-  try {
-    // Ask Claude to classify the input
-    const classifyPrompt = `Classify this input from Hassan Khadra for his LinkedIn content agent.
+Topics: Agentic AI, AI Strategy, AI-enabled delivery, Agile transformation, Startup advisory, Future of Work, Digital transformation.
+Audience: CTOs, ops leaders, consultants, founders. North America and UK focus.
+Prioritise: Last 24 hours first, then 48h, then 72h, then up to 7 days.
+Exclude these URLs already seen: ${[...seenArticleUrls,...discardedUrls].join(', ')||'none'}
 
-Input type selected: ${type}
-Content: "${content}"
-
-Return ONLY a JSON object:
+Return ONLY valid JSON - keep all string values concise to avoid truncation:
 {
-  "classification": "<one of: Content Seed, Style Update, Topic Direction, Reference Material, Avoid / Anti-repeat, Strategy Update, Pending Review>",
-  "notes": "<1 sentence explaining what Claude should do with this input when drafting posts>"
-}`;
-
-    const raw = await callClaude(classifyPrompt, 300);
-    let classification = 'Content Seed';
-    let notes = '';
-    try {
-      const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
-      const parsed = JSON.parse(raw.slice(f, l + 1));
-      classification = parsed.classification || 'Content Seed';
-      notes = parsed.notes || '';
-    } catch(e) {}
-
-    const inputId = 'IN-' + Date.now();
-    await atCreate(AT_INPUTS, {
-      'Input ID': inputId,
-      'Input Type': type,
-      'Raw Content': content,
-      'Claude Classification': classification,
-      'Claude Notes': notes,
-      'Status': 'New',
-      'Used in Post': false
-    });
-
-    document.getElementById('inputContent').value = '';
-    updateCharCount('inputContent', 'inputCharCount');
-    setStatus('Input saved');
-    loadRecentInputs();
-
-    btn.innerHTML = '&#10003; Saved!';
-    btn.style.background = 'var(--green)';
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.innerHTML = '<span>&#10003;</span> Save Input';
-      btn.style.background = '';
-    }, 2000);
-
-  } catch(e) {
-    btn.disabled = false;
-    btn.innerHTML = '<span>&#10003;</span> Save Input';
-    showError('inputError', 'Save failed: ' + e.message);
-    setStatus('Error');
-  }
-}
-
-// ─── LOAD RECENT INPUTS ───────────────────────────────────────────────────
-async function loadRecentInputs() {
-  try {
-    const records = await atGet(AT_INPUTS, 8);
-    const el = document.getElementById('recentInputsList');
-    if (!records.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#128221;</div><div class="empty-state-title">No inputs yet</div><div class="empty-state-body">Your saved inputs will appear here</div></div>`;
-      return;
-    }
-    el.innerHTML = records.map(r => {
-      const f = r.fields;
-      const statusColor = f['Status'] === 'New' ? 'tag-teal' : f['Status'] === 'Used in Draft' ? 'tag-green' : 'tag-navy';
-      return `<div class="input-item">
-        <div class="input-item-type">${f['Input Type'] || 'Input'} · ${f['Claude Classification'] || ''}</div>
-        <div class="input-item-content">${(f['Raw Content'] || '').slice(0, 120)}${(f['Raw Content'] || '').length > 120 ? '...' : ''}</div>
-        <div class="input-item-date">${f['Date Added'] ? new Date(f['Date Added']).toLocaleDateString('en-GB') : 'Just now'}</div>
-        <span class="input-item-status tag ${statusColor}">${f['Status'] || 'New'}</span>
-      </div>`;
-    }).join('');
-  } catch(e) { console.warn('Could not load inputs:', e); }
-}
-
-// ─── LOAD DRAFT CONTEXT ───────────────────────────────────────────────────
-async function loadDraftContext() {
-  const notice = document.getElementById('draftContextNotice');
-  notice.textContent = 'Loading your content context...';
-  try {
-    const [inputs, queue, published] = await Promise.all([
-      atGet(AT_INPUTS, 10, "Status='New'"),
-      atGet(AT_QUEUE, 5, "Status='Available'"),
-      atGet(AT_PUBLISHED, 5)
-    ]);
-    const newInputs = inputs.length;
-    const queueItems = queue.length;
-    const recentPosts = published.length;
-    notice.innerHTML = `&#9989; Context loaded: <strong>${newInputs} new input${newInputs !== 1 ? 's' : ''}</strong>, <strong>${queueItems} queued article${queueItems !== 1 ? 's' : ''}</strong>, <strong>${recentPosts} recent post${recentPosts !== 1 ? 's' : ''}</strong> in memory. Ready to draft.`;
-  } catch(e) {
-    notice.textContent = 'Could not load context. Claude will draft from style guide only.';
-  }
-}
-
-// ─── GENERATE DRAFTS ──────────────────────────────────────────────────────
-async function generateDrafts() {
-  const focus = document.getElementById('draftFocus').value.trim();
-  const btn = document.getElementById('generateDraftsBtn');
-  const output = document.getElementById('draftsOutput');
-
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Generating...';
-  setStatus('Generating drafts...');
-
-  output.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Claude is drafting your posts...</div><div class="loading-sub">Pulling your inputs, queue and style history</div></div>`;
-
-  try {
-    // Fetch context
-    const [inputs, queue, published] = await Promise.all([
-      atGet(AT_INPUTS, 15, "Status='New'"),
-      atGet(AT_QUEUE, 8, "Status='Available'"),
-      atGet(AT_PUBLISHED, 10)
-    ]);
-
-    const inputContext = inputs.map(r => `[${r.fields['Input Type']}] ${r.fields['Raw Content'] || ''}`).join('\n');
-    const queueContext = queue.map(r => `Title: ${r.fields['Title'] || ''}\nURL: ${r.fields['Source URL'] || ''}\nSummary: ${r.fields['Summary'] || ''}`).join('\n\n');
-    const publishedContext = published.map(r => `Hook: ${r.fields['Post Title / Hook'] || ''}\nCore argument: ${r.fields['Core Argument'] || ''}\nTags: ${(r.fields['Topic Tags'] || []).join(', ')}`).join('\n\n');
-
-    const prompt = `You are Hassan Khadra's personal LinkedIn content strategist. Generate exactly two LinkedIn post drafts for today.
-
-${HASSAN_STYLE_GUIDE}
-
-RECENT INPUTS FROM HASSAN (thoughts, URLs, strategy notes saved since last session):
-${inputContext || 'No new inputs - use content queue and your knowledge of Hassan\'s topics'}
-
-CONTENT QUEUE (articles and topics available):
-${queueContext || 'No queued articles - draw from Hassan\'s topic areas and current AI/Agile news'}
-
-RECENT PUBLISHED POSTS (avoid repeating these angles):
-${publishedContext || 'No history yet - this is an early session'}
-
-TODAY'S FOCUS FROM HASSAN: ${focus || 'No specific focus - choose the two most timely and relevant topics from the above'}
-
-Generate TWO distinct post drafts. Return ONLY valid JSON:
-{
-  "draftA": {
-    "content": "<full post text, 150-280 words, in Hassan's voice>",
-    "hookType": "<Provocative statement|Question|Story / Personal|Data / Statistic|Contrarian take|News reaction>",
-    "topicTags": ["<tag1>","<tag2>"],
-    "sourceArticle": "<URL or title if based on a specific article, otherwise empty>",
-    "coreArgument": "<1 sentence summary of the main point>"
-  },
-  "draftB": {
-    "content": "<full post text, 150-280 words, in Hassan's voice - different topic and hook type from Draft A>",
-    "hookType": "<type>",
-    "topicTags": ["<tag1>","<tag2>"],
-    "sourceArticle": "<URL or title if applicable>",
-    "coreArgument": "<1 sentence summary>"
-  }
-}
-
-CRITICAL: Posts must sound like Hassan wrote them - imperfect rhythm, no em-dashes, direct and warm, real examples, end with engagement question. Do NOT produce symmetrical AI-sounding content.`;
-
-    const raw = await callClaude(prompt, 3000);
-    const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
-    const result = JSON.parse(raw.slice(f, l + 1));
-
-    // Save drafts to Airtable
-    const draftAId = 'DA-' + Date.now();
-    const draftBId = 'DB-' + Date.now();
-    const recA = await atCreate(AT_DRAFTS, { 'Draft ID': draftAId, 'Draft Number': 'Draft A', 'Post Content': result.draftA.content, 'Hook Type': result.draftA.hookType, 'Topic Tags': result.draftA.topicTags, 'Source Articles': result.draftA.sourceArticle, 'Status': 'Generated', 'Refinement Count': 0 });
-    const recB = await atCreate(AT_DRAFTS, { 'Draft ID': draftBId, 'Draft Number': 'Draft B', 'Post Content': result.draftB.content, 'Hook Type': result.draftB.hookType, 'Topic Tags': result.draftB.topicTags, 'Source Articles': result.draftB.sourceArticle, 'Status': 'Generated', 'Refinement Count': 0 });
-
-    renderDrafts(result, recA.id, recB.id);
-    setStatus('Drafts ready');
-
-    btn.disabled = false;
-    btn.innerHTML = '<span>&#9889;</span> Generate Two Drafts';
-
-  } catch(e) {
-    output.innerHTML = `<div class="card"><div class="error-box visible">Generation failed: ${e.message}. Please try again.</div></div>`;
-    btn.disabled = false;
-    btn.innerHTML = '<span>&#9889;</span> Generate Two Drafts';
-    setStatus('Error');
-  }
-}
-
-// ─── RENDER DRAFTS ────────────────────────────────────────────────────────
-function renderDrafts(result, recAId, recBId) {
-  const output = document.getElementById('draftsOutput');
-  output.innerHTML = [
-    { label: 'Draft A', data: result.draftA, recId: recAId, key: 'A' },
-    { label: 'Draft B', data: result.draftB, recId: recBId, key: 'B' }
-  ].map(d => `
-    <div class="draft-card" id="draftCard${d.key}">
-      <div class="draft-header">
-        <span class="draft-label">${d.label}</span>
-        <span class="draft-badge tag-teal">${d.data.hookType}</span>
-      </div>
-      <div class="draft-body" id="draftContent${d.key}">${d.data.content}</div>
-      <div style="padding:8px 16px 0;"><div class="tags-wrap">${(d.data.topicTags || []).map(t => `<span class="tag tag-teal">${t}</span>`).join('')}</div></div>
-      <div class="draft-actions">
-        <div class="char-count" style="margin-bottom:8px;">${d.data.content.length} characters</div>
-        <textarea class="draft-feedback" id="feedback${d.key}" placeholder="Give feedback to refine this draft... e.g. 'Make the opening punchier', 'Add a specific data point', 'Shorten it by 30 words'"></textarea>
-        <div class="btn-row">
-          <button class="btn btn-outline btn-sm" onclick="refineDraft('${d.key}','${d.recId}')">&#8635; Refine</button>
-          <button class="btn btn-green btn-sm" onclick="approveDraft('${d.key}','${d.recId}','${d.data.coreArgument}',${JSON.stringify(d.data.topicTags)})">&#10003; Approve</button>
-          <button class="btn btn-red btn-sm" onclick="rejectDraft('${d.key}','${d.recId}')">&#10007;</button>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ─── REFINE DRAFT ─────────────────────────────────────────────────────────
-async function refineDraft(key, recId) {
-  const feedback = document.getElementById('feedback' + key).value.trim();
-  const currentContent = document.getElementById('draftContent' + key).textContent;
-  if (!feedback) { alert('Please add feedback before refining.'); return; }
-
-  const card = document.getElementById('draftCard' + key);
-  card.style.opacity = '0.5';
-  setStatus('Refining draft ' + key + '...');
-
-  try {
-    const prompt = `You are Hassan Khadra's LinkedIn content strategist. Refine this post based on his feedback.
-
-${HASSAN_STYLE_GUIDE}
-
-CURRENT DRAFT:
-${currentContent}
-
-HASSAN'S FEEDBACK:
-${feedback}
-
-Return ONLY the revised post text. No explanation, no JSON, just the improved post content.`;
-
-    const refined = await callClaude(prompt, 800);
-    document.getElementById('draftContent' + key).textContent = refined.trim();
-    document.getElementById('feedback' + key).value = '';
-
-    await atUpdate(AT_DRAFTS, recId, {
-      'Post Content': refined.trim(),
-      'Hassan Feedback': feedback,
-      'Status': 'Refined'
-    });
-
-    card.style.opacity = '1';
-    setStatus('Draft refined');
-  } catch(e) {
-    card.style.opacity = '1';
-    setStatus('Error refining');
-    alert('Refinement failed: ' + e.message);
-  }
-}
-
-// ─── APPROVE DRAFT ────────────────────────────────────────────────────────
-async function approveDraft(key, recId, coreArgument, topicTags) {
-  const content = document.getElementById('draftContent' + key).textContent;
-  setStatus('Saving approved post...');
-
-  try {
-    await atUpdate(AT_DRAFTS, recId, { 'Status': 'Approved', 'Approved': true });
-    await atCreate(AT_PUBLISHED, {
-      'Post Title / Hook': content.split('\n')[0].slice(0, 80),
-      'Full Post Content': content,
-      'Core Argument': coreArgument,
-      'Topic Tags': topicTags,
-      'Source Draft ID': recId,
-      'Style Notes': ''
-    });
-
-    const card = document.getElementById('draftCard' + key);
-    card.innerHTML = `<div style="padding:24px;text-align:center;"><div style="font-size:32px;margin-bottom:8px;">&#10003;</div><div style="font-size:14px;font-weight:700;color:var(--green);">Post approved and saved to Published Posts</div><div style="font-size:12px;color:var(--text-soft);margin-top:4px;">Copy and paste to LinkedIn when ready</div><div style="margin-top:16px;padding:16px;background:var(--green-bg);border-radius:var(--radius);font-size:13px;text-align:left;white-space:pre-line;">${content}</div></div>`;
-    setStatus('Post approved');
-  } catch(e) {
-    setStatus('Error saving');
-    alert('Could not save: ' + e.message);
-  }
-}
-
-// ─── REJECT DRAFT ─────────────────────────────────────────────────────────
-async function rejectDraft(key, recId) {
-  const reason = prompt('Optional: Why are you rejecting this draft? (helps Claude learn)');
-  try {
-    await atUpdate(AT_DRAFTS, recId, { 'Status': 'Rejected', 'Rejection Reason': reason || '' });
-    const card = document.getElementById('draftCard' + key);
-    card.style.opacity = '0.4';
-    card.innerHTML += `<div style="padding:12px 16px;text-align:center;font-size:12px;color:var(--red);font-weight:700;">&#10007; Draft rejected${reason ? ' - feedback saved' : ''}</div>`;
-    setStatus('Draft rejected');
-  } catch(e) { console.warn(e); }
-}
-
-// ─── LOAD QUEUE ───────────────────────────────────────────────────────────
-async function loadQueue() {
-  const el = document.getElementById('queueList');
-  el.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Loading queue...</div></div>`;
-  try {
-    const records = await atGet(AT_QUEUE, 20, "Status='Available'");
-    if (!records.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#128240;</div><div class="empty-state-title">Queue is empty</div><div class="empty-state-body">Use the Search tab to find articles or add a URL via the Input tab</div></div>`;
-      return;
-    }
-    el.innerHTML = records.map(r => {
-      const f = r.fields;
-      const p = f['Priority'];
-      const pClass = p === 'High' ? 'priority-high' : p === 'Medium' ? 'priority-medium' : 'priority-low';
-      return `<div class="queue-item">
-        <div class="queue-item-title">${f['Title'] || 'Untitled'}</div>
-        <div class="queue-item-meta"><span class="${pClass}">${p || 'Low'} priority</span> · ${f['Source'] || 'Manual'} · ${f['Date Found'] ? new Date(f['Date Found']).toLocaleDateString('en-GB') : ''}</div>
-        ${f['Summary'] ? `<div class="queue-item-summary">${f['Summary'].slice(0, 150)}...</div>` : ''}
-        <div class="tags-wrap" style="margin-top:7px;">${(f['Topic Tags'] || []).map(t => `<span class="tag tag-teal">${t}</span>`).join('')}</div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = `<div class="card"><div class="error-box visible">Could not load queue: ${e.message}</div></div>`;
-  }
-}
-
-// ─── LOAD HISTORY ─────────────────────────────────────────────────────────
-async function loadHistory() {
-  const el = document.getElementById('historyList');
-  el.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Loading published posts...</div></div>`;
-  try {
-    const records = await atGet(AT_PUBLISHED, 20);
-    if (!records.length) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#128196;</div><div class="empty-state-title">No published posts yet</div><div class="empty-state-body">Approved posts will appear here</div></div>`;
-      return;
-    }
-    el.innerHTML = records.map(r => {
-      const f = r.fields;
-      return `<div class="input-item">
-        <div class="input-item-type">${(f['Topic Tags'] || []).join(' · ')}</div>
-        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">${f['Post Title / Hook'] || 'Post'}</div>
-        <div class="input-item-content">${(f['Core Argument'] || '').slice(0, 100)}</div>
-        <div class="input-item-date">${f['Published Date'] ? new Date(f['Published Date']).toLocaleDateString('en-GB') : ''}</div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    el.innerHTML = `<div class="card"><div class="error-box visible">Could not load history: ${e.message}</div></div>`;
-  }
-}
-
-// ─── AUTONOMOUS SEARCH ────────────────────────────────────────────────────
-async function runSearch() {
-  const selectedTopics = [...document.querySelectorAll('.topic-chip.selected')].map(el => el.dataset.topic);
-  const customAngle = document.getElementById('customSearchAngle').value.trim();
-  const btn = document.getElementById('searchBtn');
-  const results = document.getElementById('searchResults');
-
-  if (!selectedTopics.length) { alert('Please select at least one topic.'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;margin:0;border-width:2px;"></div> Searching...';
-  setStatus('Searching for content...');
-  results.innerHTML = `<div class="loading-card card"><div class="spinner"></div><div class="loading-msg">Claude is searching for relevant content...</div><div class="loading-sub">This may take 20-30 seconds</div></div>`;
-
-  try {
-    const prompt = `You are Hassan Khadra's content research assistant. Search for and identify the most relevant recent news, articles, and insights across these topics for a LinkedIn thought leader in AI-enabled delivery, Agile transformation, and startup advisory.
-
-TOPICS TO SEARCH: ${selectedTopics.join(', ')}
-${customAngle ? `CUSTOM ANGLE: ${customAngle}` : ''}
-
-Hassan's audience: CTOs, ops leaders, consultants, founders, delivery practitioners. North American and UK market focus.
-
-Find 5 highly relevant, timely content items. Use your web search capability to find real, current articles.
-
-Return ONLY valid JSON:
-{
-  "items": [
+  "articles": [
     {
-      "title": "<article title>",
-      "url": "<article URL>",
-      "source": "<publication name>",
-      "summary": "<2-3 sentences on what the article covers and why it matters to Hassan's audience>",
-      "angle": "<1 sentence on the specific post angle Hassan could take with this>",
-      "topicTags": ["<tag1>","<tag2>"],
-      "priority": "<High|Medium|Low>"
+      "title": "<title under 80 chars>",
+      "url": "<full URL>",
+      "source": "<publication>",
+      "age": "<e.g. 2 hours ago, yesterday, 3 days ago>",
+      "summary": "<50-80 word summary explaining what it covers and why it matters to Hassan's audience>",
+      "relevance": "<1 sentence on why Hassan specifically should care>"
     }
   ]
 }`;
 
-    const raw = await callClaude(prompt, 2500);
-    const f = raw.indexOf('{'), l = raw.lastIndexOf('}');
-    const parsed = JSON.parse(raw.slice(f, l + 1));
-    const items = parsed.items || [];
+    const raw=await claude(prompt,3000);
+    const result=parseJSON(raw);
+    const articles=result.articles||[];
 
-    if (!items.length) throw new Error('No results found');
+    // Track seen
+    articles.forEach(a=>{ if(a.url) seenArticleUrls.add(a.url); });
 
-    // Save to Airtable queue
-    for (const item of items) {
-      await atCreate(AT_QUEUE, {
-        'Title': item.title,
-        'Source URL': item.url,
-        'Source': 'Autonomous Search',
-        'Topic Tags': item.topicTags,
-        'Summary': item.summary + '\n\nHassan angle: ' + item.angle,
-        'Priority': item.priority,
-        'Status': 'Available',
-        'Used in Draft': false
-      });
+    // Also get stored topic suggestions
+    const inputs=await atGet(AT.IN,25,"Status='New'");
+    const queue=await atGet(AT.Q,100,"Status='Available'");
+    const pub=await atGet(AT.PUB,20);
+
+    const topicPrompt=`You are Hassan Khadra's content strategist. Propose exactly 3 specific LinkedIn post topics for today.
+
+${STYLE}
+${settings.strategy?'Strategy context: '+settings.strategy.slice(0,300):''}
+Recent inputs: ${inputs.map(r=>(r.fields['Raw Content']||'').slice(0,100)).join(' | ').slice(0,500)||'none'}
+Recent published (avoid repeating): ${pub.map(r=>r.fields['Post Title / Hook']||'').filter(Boolean).join(', ').slice(0,400)||'none'}
+Available topics in library: ${queue.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,15).join(', ')||'none'}
+
+Return ONLY valid JSON:
+{
+  "topics": [
+    {
+      "title": "<compelling specific post topic under 70 chars>",
+      "summary": "<50-80 words explaining what the post covers and why Hassan should write it today>",
+      "source": "<'Library' or 'News' or 'Your experience'>",
+      "tags": ["<tag1>","<tag2>"]
     }
+  ]
+}`;
 
-    results.innerHTML = `
-      <div class="notice notice-teal" style="margin-bottom:12px;">&#9989; Found ${items.length} items - all added to your Content Queue</div>
-      ${items.map(item => `
-        <div class="queue-item">
-          <div class="queue-item-title">${item.title}</div>
-          <div class="queue-item-meta"><span class="${item.priority === 'High' ? 'priority-high' : item.priority === 'Medium' ? 'priority-medium' : 'priority-low'}">${item.priority}</span> · ${item.source}</div>
-          <div class="queue-item-summary">${item.summary}</div>
-          <div style="margin-top:6px;font-size:12px;color:var(--teal);font-weight:600;">Angle: ${item.angle}</div>
-          <div class="tags-wrap" style="margin-top:7px;">${item.topicTags.map(t => `<span class="tag tag-teal">${t}</span>`).join('')}</div>
+    const topicRaw=await claude(topicPrompt,1500);
+    const topicResult=parseJSON(topicRaw);
+    const topics=topicResult.topics||[];
+
+    renderBriefing(articles,topics,area);
+    addLog(`Brief complete: ${articles.length} articles, ${topics.length} topics proposed`,'check-circle');
+  }catch(e){
+    area.innerHTML=`<div class="err-box show">Brief failed: ${e.message}. Please try again.</div>`;
+    addLog('Brief failed: '+e.message,'alert-circle');
+  }
+  btn.disabled=false;
+}
+
+function renderBriefing(articles,topics,area){
+  let html='';
+
+  if(articles.length){
+    html+=`<div class="brief-phase-title"><i data-lucide="newspaper" style="width:14px;height:14px;color:var(--teal);"></i> Recent Publications (${articles.length})</div>`;
+    html+=articles.map((a,i)=>`
+      <div class="accord-card" id="brief-art-${i}">
+        <div class="accord-header" onclick="toggleAccord('brief-art-${i}')">
+          <div class="accord-icon" style="background:var(--teal-pale);"><i data-lucide="newspaper" style="width:16px;height:16px;color:var(--teal);"></i></div>
+          <div class="accord-main">
+            <div class="accord-title">${a.title||'Article'}</div>
+            <div class="accord-meta"><span>${a.source||''}</span><span>·</span><span>${a.age||''}</span></div>
+          </div>
+          <i data-lucide="chevron-down" style="width:16px;height:16px;" class="accord-chevron"></i>
         </div>
-      `).join('')}
-    `;
-    setStatus(items.length + ' items found');
-
-  } catch(e) {
-    results.innerHTML = `<div class="card"><div class="error-box visible">Search failed: ${e.message}. Please try again.</div></div>`;
-    setStatus('Search failed');
+        <div class="accord-body">
+          <div class="accord-summary">${a.summary||''}</div>
+          <div style="font-size:13px;color:var(--teal);font-weight:600;margin-bottom:12px;">${a.relevance||''}</div>
+          <div class="accord-actions">
+            <button class="btn btn-navy btn-xs" onclick="articleAction('write',${i},${JSON.stringify(a).replace(/"/g,'&quot;')})"><i data-lucide="pen-line" style="width:12px;height:12px;"></i> Write about this</button>
+            <button class="btn btn-teal btn-xs" onclick="articleAction('save',${i},${JSON.stringify(a).replace(/"/g,'&quot;')})"><i data-lucide="bookmark" style="width:12px;height:12px;"></i> Save for later</button>
+            <button class="btn btn-outline btn-xs" onclick="briefDiscard(${i},'article')"><i data-lucide="x" style="width:12px;height:12px;"></i> Discard</button>
+          </div>
+          ${a.url?`<div style="margin-top:8px;"><a href="${a.url}" target="_blank" style="font-size:12px;color:var(--teal);text-decoration:underline;">View article ↗</a></div>`:''}
+        </div>
+      </div>`).join('');
   }
 
-  btn.disabled = false;
-  btn.innerHTML = '<span>&#128269;</span> Search for Content Now';
+  if(topics.length){
+    html+=`<div class="brief-phase-title" style="margin-top:20px;"><i data-lucide="lightbulb" style="width:14px;height:14px;color:var(--gold);"></i> Suggested Topics for Today</div>`;
+    html+=`<div id="topicProposals">`;
+    html+=topics.map((t,i)=>`
+      <div class="accord-card" id="brief-top-${i}">
+        <div class="accord-header" onclick="toggleAccord('brief-top-${i}')">
+          <div class="accord-icon" style="background:var(--gold-bg);"><i data-lucide="lightbulb" style="width:16px;height:16px;color:var(--gold);"></i></div>
+          <div class="accord-main">
+            <div class="accord-title">${t.title||'Topic'}</div>
+            <div class="accord-meta"><span class="pill pill-silver" style="padding:2px 8px;font-size:11px;">${t.source||'Suggested'}</span></div>
+          </div>
+          <i data-lucide="chevron-down" style="width:16px;height:16px;" class="accord-chevron"></i>
+        </div>
+        <div class="accord-body">
+          <div class="accord-summary">${t.summary||''}</div>
+          <div class="accord-actions">
+            <button class="btn btn-navy btn-xs" onclick="topicAction('select',${i},${JSON.stringify(t).replace(/"/g,'&quot;')})"><i data-lucide="pen-line" style="width:12px;height:12px;"></i> Draft this</button>
+            <button class="btn btn-outline btn-xs" onclick="topicAction('reject',${i},${JSON.stringify(t).replace(/"/g,'&quot;')})"><i data-lucide="x" style="width:12px;height:12px;"></i> Skip</button>
+          </div>
+        </div>
+      </div>`).join('');
+    html+=`</div>`;
+    html+=`<button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="generateMoreTopics()"><i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Generate 3 more topics</button>`;
+  }
+
+  area.innerHTML=html;
+  lucide.createIcons();
 }
 
-// ─── TOPIC CHIP TOGGLE ────────────────────────────────────────────────────
-document.querySelectorAll('.topic-chip').forEach(chip => {
-  chip.addEventListener('click', () => chip.classList.toggle('selected'));
+function toggleAccord(id){
+  const card=document.getElementById(id);
+  if(!card)return;
+  const wasExpanded=card.classList.contains('expanded');
+  // Collapse all in same container
+  const parent=card.parentElement;
+  parent.querySelectorAll('.accord-card.expanded').forEach(c=>c.classList.remove('expanded'));
+  if(!wasExpanded) card.classList.add('expanded');
+}
+
+async function articleAction(action,idx,article){
+  const card=document.getElementById('brief-art-'+idx);
+  if(action==='write'){
+    // Save full article to queue with 150-word summary then go to studio
+    await atCreate(AT.Q,{
+      'Title':article.title,'Source URL':article.url,'Source':'Autonomous Search',
+      'Summary':article.summary+'\n\nRelevance: '+article.relevance,
+      'Priority':'High','Status':'Available','Used in Draft':false
+    });
+    loadStudioWithTopic(article.title, article.summary+' '+article.relevance, []);
+    if(card) card.style.opacity='0.4';
+    toast('Article saved — opening Studio','pen-line');
+    addLog('Article selected for drafting: '+article.title,'pen-line');
+  } else if(action==='save'){
+    await atCreate(AT.Q,{
+      'Title':article.title,'Source URL':article.url,'Source':'Autonomous Search',
+      'Summary':article.summary+'\n\nRelevance: '+article.relevance,
+      'Priority':'Medium','Status':'Available','Used in Draft':false
+    });
+    if(card){card.style.opacity='0.5';}
+    toast('Saved to Library','bookmark');
+    addLog('Article saved to library: '+article.title,'bookmark');
+  }
+}
+
+let pendingDiscardIdx=null;
+let pendingDiscardType=null;
+let pendingDiscardData=null;
+
+function briefDiscard(idx,type,data){
+  pendingDiscardIdx=idx; pendingDiscardType=type; pendingDiscardData=data;
+  document.getElementById('discardReason').value='';
+  openModal('discardModal');
+}
+
+async function confirmDiscard(withFeedback){
+  const reason=withFeedback?document.getElementById('discardReason').value.trim():'';
+  closeModal('discardModal');
+  const card=document.getElementById(`brief-${pendingDiscardType==='article'?'art':'top'}-${pendingDiscardIdx}`);
+  if(card){card.style.opacity='0.35';card.style.pointerEvents='none';}
+  if(reason){
+    await atCreate(AT.IN,{'Input ID':'DIS-'+Date.now(),'Input Type':'Anti-Repetition Note','Raw Content':'DISCARD: Feedback: '+reason,'Claude Classification':'Avoid / Anti-repeat','Status':'Processed','Used in Post':false});
+    addLog('Discard feedback saved: '+reason.slice(0,50),'ban');
+  }
+  toast('Discarded'+(reason?' — feedback saved':''),'trash-2');
+}
+
+async function topicAction(action,idx,topic){
+  const card=document.getElementById('brief-top-'+idx);
+  if(action==='select'){
+    // Save to queue
+    await atCreate(AT.Q,{'Title':topic.title,'Source':'Manual - Hassan','Topic Tags':topic.tags||[],'Summary':topic.summary,'Priority':'High','Status':'Available','Used in Draft':false});
+    loadStudioWithTopic(topic.title,topic.summary,topic.tags||[]);
+    toast('Opening Studio for: '+topic.title.slice(0,40),'pen-line');
+    addLog('Topic selected for drafting: '+topic.title,'pen-line');
+  } else {
+    if(card){card.style.opacity='0.35';card.style.pointerEvents='none';}
+    toast('Topic skipped','x');
+  }
+}
+
+async function generateMoreTopics(){
+  const area=document.getElementById('topicProposals');
+  if(!area)return;
+  area.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Generating more topics...</div></div></div>`;
+  try{
+    const pub=await atGet(AT.PUB,20);
+    const prompt=`Propose 3 more LinkedIn post topics for Hassan Khadra. Different from any already proposed this session.
+${STYLE}
+Published recently (avoid): ${pub.map(r=>r.fields['Post Title / Hook']||'').filter(Boolean).join(', ').slice(0,300)||'none'}
+Return ONLY valid JSON: {"topics":[{"title":"<under 70 chars>","summary":"<50-80 words>","source":"<Library|News|Your experience>","tags":["<tag>"]}]}`;
+    const raw=await claude(prompt,1000);
+    const result=parseJSON(raw);
+    const topics=result.topics||[];
+    area.innerHTML=topics.map((t,i)=>`
+      <div class="accord-card" id="brief-top-x${i}">
+        <div class="accord-header" onclick="toggleAccord('brief-top-x${i}')">
+          <div class="accord-icon" style="background:var(--gold-bg);"><i data-lucide="lightbulb" style="width:16px;height:16px;color:var(--gold);"></i></div>
+          <div class="accord-main"><div class="accord-title">${t.title}</div><div class="accord-meta"><span class="pill pill-silver" style="padding:2px 8px;font-size:11px;">${t.source}</span></div></div>
+          <i data-lucide="chevron-down" style="width:16px;height:16px;" class="accord-chevron"></i>
+        </div>
+        <div class="accord-body">
+          <div class="accord-summary">${t.summary}</div>
+          <div class="accord-actions">
+            <button class="btn btn-navy btn-xs" onclick="topicAction('select',${i},${JSON.stringify(t).replace(/"/g,'&quot;')})"><i data-lucide="pen-line" style="width:12px;height:12px;"></i> Draft this</button>
+            <button class="btn btn-outline btn-xs" onclick="topicAction('reject',${i},{})"><i data-lucide="x" style="width:12px;height:12px;"></i> Skip</button>
+          </div>
+        </div>
+      </div>`).join('');
+    lucide.createIcons();
+    addLog('Generated 3 more topic proposals','sparkles');
+  }catch(e){area.innerHTML=`<div class="err-box show">Could not generate: ${e.message}</div>`;}
+}
+
+// ── VOICE INPUT ───────────────────────────────────────────────────────────
+let mainRec=null, mainRecording=false;
+let fieldRec=null, fieldRecording=false, activeFieldId=null, activeFieldBtn=null;
+
+function toggleVoice(){
+  if(mainRecording) stopMainVoice(); else startMainVoice();
+}
+function startMainVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showErr('feedErr','Voice input requires Chrome on Android or desktop Chrome.');return;}
+  mainRec=new SR(); mainRec.continuous=true; mainRec.interimResults=true; mainRec.lang='en-GB';
+  let final='';
+  mainRec.onstart=()=>{
+    mainRecording=true;
+    document.getElementById('voiceCircle').classList.add('recording');
+    document.getElementById('voiceHeroTitle').textContent='Recording — tap to stop';
+    document.getElementById('voiceTranscript').classList.add('show');
+  };
+  mainRec.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    const t=document.getElementById('voiceTranscript');
+    t.textContent=final+interim;
+    document.getElementById('feedContent').value=final+interim;
+  };
+  mainRec.onerror=(e)=>{stopMainVoice();showErr('feedErr','Voice error: '+e.error);};
+  mainRec.onend=()=>{if(mainRecording)stopMainVoice();};
+  mainRec.start();
+}
+function stopMainVoice(){
+  if(mainRec)mainRec.stop(); mainRecording=false;
+  document.getElementById('voiceCircle').classList.remove('recording');
+  document.getElementById('voiceHeroTitle').textContent='Tap to speak';
+  document.getElementById('voiceConfirmRow').classList.add('show');
+}
+function confirmVoice(){
+  document.getElementById('voiceTranscript').classList.remove('show');
+  document.getElementById('voiceConfirmRow').classList.remove('show');
+}
+function clearVoice(){
+  document.getElementById('voiceTranscript').classList.remove('show');
+  document.getElementById('voiceConfirmRow').classList.remove('show');
+  document.getElementById('voiceTranscript').textContent='';
+  document.getElementById('feedContent').value='';
+}
+
+function toggleFieldVoice(fieldId, btnEl){
+  if(typeof btnEl==='string') btnEl=document.getElementById(btnEl);
+  if(fieldRecording&&activeFieldId===fieldId){ stopFieldVoice(); return; }
+  if(fieldRecording) stopFieldVoice();
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Voice input requires Chrome.');return;}
+  activeFieldId=fieldId; activeFieldBtn=btnEl;
+  fieldRec=new SR(); fieldRec.continuous=true; fieldRec.interimResults=true; fieldRec.lang='en-GB';
+  const existing=document.getElementById(fieldId).value;
+  let final=existing;
+  fieldRec.onstart=()=>{
+    fieldRecording=true;
+    if(btnEl){btnEl.classList.add('recording');btnEl.innerHTML='<i data-lucide="square" style="width:14px;height:14px;"></i>';lucide.createIcons();}
+  };
+  fieldRec.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript+' ';
+      else interim+=e.results[i][0].transcript;
+    }
+    document.getElementById(fieldId).value=final+interim;
+  };
+  fieldRec.onerror=()=>stopFieldVoice();
+  fieldRec.onend=()=>{if(fieldRecording)stopFieldVoice();};
+  fieldRec.start();
+}
+function stopFieldVoice(){
+  if(fieldRec)fieldRec.stop(); fieldRecording=false;
+  if(activeFieldBtn){activeFieldBtn.classList.remove('recording');activeFieldBtn.innerHTML='<i data-lucide="mic" style="width:14px;height:14px;"></i>';lucide.createIcons();}
+  activeFieldId=null; activeFieldBtn=null;
+}
+
+// ── INPUT TYPE ────────────────────────────────────────────────────────────
+function selType(btn){
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('encounterBox').classList.toggle('show',btn.dataset.type==='Personal Encounter');
+}
+function getType(){return(document.querySelector('.type-btn.sel')||{dataset:{type:'Random Thought'}}).dataset.type;}
+
+// ── SAVE INPUT ────────────────────────────────────────────────────────────
+async function saveInput(){
+  const content=document.getElementById('feedContent').value.trim();
+  const type=getType();
+  const tag=document.getElementById('encounterTag').value.trim();
+  hideErr('feedErr');
+  if(!content){showErr('feedErr','Please add some content before saving.');return;}
+
+  const btn=document.getElementById('feedSaveBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div> Saving...';
+
+  try{
+    // Get existing topics to cluster against
+    const existingTopics=await atGet(AT.Q,100,"Status='Available'");
+    const topicTitles=existingTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,50).join('; ');
+
+    const prompt=`You are Hassan Khadra's content intelligence agent. Process this new input.
+
+Input type: ${type}
+Content: "${content.slice(0,1000)}"
+${tag?'Tagging info: '+tag:''}
+
+Existing topics in library (for clustering): ${topicTitles||'none yet'}
+
+Tasks:
+1. Classify this input: Content Seed, Style Update, Topic Direction, Reference Material, Avoid / Anti-repeat, Strategy Update
+2. Detect which existing topic(s) this relates to (max 3, by exact title from the list above)
+3. If no match, suggest a new topic title this should create
+4. Write a 2-3 sentence response to Hassan about what you extracted and what you'll do with it
+5. If this could relate to multiple topics, list all that match
+
+Return ONLY valid JSON:
+{
+  "classification": "<type>",
+  "relatedTopics": ["<exact topic title from list>"],
+  "newTopicTitle": "<title if no match, else empty string>",
+  "response": "<2-3 sentence response>",
+  "tags": ["<tag1>","<tag2>"]
+}`;
+
+    const raw=await claude(prompt,700);
+    const result=parseJSON(raw);
+
+    // Save input to Airtable
+    const inputId='IN-'+Date.now();
+    await atCreate(AT.IN,{
+      'Input ID':inputId,'Input Type':type,
+      'Raw Content':content+(tag?'\n\nTag: '+tag:''),
+      'Claude Classification':result.classification,
+      'Claude Notes':result.response,
+      'Status':'New','Used in Post':false
+    });
+
+    // Topic clustering - update existing or create new
+    const linked=[];
+    if(result.relatedTopics&&result.relatedTopics.length){
+      for(const relTitle of result.relatedTopics){
+        const match=existingTopics.find(r=>(r.fields['Title']||'').toLowerCase()===relTitle.toLowerCase());
+        if(match){
+          const existingNotes=match.fields['Hassan Notes']||'';
+          await atUpdate(AT.Q,match.id,{'Hassan Notes':existingNotes+'\n\n['+new Date().toLocaleDateString('en-GB')+'] '+content.slice(0,200)});
+          linked.push(relTitle);
+        }
+      }
+    }
+    if(result.newTopicTitle&&!linked.length){
+      await atCreate(AT.Q,{'Title':result.newTopicTitle,'Source':'Manual - Hassan','Topic Tags':result.tags||[],'Summary':content.slice(0,300),'Hassan Notes':result.response,'Priority':'Medium','Status':'Available','Used in Draft':false});
+      linked.push(result.newTopicTitle+' (new)');
+    }
+    // Also add as content seed if applicable
+    if(result.classification==='Content Seed'&&result.newTopicTitle&&linked.some(t=>t.includes('(new)'))){
+      // already created above
+    }
+
+    // Toast with clustering info
+    if(linked.length){
+      toast('Saved · Linked to: '+linked.join(', ').slice(0,60),'link');
+    } else {
+      toast('Input saved','save');
+    }
+    addLog(`Input saved (${type}): ${content.slice(0,50)}`,'plus-circle');
+
+    // Show Claude response
+    document.getElementById('feedRespText').textContent=result.response;
+    document.getElementById('feedResp').classList.add('show');
+    document.getElementById('feedContent').value='';
+    document.getElementById('voiceTranscript').textContent='';
+    document.getElementById('voiceTranscript').classList.remove('show');
+    document.getElementById('voiceConfirmRow').classList.remove('show');
+
+    loadRecentFeed();
+    updateBadge();
+
+    btn.innerHTML='<i data-lucide="check" style="width:17px;height:17px;"></i> Saved!';
+    btn.style.background='var(--green)'; lucide.createIcons();
+    setTimeout(()=>{btn.disabled=false;btn.innerHTML='<i data-lucide="save" style="width:17px;height:17px;"></i> Save Input';btn.style.background='';lucide.createIcons();},2500);
+  }catch(e){
+    btn.disabled=false;btn.innerHTML='<i data-lucide="save" style="width:17px;height:17px;"></i> Save Input';lucide.createIcons();
+    showErr('feedErr','Save failed: '+e.message);
+    addLog('Input save failed: '+e.message,'alert-circle');
+  }
+}
+
+// ── RECENT FEED ───────────────────────────────────────────────────────────
+async function loadRecentFeed(){
+  try{
+    const records=await atGet(AT.IN,8);
+    const el=document.getElementById('recentFeedList');
+    if(!records.length){el.innerHTML=`<div class="empty"><div class="empty-icon"><i data-lucide="inbox" style="width:36px;height:36px;"></i></div><div class="empty-title">No inputs yet</div></div>`;lucide.createIcons();return;}
+    const icons={'Random Thought':'lightbulb','Article URL':'link','Personal Encounter':'users','Strategy Note':'target','Anti-Repetition Note':'ban','Document Extract':'file-text','Voice Note':'mic'};
+    const cols={'Random Thought':'var(--teal-pale)','Article URL':'#eef2fb','Personal Encounter':'var(--green-bg)','Strategy Note':'var(--gold-bg)','Anti-Repetition Note':'var(--red-bg)','Document Extract':'var(--silver-2)'};
+    el.innerHTML=records.map(r=>{
+      const f=r.fields;
+      const inputType=f['Input Type']||'Random Thought';
+      const ic=icons[inputType]||'circle';
+      const col=cols[inputType]||'var(--silver)';
+      return `<div class="fi-item">
+        <div class="fi-icon" style="background:${col};"><i data-lucide="${ic}" style="width:14px;height:14px;color:var(--text-mid);"></i></div>
+        <div style="flex:1;min-width:0;">
+          <div class="fi-type">${inputType}</div>
+          <div class="fi-content">${(f['Raw Content']||'').slice(0,90)}</div>
+          <div class="fi-meta">
+            <span class="pill pill-silver" style="padding:2px 7px;font-size:10px;">${f['Claude Classification']||'Processing'}</span>
+            <span>${f['Date Added']?new Date(f['Date Added']).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):''}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    lucide.createIcons();
+  }catch(e){console.warn(e);}
+}
+
+// ── LIBRARY ───────────────────────────────────────────────────────────────
+let allTopics=[]; let activeFilter='all'; let rejectedIds=new Set();
+
+async function loadLibrary(){
+  const el=document.getElementById('topicList');
+  el.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Loading library...</div></div></div>`;
+  try{
+    allTopics=await atGet(AT.Q,100,"Status='Available'");
+    renderTopics();
+    loadSeries();
+    checkCleanupNeeded(allTopics.length);
+  }catch(e){el.innerHTML=`<div class="err-box show">Could not load: ${e.message}</div>`;}
+}
+
+function renderTopics(){
+  const el=document.getElementById('topicList');
+  let topics=allTopics.filter(r=>!rejectedIds.has(r.id));
+  if(activeFilter!=='all') topics=topics.filter(r=>(r.fields['Topic Tags']||[]).includes(activeFilter));
+  if(!topics.length){el.innerHTML=`<div class="empty"><div class="empty-icon"><i data-lucide="library" style="width:36px;height:36px;"></i></div><div class="empty-title">No topics yet</div><div class="empty-body">Feed the tool with ideas or use the briefing to find content.</div></div>`;lucide.createIcons();return;}
+  const pOrder={'High':0,'Medium':1,'Low':2};
+  topics.sort((a,b)=>(pOrder[a.fields['Priority']]||1)-(pOrder[b.fields['Priority']]||1));
+  el.innerHTML=topics.map(r=>{
+    const f=r.fields;
+    const p=f['Priority']||'Medium';
+    const pCls=p==='High'?'pill-red':p==='Medium'?'pill-gold':'pill-silver';
+    return `<div class="accord-card" id="lib-${r.id}">
+      <div class="accord-header" onclick="toggleAccord('lib-${r.id}')">
+        <div class="accord-icon" style="background:var(--teal-pale);"><i data-lucide="lightbulb" style="width:15px;height:15px;color:var(--teal);"></i></div>
+        <div class="accord-main">
+          <div class="accord-title">${f['Title']||'Untitled'}</div>
+          <div class="accord-meta"><span class="pill ${pCls}" style="padding:2px 8px;font-size:11px;">${p}</span>${f['Source']?`<span>${f['Source']}</span>`:''}</div>
+        </div>
+        <i data-lucide="chevron-down" style="width:16px;height:16px;" class="accord-chevron"></i>
+      </div>
+      <div class="accord-body">
+        ${f['Summary']?`<div class="accord-summary">${f['Summary'].slice(0,180)}</div>`:''}
+        ${f['Hassan Notes']?`<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px;font-style:italic;">${f['Hassan Notes'].slice(0,120)}</div>`:''}
+        <div class="tags-wrap" style="margin-bottom:10px;">${(f['Topic Tags']||[]).map(t=>`<span class="pill pill-teal" style="font-size:11px;">${t}</span>`).join('')}</div>
+        <div class="accord-actions">
+          <button class="btn btn-navy btn-xs" onclick="draftFromLib('${r.id}')"><i data-lucide="pen-line" style="width:12px;height:12px;"></i> Draft</button>
+          <button class="btn btn-outline btn-xs" onclick="skipLibTopic('${r.id}')"><i data-lucide="x" style="width:12px;height:12px;"></i> Skip</button>
+          ${f['Source URL']?`<a href="${f['Source URL']}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;"><i data-lucide="external-link" style="width:12px;height:12px;"></i></a>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function filterLib(btn){
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active'); activeFilter=btn.dataset.f; renderTopics();
+}
+function skipLibTopic(id){rejectedIds.add(id);const c=document.getElementById('lib-'+id);if(c){c.style.opacity='0';setTimeout(()=>c.remove(),250);};}
+
+function draftFromLib(id){
+  const topic=allTopics.find(r=>r.id===id);
+  if(!topic)return;
+  const f=topic.fields;
+  loadStudioWithTopic(f['Title']||'',f['Summary']||'',f['Topic Tags']||[]);
+  toast('Opening Studio','pen-line');
+}
+
+async function suggestTopics(){
+  const theme=document.getElementById('suggestTheme').value.trim();
+  const btn=document.getElementById('suggestBtn');
+  btn.disabled=true;btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div>';
+  try{
+    const existing=allTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,30).join(', ');
+    const prompt=`Suggest 5 specific compelling LinkedIn post topics for Hassan Khadra.
+Pillars: Agentic AI, AI delivery, Agile transformation, startup advisory, compounding improvement, Future of Work.
+${theme?'Focus on: '+theme:''}
+Already in library (don't repeat): ${existing||'none'}
+Return ONLY JSON: {"topics":[{"title":"<under 60 chars>","tags":["<tag>"],"priority":"<High|Medium|Low>","angle":"<1 sentence>"}]}`;
+    const raw=await claude(prompt,1000);
+    const result=parseJSON(raw);
+    for(const t of (result.topics||[])){
+      const rec=await atCreate(AT.Q,{'Title':t.title,'Source':'Manual - Hassan','Topic Tags':t.tags||[],'Summary':t.angle||'','Priority':t.priority||'Medium','Status':'Available','Used in Draft':false});
+      allTopics.unshift(rec);
+    }
+    renderTopics(); updateBadge();
+    toast('Added '+result.topics.length+' topic suggestions','sparkles');
+    addLog('Suggested '+result.topics.length+' new topics','sparkles');
+    checkCleanupNeeded(allTopics.length);
+  }catch(e){alert('Could not generate suggestions: '+e.message);}
+  btn.disabled=false;btn.innerHTML='<i data-lucide="sparkles" style="width:14px;height:14px;"></i> Suggest 5';lucide.createIcons();
+}
+
+// ── CLEANUP ───────────────────────────────────────────────────────────────
+let cleanupOffset=0; let cleanupItems=[];
+
+function checkCleanupNeeded(count){
+  const bar=document.getElementById('cleanupBar');
+  if(bar) bar.classList.toggle('show',count>=(MAX_TOPICS*CLEANUP_THRESHOLD));
+}
+
+async function openCleanup(){
+  cleanupOffset=0; cleanupItems=[];
+  openModal('cleanupModal');
+  await loadMoreCleanup();
+}
+
+async function loadMoreCleanup(){
+  const el=document.getElementById('cleanupList');
+  el.innerHTML+=`<div class="loading-row" id="cleanupLoader"><div class="spinner"></div><div><div class="loading-text">Loading topics...</div></div></div>`;
+  try{
+    // Get least-used topics - never selected, oldest
+    const allQ=await atGet(AT.Q,100,"AND(Status='Available',{Used in Draft}=FALSE())");
+    const batch=allQ.slice(cleanupOffset,cleanupOffset+10);
+    cleanupOffset+=10;
+    document.getElementById('cleanupLoader')?.remove();
+    if(!batch.length){el.innerHTML+='<div style="font-size:13px;color:var(--text-soft);padding:10px 0;text-align:center;">No more topics to review.</div>';document.getElementById('cleanupMoreBtn').disabled=true;return;}
+    batch.forEach(r=>{
+      const f=r.fields;
+      const div=document.createElement('div');
+      div.className='accord-card'; div.id='cu-'+r.id;
+      div.innerHTML=`<div class="accord-header" onclick="toggleAccord('cu-${r.id}')">
+        <div class="accord-icon" style="background:var(--silver-2);"><i data-lucide="archive" style="width:14px;height:14px;color:var(--text-soft);"></i></div>
+        <div class="accord-main"><div class="accord-title">${f['Title']||'Untitled'}</div><div class="accord-meta">${f['Source']||''}</div></div>
+        <i data-lucide="chevron-down" style="width:16px;height:16px;" class="accord-chevron"></i>
+      </div>
+      <div class="accord-body">
+        ${f['Summary']?`<div class="accord-summary">${f['Summary'].slice(0,150)}</div>`:'<div class="accord-summary" style="color:var(--text-soft);">No summary stored.</div>'}
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-outline btn-sm" onclick="cleanupKeep('${r.id}')"><i data-lucide="check" style="width:13px;height:13px;"></i> Keep</button>
+          <button class="btn btn-red btn-sm" onclick="cleanupDelete('${r.id}')"><i data-lucide="trash-2" style="width:13px;height:13px;"></i> Delete</button>
+        </div>
+      </div>`;
+      el.appendChild(div);
+    });
+    lucide.createIcons();
+  }catch(e){document.getElementById('cleanupLoader')?.remove();el.innerHTML+=`<div class="err-box show">Error: ${e.message}</div>`;}
+}
+
+function cleanupKeep(id){const c=document.getElementById('cu-'+id);if(c){c.style.opacity='0.4';c.style.pointerEvents='none';}toast('Kept','check');addLog('Cleanup: kept topic','check');}
+async function cleanupDelete(id){
+  await atDelete(AT.Q,id);
+  const c=document.getElementById('cu-'+id);if(c)c.remove();
+  allTopics=allTopics.filter(r=>r.id!==id);
+  toast('Topic deleted permanently','trash-2');
+  addLog('Cleanup: deleted topic','trash-2');
+  checkCleanupNeeded(allTopics.length);
+}
+
+// ── SERIES ────────────────────────────────────────────────────────────────
+function openSeriesModal(){openModal('seriesModal');}
+function closeSeriesModal(){closeModal('seriesModal');}
+async function saveSeries(){
+  const name=document.getElementById('seriesName').value.trim();
+  if(!name){alert('Please give the series a name.');return;}
+  const topics=document.getElementById('seriesTopics').value.trim().split('\n').filter(Boolean).slice(0,20);
+  await atCreate(AT.IN,{'Input ID':'SER-'+Date.now(),'Input Type':'Strategy Note','Raw Content':`SERIES: ${name}\nTHEME: ${document.getElementById('seriesTheme').value}\nNOTES: ${document.getElementById('seriesNotes').value}\nTOPICS:\n${topics.join('\n')}`,'Claude Classification':'Strategy Update','Claude Notes':`Series: ${name} (${topics.length} topics)`,'Status':'New','Used in Post':false});
+  closeModal('seriesModal'); loadSeries();
+  toast('Series saved: '+name,'layers'); addLog('Series created: '+name,'layers');
+}
+async function loadSeries(){
+  try{
+    const records=await atGet(AT.IN,20,"AND({Input Type}='Strategy Note',FIND('SERIES:',{Raw Content})>0)");
+    const el=document.getElementById('seriesList');
+    if(!records.length){el.innerHTML='<div style="font-size:13px;color:var(--text-soft);">No series yet.</div>';return;}
+    el.innerHTML=records.map(r=>{
+      const c=r.fields['Raw Content']||'';
+      const nm=(c.match(/SERIES: (.+)/)||[])[1]||'Unnamed';
+      const tops=(c.match(/TOPICS:\n([\s\S]*)/)||[])[1];
+      const topCount=tops?tops.split('\n').filter(Boolean).length:0;
+      return `<div class="series-card"><div class="sc-badge">Series · ${topCount} topics</div><div class="sc-title">${nm}</div><div class="sc-meta">${r.fields['Claude Notes']||''}</div><div class="sc-bar"><div class="sc-fill" style="width:0%"></div></div></div>`;
+    }).join('');
+  }catch(e){console.warn(e);}
+}
+
+// ── STUDIO ────────────────────────────────────────────────────────────────
+let currentDraft=''; let currentDraftId=null; let hasDraft=false;
+let studioTopicTitle=''; let studioTopicTags=[];
+
+function loadStudioWithTopic(title,summary,tags){
+  studioTopicTitle=title; studioTopicTags=tags;
+  document.getElementById('studioTitle').textContent=title||'Draft';
+  document.getElementById('studioFeedback').value=summary?`Write a LinkedIn post about: ${title}. Context: ${summary.slice(0,200)}` : `Write a LinkedIn post about: ${title}`;
+  goScreen('studio');
+}
+
+function startFreshDraft(){
+  studioTopicTitle=''; studioTopicTags=[];
+  document.getElementById('studioTitle').textContent='Ready to draft';
+  document.getElementById('studioFeedback').value='';
+  document.getElementById('studioFeedback').placeholder='Topic, brief, or feedback...';
+  document.getElementById('studioDraftArea').innerHTML='<div class="draft-text placeholder" id="draftText">Your draft will appear here. Give Claude a topic or brief below, then tap Generate.</div><div class="draft-wc" id="draftWC"></div>';
+  document.getElementById('studioGenBtn').style.display='flex';
+  document.getElementById('studioRefBtn').style.display='none';
+  document.getElementById('studioCopyBtn').style.display='none';
+  document.getElementById('studioApprBtn').style.display='none';
+  document.getElementById('copySuccess').classList.remove('show');
+  currentDraft=''; currentDraftId=null; hasDraft=false;
+  goScreen('studio');
+}
+
+function resetStudioIfClean(){
+  if(!hasDraft){
+    document.getElementById('studioGenBtn').style.display='flex';
+    document.getElementById('studioRefBtn').style.display='none';
+    document.getElementById('studioCopyBtn').style.display='none';
+    document.getElementById('studioApprBtn').style.display='none';
+  }
+}
+
+async function generateDraft(){
+  const brief=document.getElementById('studioFeedback').value.trim();
+  if(!brief){document.getElementById('studioFeedback').focus();return;}
+  const btn=document.getElementById('studioGenBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div>';
+  document.getElementById('studioDraftArea').innerHTML='<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Drafting in your voice...</div><div class="loading-sub">Claude is writing your post</div></div></div>';
+
+  try{
+    const settings=getSettings();
+    const [inputs,pub]=await Promise.all([atGet(AT.IN,25,"Status='New'"),atGet(AT.PUB,30)]);
+
+    // Pull inputs related to this topic
+    const topicInputs=studioTopicTitle?inputs.filter(r=>(r.fields['Claude Notes']||'').toLowerCase().includes(studioTopicTitle.toLowerCase().slice(0,20))):inputs;
+
+    const inputCtx=topicInputs.map(r=>`[${r.fields['Input Type']}] ${(r.fields['Raw Content']||'').slice(0,150)}`).join('\n');
+    const pubCtx=pub.map(r=>`Hook: ${r.fields['Post Title / Hook']||''} | Argument: ${r.fields['Core Argument']||''}`).join('\n');
+    const styleNotes=pub.map(r=>r.fields['Style Notes']||'').filter(Boolean).slice(0,5).join(' | ');
+
+    const prompt=`You are Hassan Khadra's LinkedIn content writer. Write one post now.
+
+${STYLE}
+${settings.cv?'Background: '+settings.cv.slice(0,400):''}
+${settings.strategy?'Strategy: '+settings.strategy.slice(0,300):''}
+${settings.avoid?'Additional avoidances: '+settings.avoid:''}
+${styleNotes?'Recent style feedback to apply: '+styleNotes:''}
+
+RELEVANT INPUTS FROM HASSAN:
+${inputCtx||'No specific inputs — draw from general expertise'}
+
+PUBLISHED HISTORY (do not repeat these angles):
+${pubCtx||'No history yet'}
+
+TODAY'S BRIEF: ${brief}
+
+Write exactly ONE LinkedIn post. Return ONLY the post text — no JSON, no explanation, just the post ready to copy. Apply Hassan's style rigorously. 150-280 words. Human, bold, specific.`;
+
+    const draft=await claude(prompt,1200);
+    currentDraft=draft.trim(); hasDraft=true;
+
+    const rec=await atCreate(AT.D,{'Draft ID':'D-'+Date.now(),'Draft Number':'Draft A','Post Content':currentDraft,'Status':'Generated','Refinement Count':0});
+    currentDraftId=rec.id;
+
+    document.getElementById('studioDraftArea').innerHTML=`<div class="draft-text" id="draftText">${currentDraft}</div><div class="draft-wc" id="draftWC">${currentDraft.split(/\s+/).length} words</div>`;
+    document.getElementById('studioFeedback').value='';
+    document.getElementById('studioFeedback').placeholder='Give feedback to refine... e.g. "More provocative opening" or "Add a specific data point"';
+    document.getElementById('studioGenBtn').style.display='none';
+    document.getElementById('studioRefBtn').style.display='flex';
+    document.getElementById('studioCopyBtn').style.display='flex';
+    document.getElementById('studioApprBtn').style.display='flex';
+    addLog('Draft generated for: '+(studioTopicTitle||brief.slice(0,40)),'sparkles');
+  }catch(e){
+    document.getElementById('studioDraftArea').innerHTML=`<div class="err-box show">Generation failed: ${e.message}</div>`;
+    addLog('Draft generation failed: '+e.message,'alert-circle');
+  }
+  btn.disabled=false; btn.innerHTML='<i data-lucide="sparkles" style="width:15px;height:15px;"></i> Generate'; lucide.createIcons();
+}
+
+async function refineDraft(){
+  const feedback=document.getElementById('studioFeedback').value.trim();
+  if(!feedback){document.getElementById('studioFeedback').focus();return;}
+  if(!currentDraft)return;
+  const btn=document.getElementById('studioRefBtn');
+  btn.disabled=true; btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div>';
+
+  try{
+    const prompt=`You are Hassan Khadra's LinkedIn content writer. Refine this post based on his feedback.
+
+${STYLE}
+
+CURRENT DRAFT:
+${currentDraft}
+
+HASSAN'S FEEDBACK:
+${feedback}
+
+Return ONLY the revised post text. Apply the feedback precisely. Maintain Hassan's voice. No explanation.`;
+
+    const refined=await claude(prompt,900);
+    currentDraft=refined.trim();
+    document.getElementById('draftText').textContent=currentDraft;
+    document.getElementById('draftWC').textContent=currentDraft.split(/\s+/).length+' words';
+    document.getElementById('studioFeedback').value='';
+    if(currentDraftId) await atUpdate(AT.D,currentDraftId,{'Post Content':currentDraft,'Hassan Feedback':feedback,'Status':'Refined'});
+    addLog('Draft refined: '+feedback.slice(0,50),'refresh-cw');
+  }catch(e){alert('Refinement failed: '+e.message);}
+  btn.disabled=false; btn.innerHTML='<i data-lucide="refresh-cw" style="width:15px;height:15px;"></i> Refine'; lucide.createIcons();
+}
+
+function copyDraft(){
+  if(!currentDraft)return;
+  navigator.clipboard.writeText(currentDraft).then(()=>{
+    const s=document.getElementById('copySuccess');
+    s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),3000);
+    toast('Copied to clipboard','copy'); addLog('Draft copied to clipboard','copy');
+  });
+}
+
+async function approveDraft(){
+  if(!currentDraft)return;
+  const settings=getSettings();
+
+  // Extract style notes from this approval session
+  const stylePrompt=`In 1-2 sentences, describe any style preferences or patterns evident in this approved LinkedIn post that should be remembered for future drafts.
+Post: "${currentDraft.slice(0,400)}"
+Return ONLY the style note text, nothing else.`;
+  let styleNote='';
+  try{ styleNote=await claude(stylePrompt,200); } catch(e){}
+
+  try{
+    await atCreate(AT.PUB,{
+      'Post Title / Hook':currentDraft.split('\n')[0].slice(0,80),
+      'Full Post Content':currentDraft,
+      'Core Argument':studioTopicTitle||currentDraft.split('\n')[0].slice(0,100),
+      'Topic Tags':studioTopicTags,
+      'Source Draft ID':currentDraftId||'',
+      'Style Notes':styleNote
+    });
+    if(currentDraftId) await atUpdate(AT.D,currentDraftId,{'Status':'Published','Approved':true});
+    copyDraft();
+    document.getElementById('studioDraftArea').innerHTML=`<div style="text-align:center;padding:36px 16px;"><div style="font-size:36px;margin-bottom:12px;">✓</div><div style="font-size:17px;font-weight:800;color:var(--green);margin-bottom:8px;">Post approved</div><div style="font-size:13px;color:var(--text-soft);margin-bottom:18px;">Saved to history. Copied to clipboard — paste into LinkedIn.</div><div style="background:var(--silver);border-radius:var(--radius);padding:14px;font-size:15px;text-align:left;white-space:pre-line;line-height:1.75;color:var(--text);">${currentDraft}</div></div>`;
+    document.getElementById('studioRefBtn').style.display='none';
+    document.getElementById('studioApprBtn').style.display='none';
+    currentDraft=''; currentDraftId=null; hasDraft=false;
+    addLog('Post approved and saved to history','check-circle');
+    toast('Post approved — style notes saved','check-circle');
+  }catch(e){alert('Could not save: '+e.message);}
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+function getSettings(){try{return JSON.parse(localStorage.getItem('afc_s')||'{}');}catch{return {};}}
+function loadSettingsForm(){const s=getSettings();['LinkedIn','Website','CV','Strategy','Avoid','Goals'].forEach(k=>{const el=document.getElementById('s'+k);if(el&&s[k]) el.value=s[k];});}
+function saveSettings(){
+  const s={LinkedIn:document.getElementById('sLinkedIn').value,Website:document.getElementById('sWebsite').value,CV:document.getElementById('sCV').value,Strategy:document.getElementById('sStrategy').value,Avoid:document.getElementById('sAvoid').value,Goals:document.getElementById('sGoals').value};
+  localStorage.setItem('afc_s',JSON.stringify(s));
+  const btn=document.querySelector('#screen-settings .btn-navy');
+  btn.innerHTML='<i data-lucide="check" style="width:16px;height:16px;"></i> Saved!';
+  btn.style.background='var(--green)'; lucide.createIcons();
+  setTimeout(()=>{btn.innerHTML='<i data-lucide="save" style="width:16px;height:16px;"></i> Save Settings';btn.style.background='';lucide.createIcons();},2000);
+  toast('Settings saved','save'); addLog('Settings updated','settings');
+}
+
+// ── BADGE ─────────────────────────────────────────────────────────────────
+async function updateBadge(){
+  try{
+    const r=await atGet(AT.Q,100,"Status='Available'");
+    const b=document.getElementById('feedBadge');
+    if(r.length>0){b.textContent=r.length;b.classList.add('show');}else{b.classList.remove('show');}
+  }catch(e){}
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  lucide.createIcons();
+  loadHomeStats();
+  loadRecentFeed();
+  loadSettingsForm();
+  updateBadge();
 });
-
-// ─── HELPERS ──────────────────────────────────────────────────────────────
-function setStatus(msg) { document.getElementById('headerStatus').textContent = msg; }
-function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
-function updateCharCount(inputId, countId) {
-  const len = document.getElementById(inputId).value.length;
-  const el = document.getElementById(countId);
-  el.textContent = len + ' characters';
-  el.classList.toggle('over', len > 3000);
-}
-
-// ─── INIT ─────────────────────────────────────────────────────────────────
-loadRecentInputs();
-loadDraftContext();
 </script>
 </body>
 </html>
