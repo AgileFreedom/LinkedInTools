@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#142850">
 <title>AFC Content Agent</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js" onload="lucideReady()" onerror="lucideFallback()"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -1694,9 +1694,8 @@ async function updateBadge(){
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',function(){
+function appInit(){
   lucide.createIcons();
-  // Check if onboarding is needed
   if(!isOnboardingComplete()){
     showOnboarding();
   } else {
@@ -1705,7 +1704,23 @@ document.addEventListener('DOMContentLoaded',function(){
     loadSettingsForm();
     updateBadge();
   }
-});
+}
+
+function lucideReady(){
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', appInit);
+  } else {
+    appInit();
+  }
+}
+
+function lucideFallback(){
+  // Lucide CDN failed - try unpkg as backup
+  const s=document.createElement('script');
+  s.src='https://unpkg.com/lucide@0.363.0/dist/umd/lucide.min.js';
+  s.onload=lucideReady;
+  document.head.appendChild(s);
+}
 </script>
 </body>
 </html>
