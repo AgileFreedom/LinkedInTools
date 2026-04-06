@@ -277,8 +277,8 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 .log-icon{flex-shrink:0;margin-top:1px;}
 
 /* ONBOARDING GATE */
-.ob-overlay{position:fixed;inset:0;z-index:500;background:var(--navy);overflow-y:auto;display:none;}
-.ob-overlay.show{display:block;}
+.ob-overlay{position:fixed;inset:0;z-index:9999;background:var(--navy);overflow-y:auto;display:none;}
+.ob-overlay.show{display:block !important;}
 .ob-inner{max-width:540px;margin:0 auto;padding:36px 22px 60px;width:100%;}
 .ob-logo{display:flex;align-items:center;gap:11px;margin-bottom:28px;}
 .ob-mark{width:36px;height:36px;background:var(--teal);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;}
@@ -1584,7 +1584,8 @@ const STRATEGY_MAX_WORDS = 5000;
 
 function isOnboardingComplete(){
   const s = getSettings();
-  return !!(s.LinkedIn && s.LinkedIn.trim() && s.Strategy && s.Strategy.trim());
+  // Must have the explicit onboardingComplete flag AND both mandatory fields
+  return !!(s.onboardingComplete === true && s.LinkedIn && s.LinkedIn.trim() && s.Strategy && s.Strategy.trim());
 }
 
 function showOnboarding(){
@@ -1708,6 +1709,16 @@ async function updateBadge(){
 // ── INIT ──────────────────────────────────────────────────────────────────
 function appInit(){
   lucide.createIcons();
+
+  // Migration: if settings exist from an old session without the explicit
+  // onboardingComplete flag, clear it so the onboarding gate fires correctly
+  const s = getSettings();
+  if(s.LinkedIn && !s.hasOwnProperty('onboardingComplete')){
+    // Old session data - remove the flag so onboarding re-runs
+    delete s.onboardingComplete;
+    localStorage.setItem('afc_s', JSON.stringify(s));
+  }
+
   if(!isOnboardingComplete()){
     showOnboarding();
   } else {
