@@ -264,7 +264,44 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 .log-item:last-child{border-bottom:none;}
 .log-time{font-size:11px;color:var(--text-soft);white-space:nowrap;flex-shrink:0;margin-top:1px;}
 .log-icon{flex-shrink:0;margin-top:1px;}
-</style>
+
+/* ONBOARDING GATE */
+.ob-overlay{position:fixed;inset:0;z-index:500;background:var(--navy);overflow-y:auto;display:none;}
+.ob-overlay.show{display:block;}
+.ob-inner{max-width:540px;margin:0 auto;padding:36px 22px 60px;width:100%;}
+.ob-logo{display:flex;align-items:center;gap:11px;margin-bottom:28px;}
+.ob-mark{width:36px;height:36px;background:var(--teal);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;}
+.ob-logo-text{font-size:16px;font-weight:800;color:#fff;}
+.ob-logo-sub{font-size:11px;color:rgba(255,255,255,.4);}
+.ob-title{font-size:24px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:8px;letter-spacing:-.02em;}
+.ob-sub{font-size:14px;color:rgba(255,255,255,.6);line-height:1.65;margin-bottom:28px;}
+.ob-section{margin-bottom:22px;}
+.ob-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--teal-light);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.ob-req{background:rgba(184,50,50,.25);color:#ff9a9a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.ob-opt{background:rgba(255,255,255,.1);color:rgba(255,255,255,.4);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.ob-field{margin-bottom:14px;}
+.ob-field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.5);display:block;margin-bottom:5px;}
+.ob-field input,.ob-field textarea{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);color:#fff;padding:12px 14px;font-family:var(--sans);font-size:15px;outline:none;border-radius:var(--radius);width:100%;transition:border-color .2s,background .2s;line-height:1.5;}
+.ob-field input::placeholder,.ob-field textarea::placeholder{color:rgba(255,255,255,.28);}
+.ob-field input:focus,.ob-field textarea:focus{border-color:var(--teal-light);background:rgba(255,255,255,.11);}
+.ob-field textarea{resize:vertical;}
+.ob-wc-row{display:flex;align-items:center;justify-content:space-between;margin-top:5px;}
+.ob-wc{font-size:12px;color:rgba(255,255,255,.35);}
+.ob-wc.warn{color:#ff9a9a;font-weight:700;}
+.ob-wc-bar{height:3px;background:rgba(255,255,255,.1);border-radius:2px;flex:1;margin-left:10px;}
+.ob-wc-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .2s;}
+.ob-err{background:rgba(184,50,50,.2);border-left:3px solid #ff8a8a;padding:11px 14px;font-size:13px;color:#ff9a9a;border-radius:0 var(--radius) var(--radius) 0;margin-bottom:14px;display:none;}
+.ob-err.show{display:block;}
+.ob-btn{width:100%;padding:15px;background:var(--teal);border:none;color:#fff;font-family:var(--sans);font-size:15px;font-weight:700;border-radius:var(--radius);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px;}
+.ob-btn:hover:not(:disabled){background:var(--teal-light);}
+.ob-btn:disabled{opacity:.45;cursor:not-allowed;}
+.ob-divider{height:1px;background:rgba(255,255,255,.08);margin:20px 0;}
+/* Settings word count */
+.settings-wc-row{display:flex;align-items:center;justify-content:space-between;margin-top:5px;}
+.settings-wc{font-size:12px;color:var(--text-soft);}
+.settings-wc.warn{color:var(--red);font-weight:700;}
+.settings-wc-bar{height:3px;background:var(--silver-2);border-radius:2px;flex:1;margin-left:10px;}
+.settings-wc-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .2s;}
 </head>
 <body>
 
@@ -279,6 +316,60 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     <button class="hbtn" onclick="goScreen('settings')" title="Settings"><i data-lucide="settings" style="width:19px;height:19px;"></i></button>
   </div>
 </header>
+
+<!-- ONBOARDING GATE -->
+<div class="ob-overlay" id="onboardingOverlay">
+  <div class="ob-inner">
+    <div class="ob-logo">
+      <div class="ob-mark">AF</div>
+      <div><div class="ob-logo-text">AFC Content Agent</div><div class="ob-logo-sub">Agile Freedom Consulting</div></div>
+    </div>
+    <div class="ob-title">Let's set up your agent</div>
+    <div class="ob-sub">Before your agent can draft posts in your voice, it needs to know who you are and what you stand for. This takes about 5 minutes and only happens once.</div>
+
+    <div class="ob-section">
+      <div class="ob-section-title"><i data-lucide="user" style="width:13px;height:13px;"></i> Your Profile <span class="ob-req">Required</span></div>
+      <div class="ob-field">
+        <label>LinkedIn Profile URL</label>
+        <input type="url" id="obLinkedIn" placeholder="https://www.linkedin.com/in/yourname">
+      </div>
+    </div>
+
+    <div class="ob-section">
+      <div class="ob-section-title"><i data-lucide="target" style="width:13px;height:13px;"></i> Content Strategy <span class="ob-req">Required</span></div>
+      <div style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.55;">Describe your thought leadership direction, target audience, content pillars, tone preferences, and posting goals. Write freely — the more context you give, the better your agent will perform.</div>
+      <div class="ob-field">
+        <label>Your Strategy & Direction</label>
+        <textarea id="obStrategy" rows="8" placeholder="Example: I am a Senior Transformation Consultant and founder of Agile Freedom Consulting. My audience is CTOs, ops leaders, and founders primarily in North America and the UK. My main content pillars are: agentic AI and AI-enabled delivery, Agile transformation, compounding improvement, startup advisory, and the future of work. My tone is confident, direct, and warm — I write in first person with human imperfect rhythm. I never use em-dashes or symmetrical AI-sounding structures. I aim to post 5 times per week and always end with a genuine question to drive engagement..." oninput="obStrategyCount()"></textarea>
+        <div class="ob-wc-row">
+          <span class="ob-wc" id="obStrategyWC">0 / 5,000 words</span>
+          <div class="ob-wc-bar"><div class="ob-wc-fill" id="obStrategyBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-divider"></div>
+
+    <div class="ob-section">
+      <div class="ob-section-title"><i data-lucide="file-text" style="width:13px;height:13px;"></i> Background Documents <span class="ob-opt">Optional</span></div>
+      <div class="ob-field">
+        <label>CV / Professional Background</label>
+        <textarea id="obCV" rows="4" placeholder="Paste key highlights from your CV — roles, achievements, credentials, notable clients..."></textarea>
+      </div>
+      <div class="ob-field">
+        <label>Website URL</label>
+        <input type="url" id="obWebsite" placeholder="https://agilefreedom.co.uk">
+      </div>
+    </div>
+
+    <div class="ob-err" id="obErr"></div>
+
+    <button class="ob-btn" id="obSubmitBtn" onclick="completeOnboarding()">
+      <i data-lucide="arrow-right" style="width:18px;height:18px;"></i>
+      Complete Setup & Enter
+    </button>
+  </div>
+</div>
 
 <div class="main">
 
@@ -444,13 +535,23 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
   <div class="screen-sub">Your foundation layer. Claude reads this before every drafting session.</div>
   <div class="settings-section">
     <div class="settings-section-title"><i data-lucide="user" style="width:15px;height:15px;color:var(--teal);"></i> Profile</div>
-    <div class="form-group"><label class="field-label">LinkedIn URL</label><input type="url" id="sLinkedIn" placeholder="https://www.linkedin.com/in/hassankhadra"></div>
-    <div class="form-group"><label class="field-label">Website URL</label><input type="url" id="sWebsite" placeholder="https://agilefreedom.co.uk"></div>
+    <div class="form-group"><label class="field-label">LinkedIn URL <span style="color:var(--red);font-size:10px;font-weight:700;"> REQUIRED</span></label><input type="url" id="sLinkedIn" placeholder="https://www.linkedin.com/in/hassankhadra"></div>
+    <div class="form-group"><label class="field-label">Website URL <span style="color:var(--text-soft);font-size:10px;"> optional</span></label><input type="url" id="sWebsite" placeholder="https://agilefreedom.co.uk"></div>
   </div>
   <div class="settings-section">
-    <div class="settings-section-title"><i data-lucide="file-text" style="width:15px;height:15px;color:var(--teal);"></i> Foundation Documents</div>
-    <div class="form-group"><label class="field-label">CV / Background</label><textarea id="sCV" placeholder="Paste key highlights from your CV..." style="min-height:110px;"></textarea></div>
-    <div class="form-group"><label class="field-label">Strategy & Direction</label><textarea id="sStrategy" placeholder="Your thought leadership direction, target audience, key messages..." style="min-height:110px;"></textarea></div>
+    <div class="settings-section-title"><i data-lucide="target" style="width:15px;height:15px;color:var(--teal);"></i> Content Strategy</div>
+    <div class="form-group">
+      <label class="field-label">Strategy & Direction <span style="color:var(--red);font-size:10px;font-weight:700;"> REQUIRED</span></label>
+      <textarea id="sStrategy" placeholder="Your thought leadership direction, target audience, content pillars, tone preferences, posting goals..." style="min-height:160px;" oninput="settingsStrategyCount()"></textarea>
+      <div class="settings-wc-row">
+        <span class="settings-wc" id="sStrategyWC">0 / 5,000 words</span>
+        <div class="settings-wc-bar"><div class="settings-wc-fill" id="sStrategyBar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="settings-section">
+    <div class="settings-section-title"><i data-lucide="file-text" style="width:15px;height:15px;color:var(--teal);"></i> Background Documents</div>
+    <div class="form-group"><label class="field-label">CV / Background <span style="color:var(--text-soft);font-size:10px;"> optional</span></label><textarea id="sCV" placeholder="Paste key highlights from your CV..." style="min-height:110px;"></textarea></div>
   </div>
   <div class="settings-section">
     <div class="settings-section-title"><i data-lucide="sliders-horizontal" style="width:15px;height:15px;color:var(--teal);"></i> Style Preferences</div>
@@ -688,47 +789,59 @@ Return ONLY valid JSON - keep all string values concise to avoid truncation:
       "url": "<full URL>",
       "source": "<publication>",
       "age": "<e.g. 2 hours ago, yesterday, 3 days ago>",
-      "summary": "<50-80 word summary explaining what it covers and why it matters to Hassan's audience>",
-      "relevance": "<1 sentence on why Hassan specifically should care>"
+      "summary": "<2-3 sentences on what it covers and why it matters>",
+      "relevance": "<one short sentence on why Hassan should care>"
     }
   ]
 }`;
 
-    const raw=await claude(prompt,3000);
-    const result=parseJSON(raw);
-    const articles=result.articles||[];
+    const raw=await claude(prompt,4000);
+
+    // Defensive parse - extract whatever articles came back even if truncated
+    let articles=[];
+    try{
+      const result=parseJSON(raw);
+      articles=result.articles||[];
+    }catch(e){
+      // Try to extract partial results
+      const matches=[...raw.matchAll(/"title"\s*:\s*"([^"]+)"/g)];
+      if(matches.length){
+        matches.forEach((m,i)=>{
+          const urlM=raw.match(new RegExp('"url"\\s*:\\s*"([^"]+)"'));
+          const srcM=raw.match(new RegExp('"source"\\s*:\\s*"([^"]+)"'));
+          const sumM=raw.match(new RegExp('"summary"\\s*:\\s*"([^"]+)"'));
+          articles.push({title:m[1],url:urlM?urlM[1]:'',source:srcM?srcM[1]:'',age:'recent',summary:sumM?sumM[1]:'',relevance:'Relevant to your content pillars'});
+        });
+      }
+      if(!articles.length) throw new Error('Could not parse search results. Please try again.');
+    }
 
     // Track seen
     articles.forEach(a=>{ if(a.url) seenArticleUrls.add(a.url); });
 
-    // Also get stored topic suggestions
+    // Get topic suggestions in a separate call
     const inputs=await atGet(AT.IN,25,"Status='New'");
-    const queue=await atGet(AT.Q,100,"Status='Available'");
+    const queue=await atGet(AT.Q,50,"Status='Available'");
     const pub=await atGet(AT.PUB,20);
 
-    const topicPrompt=`You are Hassan Khadra's content strategist. Propose exactly 3 specific LinkedIn post topics for today.
+    const topicPrompt=`Propose exactly 3 LinkedIn post topics for Hassan Khadra today.
 
-${STYLE}
-${settings.strategy?'Strategy context: '+settings.strategy.slice(0,300):''}
-Recent inputs: ${inputs.map(r=>(r.fields['Raw Content']||'').slice(0,100)).join(' | ').slice(0,500)||'none'}
-Recent published (avoid repeating): ${pub.map(r=>r.fields['Post Title / Hook']||'').filter(Boolean).join(', ').slice(0,400)||'none'}
-Available topics in library: ${queue.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,15).join(', ')||'none'}
+Hassan writes about: Agentic AI, AI delivery, Agile transformation, startup advisory, Future of Work.
+Audience: CTOs, ops leaders, consultants, founders. North America and UK.
+${settings.strategy?'His strategy: '+settings.strategy.slice(0,200):''}
+Recent inputs: ${inputs.map(r=>(r.fields['Raw Content']||'').slice(0,80)).join(' | ').slice(0,400)||'none'}
+Avoid repeating: ${pub.map(r=>r.fields['Post Title / Hook']||'').filter(Boolean).slice(0,10).join(', ').slice(0,300)||'none'}
+Library topics available: ${queue.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,10).join(', ').slice(0,300)||'none'}
 
-Return ONLY valid JSON:
-{
-  "topics": [
-    {
-      "title": "<compelling specific post topic under 70 chars>",
-      "summary": "<50-80 words explaining what the post covers and why Hassan should write it today>",
-      "source": "<'Library' or 'News' or 'Your experience'>",
-      "tags": ["<tag1>","<tag2>"]
-    }
-  ]
-}`;
+Return ONLY this JSON with no extra text:
+{"topics":[{"title":"<under 60 chars>","summary":"<2-3 sentences on what the post covers and why today>","source":"<Library|News|Experience>","tags":["<tag1>","<tag2>"]}]}`;
 
-    const topicRaw=await claude(topicPrompt,1500);
-    const topicResult=parseJSON(topicRaw);
-    const topics=topicResult.topics||[];
+    const topicRaw=await claude(topicPrompt,1200);
+    let topics=[];
+    try{
+      const topicResult=parseJSON(topicRaw);
+      topics=topicResult.topics||[];
+    }catch(e){ console.warn('Topic parse failed:',e); }
 
     renderBriefing(articles,topics,area);
     addLog(`Brief complete: ${articles.length} articles, ${topics.length} topics proposed`,'check-circle');
@@ -1362,7 +1475,7 @@ TODAY'S BRIEF: ${brief}
 
 Write exactly ONE LinkedIn post. Return ONLY the post text — no JSON, no explanation, just the post ready to copy. Apply Hassan's style rigorously. 150-280 words. Human, bold, specific.`;
 
-    const draft=await claude(prompt,1200);
+    const draft=await claude(prompt,1800);
     currentDraft=draft.trim(); hasDraft=true;
 
     const rec=await atCreate(AT.D,{'Draft ID':'D-'+Date.now(),'Draft Number':'Draft A','Post Content':currentDraft,'Status':'Generated','Refinement Count':0});
@@ -1454,11 +1567,115 @@ Return ONLY the style note text, nothing else.`;
   }catch(e){alert('Could not save: '+e.message);}
 }
 
+// ── ONBOARDING ────────────────────────────────────────────────────────────
+const STRATEGY_MAX_WORDS = 5000;
+
+function isOnboardingComplete(){
+  const s = getSettings();
+  return !!(s.LinkedIn && s.LinkedIn.trim() && s.Strategy && s.Strategy.trim());
+}
+
+function showOnboarding(){
+  document.getElementById('onboardingOverlay').classList.add('show');
+  lucide.createIcons();
+}
+
+function hideOnboarding(){
+  document.getElementById('onboardingOverlay').classList.remove('show');
+}
+
+function obStrategyCount(){
+  const val = document.getElementById('obStrategy').value;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  const pct = Math.min(100, (words / STRATEGY_MAX_WORDS) * 100);
+  const wc = document.getElementById('obStrategyWC');
+  const bar = document.getElementById('obStrategyBar');
+  wc.textContent = words.toLocaleString() + ' / 5,000 words';
+  wc.classList.toggle('warn', words > STRATEGY_MAX_WORDS);
+  bar.style.width = pct + '%';
+  bar.style.background = words > STRATEGY_MAX_WORDS ? 'var(--red)' : 'var(--teal-light)';
+}
+
+function settingsStrategyCount(){
+  const val = document.getElementById('sStrategy').value;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  const pct = Math.min(100, (words / STRATEGY_MAX_WORDS) * 100);
+  const wc = document.getElementById('sStrategyWC');
+  const bar = document.getElementById('sStrategyBar');
+  if(!wc || !bar) return;
+  wc.textContent = words.toLocaleString() + ' / 5,000 words';
+  wc.classList.toggle('warn', words > STRATEGY_MAX_WORDS);
+  bar.style.width = pct + '%';
+  bar.style.background = words > STRATEGY_MAX_WORDS ? 'var(--red)' : 'var(--teal)';
+}
+
+function completeOnboarding(){
+  const linkedin = document.getElementById('obLinkedIn').value.trim();
+  const strategy = document.getElementById('obStrategy').value.trim();
+  const cv = document.getElementById('obCV').value.trim();
+  const website = document.getElementById('obWebsite').value.trim();
+  const err = document.getElementById('obErr');
+  err.classList.remove('show');
+
+  if(!linkedin || !linkedin.includes('linkedin.com')){
+    err.textContent = 'Please enter a valid LinkedIn profile URL to continue.';
+    err.classList.add('show'); return;
+  }
+  if(!strategy || strategy.trim().split(/\s+/).length < 20){
+    err.textContent = 'Please add your content strategy and direction (at least 20 words) to continue.';
+    err.classList.add('show'); return;
+  }
+  const words = strategy.trim().split(/\s+/).length;
+  if(words > STRATEGY_MAX_WORDS){
+    err.textContent = `Your strategy is ${words.toLocaleString()} words — please reduce to under 5,000 words.`;
+    err.classList.add('show'); return;
+  }
+
+  // Save to settings
+  const existing = getSettings();
+  const s = { ...existing, LinkedIn:linkedin, Strategy:strategy, CV:cv, Website:website, onboardingComplete:true };
+  localStorage.setItem('afc_s', JSON.stringify(s));
+
+  hideOnboarding();
+  toast('Setup complete — welcome to your content agent', 'check-circle');
+  addLog('Initial setup completed', 'check-circle');
+  loadHomeStats();
+  loadRecentFeed();
+  updateBadge();
+}
+
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 function getSettings(){try{return JSON.parse(localStorage.getItem('afc_s')||'{}');}catch{return {};}}
-function loadSettingsForm(){const s=getSettings();['LinkedIn','Website','CV','Strategy','Avoid','Goals'].forEach(k=>{const el=document.getElementById('s'+k);if(el&&s[k]) el.value=s[k];});}
+
+function loadSettingsForm(){
+  const s=getSettings();
+  const map = {LinkedIn:'sLinkedIn', Website:'sWebsite', CV:'sCV', Strategy:'sStrategy', Avoid:'sAvoid', Goals:'sGoals'};
+  Object.entries(map).forEach(([k,id])=>{ const el=document.getElementById(id); if(el&&s[k]) el.value=s[k]; });
+  settingsStrategyCount();
+}
+
 function saveSettings(){
-  const s={LinkedIn:document.getElementById('sLinkedIn').value,Website:document.getElementById('sWebsite').value,CV:document.getElementById('sCV').value,Strategy:document.getElementById('sStrategy').value,Avoid:document.getElementById('sAvoid').value,Goals:document.getElementById('sGoals').value};
+  const linkedin = document.getElementById('sLinkedIn').value.trim();
+  const strategy = document.getElementById('sStrategy').value.trim();
+  const err_linkedin = !linkedin || !linkedin.includes('linkedin.com');
+  const err_strategy = !strategy || strategy.split(/\s+/).length < 20;
+
+  if(err_linkedin || err_strategy){
+    toast('LinkedIn URL and Strategy are required','alert-circle');
+    return;
+  }
+  const words = strategy.split(/\s+/).length;
+  if(words > STRATEGY_MAX_WORDS){ toast('Strategy exceeds 5,000 word limit','alert-circle'); return; }
+
+  const s={
+    LinkedIn:linkedin,
+    Website:document.getElementById('sWebsite').value,
+    CV:document.getElementById('sCV').value,
+    Strategy:strategy,
+    Avoid:document.getElementById('sAvoid').value,
+    Goals:document.getElementById('sGoals').value,
+    onboardingComplete:true
+  };
   localStorage.setItem('afc_s',JSON.stringify(s));
   const btn=document.querySelector('#screen-settings .btn-navy');
   btn.innerHTML='<i data-lucide="check" style="width:16px;height:16px;"></i> Saved!';
@@ -1479,10 +1696,15 @@ async function updateBadge(){
 // ── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
   lucide.createIcons();
-  loadHomeStats();
-  loadRecentFeed();
-  loadSettingsForm();
-  updateBadge();
+  // Check if onboarding is needed
+  if(!isOnboardingComplete()){
+    showOnboarding();
+  } else {
+    loadHomeStats();
+    loadRecentFeed();
+    loadSettingsForm();
+    updateBadge();
+  }
 });
 </script>
 </body>
