@@ -9,17 +9,19 @@
 <title>AFC Content Agent</title>
 <!-- 
   AFC Content Agent
-  Version: 3.0
-  Date: 2026-04-06
+  Version: 3.2
+  Date: 2026-04-07
   Changelog:
-  - v3.0: Full rebuild - onboarding gate, daily briefing, topic clustering,
-           activity log, voice on all fields, library cleanup, style learning,
-           accordion cards, defensive JSON parsing, fixed missing </style> tag
+  - v3.2: Feed rebuilt (2-mode: Thought/Link, Claude-style input, voice mic in toolbar),
+           tab nav gold active state fixed, tab switching bug fixed, briefing/tab guards,
+           permanent delete for all tables, Data Management in Settings, Clear All with DELETE confirm
+  - v3.1: Onboarding gate, file attachments, exit button, filing cabinet tabs
+  - v3.0: Full rebuild - onboarding gate, daily briefing, topic clustering, activity log
   - v2.0: Redesign - 4-screen nav, Feed/Library/Studio/Settings
   - v1.0: Initial build
 -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js" onload="lucideReady()" onerror="lucideFallback()"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -50,14 +52,16 @@ body{font-family:var(--sans);background:var(--silver);color:var(--text);display:
 .status-dot.busy{background:var(--gold);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-/* NAV */
-.nav-bar{background:var(--white);border-top:1px solid var(--border);display:flex;flex-shrink:0;order:10;padding-bottom:env(safe-area-inset-bottom);}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;gap:3px;cursor:pointer;color:var(--text-soft);transition:color .2s;border:none;background:transparent;font-family:var(--sans);position:relative;}
-.nav-item.active{color:var(--navy);}
-.nav-item.active::after{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--teal);}
-.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
-.nav-badge{position:absolute;top:5px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;}
-.nav-badge.show{display:flex;}
+/* FILING CABINET TABS */
+.tab-bar{background:var(--navy);display:flex;align-items:flex-end;padding:0 12px;gap:3px;flex-shrink:0;border-bottom:3px solid var(--teal);}
+.tab-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 14px 8px;cursor:pointer;color:rgba(255,255,255,.45);transition:all .2s;border:none;background:rgba(255,255,255,.06);font-family:var(--sans);border-radius:var(--radius) var(--radius) 0 0;border:1px solid rgba(255,255,255,.08);border-bottom:none;margin-bottom:-1px;min-width:64px;}
+.tab-item:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.75);}
+.tab-item.active{background:var(--gold);color:#fff;border-color:var(--gold);border-bottom:3px solid var(--gold);z-index:2;}
+.tab-item.active .tab-label{color:#fff;font-weight:900;}
+.tab-item.active i{color:#fff !important;}
+.tab-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+.tab-badge{position:absolute;top:5px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;}
+.tab-badge.show{display:flex;}
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
@@ -313,6 +317,79 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 .settings-wc.warn{color:var(--red);font-weight:700;}
 .settings-wc-bar{height:3px;background:var(--silver-2);border-radius:2px;flex:1;margin-left:10px;}
 .settings-wc-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .2s;}
+
+/* FEED MODES */
+.feed-mode-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.feed-mode-btn{background:var(--white);border:2px solid var(--border);border-radius:var(--radius);padding:13px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;font-family:var(--sans);text-align:left;}
+.feed-mode-btn.active{border-color:var(--navy);background:var(--teal-pale);}
+.feed-mode-btn:hover:not(.active){border-color:var(--teal);}
+.feed-mode-btn i{flex-shrink:0;color:var(--text-soft);}
+.feed-mode-btn.active i{color:var(--teal);}
+.feed-mode-label{font-size:13px;font-weight:700;color:var(--navy);}
+.feed-mode-sub{font-size:11px;color:var(--text-soft);margin-top:2px;line-height:1.3;}
+.thought-type-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.ttype-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border:1.5px solid var(--border);background:var(--white);border-radius:20px;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--text-mid);cursor:pointer;transition:all .15s;}
+.ttype-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ttype-btn:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+
+/* CLAUDE-STYLE INPUT */
+.claude-input-wrap{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:4px;transition:border-color .2s;}
+.claude-input-wrap:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(80,120,140,.1);}
+.claude-input-textarea{width:100%;border:none;outline:none;padding:13px 15px;font-family:var(--sans);font-size:15px;color:var(--text);background:transparent;resize:none;line-height:1.6;min-height:80px;max-height:240px;display:block;}
+.claude-input-url{width:100%;border:none;outline:none;padding:13px 15px;font-family:var(--sans);font-size:15px;color:var(--text);background:transparent;display:block;}
+.claude-input-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-top:1px solid var(--border);background:var(--silver);}
+.claude-input-left{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+.claude-input-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.claude-tool-btn{width:32px;height:32px;border-radius:var(--radius-sm);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-soft);transition:all .15s;}
+.claude-tool-btn:hover{background:var(--silver-2);color:var(--navy);}
+.claude-tool-btn.recording{background:var(--red-bg) !important;color:var(--red) !important;}
+.claude-send-btn{width:34px;height:34px;border-radius:var(--radius-sm);background:var(--navy);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .2s;}
+.claude-send-btn:hover{background:var(--teal);}
+.claude-send-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* DATA MANAGEMENT */
+.danger-zone{background:var(--red-bg);border:1px solid rgba(184,50,50,.2);border-radius:var(--radius);padding:16px;margin-top:8px;}
+.danger-zone-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.danger-btn{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--white);border:1.5px solid rgba(184,50,50,.3);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all .2s;font-family:var(--sans);}
+.danger-btn:hover{border-color:var(--red);background:var(--red-bg);}
+.danger-btn:last-child{margin-bottom:0;}
+.danger-btn-text{font-size:13px;font-weight:700;color:var(--red);}
+.danger-btn-sub{font-size:11px;color:var(--text-soft);margin-top:1px;}
+.danger-btn-icon{color:rgba(184,50,50,.5);flex-shrink:0;}
+.nuke-btn{width:100%;padding:13px;background:var(--red);border:none;border-radius:var(--radius);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;transition:all .2s;}
+.nuke-btn:hover{background:#991f1f;}
+.nuke-input{width:100%;background:var(--white);border:1.5px solid rgba(184,50,50,.3);color:var(--text);padding:11px 14px;font-family:var(--sans);font-size:14px;outline:none;border-radius:var(--radius-sm);margin-bottom:10px;transition:border-color .2s;}
+.nuke-input:focus{border-color:var(--red);}
+.clear-tab-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:var(--red-bg);border:1px solid rgba(184,50,50,.25);border-radius:var(--radius-sm);color:var(--red);font-family:var(--sans);font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.04em;}
+.clear-tab-btn:hover{background:var(--red);color:#fff;}
+
+/* FILE ATTACHMENT */
+.attach-area{border:2px dashed rgba(255,255,255,.2);border-radius:var(--radius);padding:14px;margin-top:8px;}
+.attach-area-light{border:2px dashed var(--border);border-radius:var(--radius);padding:14px;margin-top:8px;}
+.attach-label{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.attach-label-light{font-size:12px;color:var(--text-soft);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.attach-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius-sm);color:rgba(255,255,255,.7);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--sans);}
+.attach-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.attach-btn-light{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--silver);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-mid);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--sans);}
+.attach-btn-light:hover{border-color:var(--teal);color:var(--teal);}
+.attach-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.attach-file{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;font-size:12px;color:rgba(255,255,255,.8);}
+.attach-file-light{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--teal-pale);border:1px solid var(--teal-pale2);border-radius:20px;font-size:12px;color:var(--teal);}
+.attach-file button{background:none;border:none;cursor:pointer;color:inherit;opacity:.6;font-size:13px;padding:0;line-height:1;}
+.attach-file button:hover{opacity:1;}
+.attach-limit{font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;}
+.attach-limit-light{font-size:11px;color:var(--text-soft);margin-top:6px;}
+
+/* SETUP INCOMPLETE BANNER */
+.setup-banner{background:var(--gold-bg);border:1px solid rgba(201,153,58,.4);border-left:4px solid var(--gold);border-radius:0 var(--radius) var(--radius) 0;padding:13px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.setup-banner-text{font-size:13px;color:#7a5c10;line-height:1.5;flex:1;}
+.setup-banner-text strong{color:#5a3e00;}
+.setup-banner-btn{padding:8px 14px;background:var(--gold);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+
+/* ONBOARDING EXIT */
+.ob-exit{text-align:center;margin-top:16px;}
+.ob-exit-btn{background:transparent;border:none;color:rgba(255,255,255,.35);font-size:13px;font-family:var(--sans);cursor:pointer;text-decoration:underline;padding:4px;}
+.ob-exit-btn:hover{color:rgba(255,255,255,.6);}
 </style>
 </head>
 <body>
@@ -329,6 +406,27 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
   </div>
 </header>
 
+<!-- FILING CABINET TABS -->
+<div class="tab-bar" id="tabBar">
+  <button class="tab-item active" id="nav-home" onclick="goScreen('home')">
+    <i data-lucide="home" style="width:18px;height:18px;color:rgba(255,255,255,.45);"></i>
+    <span class="tab-label">Home</span>
+  </button>
+  <button class="tab-item" id="nav-feed" onclick="goScreen('feed')">
+    <i data-lucide="plus-circle" style="width:18px;height:18px;color:rgba(255,255,255,.45);"></i>
+    <span class="tab-label">Feed</span>
+    <span class="tab-badge" id="feedBadge"></span>
+  </button>
+  <button class="tab-item" id="nav-library" onclick="goScreen('library')">
+    <i data-lucide="library" style="width:18px;height:18px;color:rgba(255,255,255,.45);"></i>
+    <span class="tab-label">Library</span>
+  </button>
+  <button class="tab-item" id="nav-studio" onclick="goScreen('studio')">
+    <i data-lucide="pen-line" style="width:18px;height:18px;color:rgba(255,255,255,.45);"></i>
+    <span class="tab-label">Studio</span>
+  </button>
+</div>
+
 <!-- ONBOARDING GATE -->
 <div class="ob-overlay" id="onboardingOverlay">
   <div class="ob-inner">
@@ -339,37 +437,76 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     <div class="ob-title">Let's set up your agent</div>
     <div class="ob-sub">Before your agent can draft posts in your voice, it needs to know who you are and what you stand for. This takes about 5 minutes and only happens once.</div>
 
+    <!-- REQUIRED: LinkedIn -->
     <div class="ob-section">
-      <div class="ob-section-title"><i data-lucide="user" style="width:13px;height:13px;"></i> Your Profile <span class="ob-req">Required</span></div>
+      <div class="ob-section-title">
+        <i data-lucide="linkedin" style="width:13px;height:13px;"></i>
+        LinkedIn Profile URL
+        <span class="ob-req">&#9733; REQUIRED</span>
+      </div>
       <div class="ob-field">
-        <label>LinkedIn Profile URL</label>
         <input type="url" id="obLinkedIn" placeholder="https://www.linkedin.com/in/yourname">
       </div>
     </div>
 
+    <!-- REQUIRED: Content Strategy -->
     <div class="ob-section">
-      <div class="ob-section-title"><i data-lucide="target" style="width:13px;height:13px;"></i> Content Strategy <span class="ob-req">Required</span></div>
-      <div style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.55;">Describe your thought leadership direction, target audience, content pillars, tone preferences, and posting goals. Write freely — the more context you give, the better your agent will perform.</div>
+      <div class="ob-section-title">
+        <i data-lucide="target" style="width:13px;height:13px;"></i>
+        Content Strategy &amp; Direction
+        <span class="ob-req">&#9733; REQUIRED</span>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:12px;line-height:1.55;">Describe your thought leadership direction, target audience, content pillars, tone preferences, and posting goals. Write freely — the more context you give, the better your agent will perform. You can also attach documents (CV, strategy docs, previous posts).</div>
       <div class="ob-field">
-        <label>Your Strategy & Direction</label>
-        <textarea id="obStrategy" rows="8" placeholder="Example: I am a Senior Transformation Consultant and founder of Agile Freedom Consulting. My audience is CTOs, ops leaders, and founders primarily in North America and the UK. My main content pillars are: agentic AI and AI-enabled delivery, Agile transformation, compounding improvement, startup advisory, and the future of work. My tone is confident, direct, and warm — I write in first person with human imperfect rhythm. I never use em-dashes or symmetrical AI-sounding structures. I aim to post 5 times per week and always end with a genuine question to drive engagement..." oninput="obStrategyCount()"></textarea>
+        <textarea id="obStrategy" rows="7" placeholder="Example: I am a Senior Transformation Consultant. My audience is CTOs, ops leaders, and founders in North America and the UK. My content pillars are agentic AI, Agile transformation, compounding improvement, and startup advisory. My tone is confident, direct, and warm — first person, human rhythm, no em-dashes..." oninput="obStrategyCount()"></textarea>
         <div class="ob-wc-row">
           <span class="ob-wc" id="obStrategyWC">0 / 5,000 words</span>
           <div class="ob-wc-bar"><div class="ob-wc-fill" id="obStrategyBar" style="width:0%"></div></div>
         </div>
       </div>
+      <div class="attach-area">
+        <div class="attach-label"><i data-lucide="paperclip" style="width:12px;height:12px;"></i> Attach strategy documents (optional)</div>
+        <button class="attach-btn" onclick="triggerAttach('obStrategyFiles')">
+          <i data-lucide="upload" style="width:13px;height:13px;"></i> Choose files
+        </button>
+        <input type="file" id="obStrategyFiles" multiple accept=".pdf,.doc,.docx,.txt" style="display:none;" onchange="handleAttach(this,'obStrategyFileList')">
+        <div class="attach-files" id="obStrategyFileList"></div>
+        <div class="attach-limit">Up to 5 files · 25MB per file · PDF, Word, TXT</div>
+      </div>
     </div>
 
     <div class="ob-divider"></div>
 
+    <!-- OPTIONAL: CV -->
     <div class="ob-section">
-      <div class="ob-section-title"><i data-lucide="file-text" style="width:13px;height:13px;"></i> Background Documents <span class="ob-opt">Optional</span></div>
+      <div class="ob-section-title">
+        <i data-lucide="file-text" style="width:13px;height:13px;"></i>
+        CV / Professional Background
+        <span class="ob-opt">optional</span>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,.35);margin-bottom:10px;line-height:1.5;">Paste highlights or attach your CV. Helps Claude reference your credentials and experience when drafting.</div>
       <div class="ob-field">
-        <label>CV / Professional Background</label>
-        <textarea id="obCV" rows="4" placeholder="Paste key highlights from your CV — roles, achievements, credentials, notable clients..."></textarea>
+        <textarea id="obCV" rows="4" placeholder="Paste key highlights — roles, achievements, credentials, notable clients..."></textarea>
+      </div>
+      <div class="attach-area">
+        <div class="attach-label"><i data-lucide="paperclip" style="width:12px;height:12px;"></i> Or attach CV documents</div>
+        <button class="attach-btn" onclick="triggerAttach('obCVFiles')">
+          <i data-lucide="upload" style="width:13px;height:13px;"></i> Choose files
+        </button>
+        <input type="file" id="obCVFiles" multiple accept=".pdf,.doc,.docx,.txt" style="display:none;" onchange="handleAttach(this,'obCVFileList')">
+        <div class="attach-files" id="obCVFileList"></div>
+        <div class="attach-limit">Up to 5 files · 25MB per file</div>
+      </div>
+    </div>
+
+    <!-- OPTIONAL: Website -->
+    <div class="ob-section">
+      <div class="ob-section-title">
+        <i data-lucide="globe" style="width:13px;height:13px;"></i>
+        Website URL
+        <span class="ob-opt">optional</span>
       </div>
       <div class="ob-field">
-        <label>Website URL</label>
         <input type="url" id="obWebsite" placeholder="https://agilefreedom.co.uk">
       </div>
     </div>
@@ -378,8 +515,12 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 
     <button class="ob-btn" id="obSubmitBtn" onclick="completeOnboarding()">
       <i data-lucide="arrow-right" style="width:18px;height:18px;"></i>
-      Complete Setup & Enter
+      Complete Setup &amp; Enter
     </button>
+
+    <div class="ob-exit">
+      <button class="ob-exit-btn" onclick="exitOnboarding()">Skip for now — I'll complete setup later</button>
+    </div>
   </div>
 </div>
 
@@ -387,6 +528,12 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
+  <div id="setupBanner" style="display:none;">
+    <div class="setup-banner">
+      <div class="setup-banner-text"><strong>Setup incomplete.</strong> Some features are disabled until you complete your profile and content strategy.</div>
+      <button class="setup-banner-btn" onclick="showOnboarding()">Complete Setup</button>
+    </div>
+  </div>
   <div class="home-greeting">
     <h2 id="homeGreeting">Good morning, Hassan</h2>
     <p id="homeDate"></p>
@@ -396,9 +543,9 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     <div class="stat-card"><div class="stat-num" id="statPosts">—</div><div class="stat-label">Posts this month</div></div>
   </div>
   <div class="brief-btn-wrap">
-    <button class="brief-btn" onclick="runBriefing()" id="briefBtn">
+    <button class="brief-btn" onclick="runBriefingGuarded()" id="briefBtn">
       <div class="brief-btn-icon"><i data-lucide="newspaper" style="width:22px;height:22px;color:#fff;"></i></div>
-      <div class="brief-btn-text"><h3>Get Today's Brief</h3><p>News + topic proposals, tailored to you</p></div>
+      <div class="brief-btn-text"><h3>Get Today's Brief</h3><p id="briefBtnSub">News + topic proposals, tailored to you</p></div>
     </button>
   </div>
   <div id="briefingArea"></div>
@@ -424,44 +571,100 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 
 <!-- FEED -->
 <div class="screen" id="screen-feed">
-  <div class="screen-title">Feed</div>
-  <div class="screen-sub">Drop anything in. Claude classifies, clusters, and stores it.</div>
-
-  <div class="voice-hero" id="voiceHero" onclick="toggleVoice()">
-    <div class="voice-circle" id="voiceCircle"><i data-lucide="mic" style="width:22px;height:22px;color:#fff;" id="voiceMainIcon"></i></div>
-    <div class="voice-hero-text"><h3 id="voiceHeroTitle">Tap to speak</h3><p id="voiceHeroSub">Voice note — powered by your device</p></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div class="screen-title" style="margin-bottom:0;">Feed</div>
+    <button class="clear-tab-btn" onclick="confirmClearTable('inputs')">
+      <i data-lucide="trash-2" style="width:11px;height:11px;"></i> Clear History
+    </button>
   </div>
-  <div class="voice-transcript" id="voiceTranscript"></div>
-  <div class="voice-confirm-row" id="voiceConfirmRow">
-    <button class="btn btn-green btn-sm" onclick="confirmVoice()"><i data-lucide="check" style="width:14px;height:14px;"></i> Use this</button>
-    <button class="btn btn-outline btn-sm" onclick="clearVoice()"><i data-lucide="x" style="width:14px;height:14px;"></i> Clear</button>
+  <div class="screen-sub">Drop a thought or a link. Claude classifies and stores it automatically.</div>
+
+  <!-- MODE SELECTOR - two clear options only -->
+  <div class="feed-mode-row">
+    <button class="feed-mode-btn active" id="feedModeThought" onclick="setFeedMode('thought')">
+      <i data-lucide="lightbulb" style="width:18px;height:18px;"></i>
+      <div>
+        <div class="feed-mode-label">Thought / Encounter</div>
+        <div class="feed-mode-sub">Idea, reflection, meeting, strategy, or document</div>
+      </div>
+    </button>
+    <button class="feed-mode-btn" id="feedModeLink" onclick="setFeedMode('link')">
+      <i data-lucide="link" style="width:18px;height:18px;"></i>
+      <div>
+        <div class="feed-mode-label">Article / Video / Link</div>
+        <div class="feed-mode-sub">URL from web, LinkedIn, YouTube, podcast</div>
+      </div>
+    </button>
   </div>
 
-  <div class="form-group">
-    <label class="field-label">What are you sharing?</label>
-    <div class="type-grid" id="typeGrid">
-      <button class="type-btn sel" data-type="Random Thought" onclick="selType(this)"><div class="type-icon" style="background:var(--teal-pale);"><i data-lucide="lightbulb" style="width:14px;height:14px;color:var(--teal);"></i></div><div><div class="type-label">Thought</div><div class="type-sub">Idea or reflection</div></div></button>
-      <button class="type-btn" data-type="Article URL" onclick="selType(this)"><div class="type-icon" style="background:#eef2fb;"><i data-lucide="link" style="width:14px;height:14px;color:var(--navy);"></i></div><div><div class="type-label">Link</div><div class="type-sub">Article or video</div></div></button>
-      <button class="type-btn" data-type="Personal Encounter" onclick="selType(this)"><div class="type-icon" style="background:var(--green-bg);"><i data-lucide="users" style="width:14px;height:14px;color:var(--green);"></i></div><div><div class="type-label">Encounter</div><div class="type-sub">Meeting or convo</div></div></button>
-      <button class="type-btn" data-type="Strategy Note" onclick="selType(this)"><div class="type-icon" style="background:var(--gold-bg);"><i data-lucide="target" style="width:14px;height:14px;color:var(--gold);"></i></div><div><div class="type-label">Strategy</div><div class="type-sub">Direction or style</div></div></button>
-      <button class="type-btn" data-type="Anti-Repetition Note" onclick="selType(this)"><div class="type-icon" style="background:var(--red-bg);"><i data-lucide="ban" style="width:14px;height:14px;color:var(--red);"></i></div><div><div class="type-label">Avoid</div><div class="type-sub">Don't repeat this</div></div></button>
-      <button class="type-btn" data-type="Document Extract" onclick="selType(this)"><div class="type-icon" style="background:var(--silver-2);"><i data-lucide="file-text" style="width:14px;height:14px;color:var(--text-soft);"></i></div><div><div class="type-label">Document</div><div class="type-sub">Extract or report</div></div></button>
+  <!-- THOUGHT MODE -->
+  <div id="feedThoughtMode">
+    <div class="form-group">
+      <label class="field-label">Type</label>
+      <div class="thought-type-row">
+        <button class="ttype-btn active" data-type="Random Thought" onclick="selThoughtType(this)">
+          <i data-lucide="lightbulb" style="width:13px;height:13px;"></i> Thought
+        </button>
+        <button class="ttype-btn" data-type="Personal Encounter" onclick="selThoughtType(this)">
+          <i data-lucide="users" style="width:13px;height:13px;"></i> Encounter
+        </button>
+        <button class="ttype-btn" data-type="Strategy Note" onclick="selThoughtType(this)">
+          <i data-lucide="target" style="width:13px;height:13px;"></i> Strategy
+        </button>
+        <button class="ttype-btn" data-type="Anti-Repetition Note" onclick="selThoughtType(this)">
+          <i data-lucide="ban" style="width:13px;height:13px;"></i> Avoid
+        </button>
+      </div>
+    </div>
+
+    <!-- Encounter tag -->
+    <div class="encounter-box" id="encounterBox">
+      <div class="enc-title"><i data-lucide="tag" style="width:12px;height:12px;"></i> Tag opportunity</div>
+      <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px;">Tagging this person benefits you both. Add their name and LinkedIn handle.</div>
+      <input type="text" id="encounterTag" placeholder="e.g. John Smith @johnsmith" style="font-size:14px;padding:10px 12px;">
+    </div>
+
+    <!-- Claude-style input box with voice -->
+    <div class="claude-input-wrap">
+      <textarea id="feedContent" class="claude-input-textarea" placeholder="Share your thought, describe what you heard, or paste document text..." rows="3" oninput="autoResizeFeed(this)"></textarea>
+      <div class="claude-input-toolbar">
+        <div class="claude-input-left">
+          <button class="claude-tool-btn" onclick="triggerAttach('feedFiles')" title="Attach document">
+            <i data-lucide="paperclip" style="width:16px;height:16px;"></i>
+          </button>
+          <input type="file" id="feedFiles" multiple accept=".pdf,.doc,.docx,.txt" style="display:none;" onchange="handleFeedAttach(this)">
+          <div class="attach-files" id="feedFileList" style="display:inline-flex;gap:5px;flex-wrap:wrap;"></div>
+        </div>
+        <div class="claude-input-right">
+          <button class="claude-tool-btn" id="feedVoiceBtn" onclick="toggleFieldVoice('feedContent','feedVoiceBtn')" title="Voice input">
+            <i data-lucide="mic" style="width:16px;height:16px;"></i>
+          </button>
+          <button class="claude-send-btn" id="feedSaveBtn" onclick="saveInput()" title="Save">
+            <i data-lucide="arrow-up" style="width:16px;height:16px;"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="encounter-box" id="encounterBox">
-    <div class="enc-title"><i data-lucide="tag" style="width:12px;height:12px;"></i> Tag opportunity</div>
-    <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px;">Tagging this person could benefit you both. Add their name and LinkedIn handle if you want to include them.</div>
-    <input type="text" id="encounterTag" placeholder="e.g. John Smith @johnsmith" style="font-size:14px;padding:10px 12px;">
-  </div>
-
-  <div class="form-group">
-    <label class="field-label">Content</label>
-    <div class="voice-input-wrap">
-      <textarea id="feedContent" rows="4" placeholder="Type your thought, paste a URL, describe what you heard..."></textarea>
-      <button class="voice-input-btn" id="feedVoiceBtn" onclick="toggleFieldVoice('feedContent','feedVoiceBtn')" title="Voice input"><i data-lucide="mic" style="width:14px;height:14px;"></i></button>
+  <!-- LINK MODE -->
+  <div id="feedLinkMode" style="display:none;">
+    <div class="claude-input-wrap">
+      <input type="url" id="feedLinkUrl" class="claude-input-url" placeholder="Paste URL here — article, YouTube, LinkedIn post, podcast...">
+      <div class="claude-input-toolbar">
+        <div class="claude-input-left">
+          <span style="font-size:12px;color:var(--text-soft);">Optional note:</span>
+        </div>
+        <div class="claude-input-right">
+          <button class="claude-send-btn" id="feedLinkSaveBtn" onclick="saveLink()" title="Save link">
+            <i data-lucide="arrow-up" style="width:16px;height:16px;"></i>
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="field-hint">Claude will tell you what it extracted and cluster this with related topics automatically.</div>
+    <div class="form-group" style="margin-top:10px;">
+      <textarea id="feedLinkNote" class="claude-input-textarea" placeholder="What caught your attention? Any specific angle? (optional)" rows="2" style="min-height:60px;"></textarea>
+    </div>
   </div>
 
   <div class="err-box" id="feedErr"></div>
@@ -469,10 +672,6 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     <div class="feed-resp-label"><i data-lucide="sparkles" style="width:11px;height:11px;"></i> Claude's response</div>
     <div id="feedRespText"></div>
   </div>
-
-  <button class="btn btn-navy" id="feedSaveBtn" onclick="saveInput()">
-    <i data-lucide="save" style="width:17px;height:17px;"></i> Save Input
-  </button>
 
   <div style="margin-top:20px;">
     <div class="sec-label">Recent inputs</div>
@@ -482,7 +681,12 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 
 <!-- LIBRARY -->
 <div class="screen" id="screen-library">
-  <div class="screen-title">Library</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div class="screen-title" style="margin-bottom:0;">Library</div>
+    <button class="clear-tab-btn" onclick="confirmClearTable('library')">
+      <i data-lucide="trash-2" style="width:11px;height:11px;"></i> Clear All
+    </button>
+  </div>
   <div class="screen-sub">Your topic repository. Browse, filter, or get suggestions.</div>
 
   <div class="cleanup-bar" id="cleanupBar">
@@ -572,20 +776,71 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
   </div>
   <button class="btn btn-navy" onclick="saveSettings()"><i data-lucide="save" style="width:16px;height:16px;"></i> Save Settings</button>
   <div class="notice notice-teal" style="margin-top:14px;font-size:13px;">Settings are saved locally and injected into every Claude session.</div>
+
+  <div class="settings-section" style="margin-top:28px;">
+    <div class="settings-section-title"><i data-lucide="trash-2" style="width:15px;height:15px;color:var(--red);"></i> <span style="color:var(--red);">Data Management</span></div>
+    <div class="notice notice-gold" style="font-size:13px;margin-bottom:14px;">All deletions are permanent and cannot be undone. Use with caution.</div>
+    <div class="danger-zone">
+      <div class="danger-zone-title"><i data-lucide="database" style="width:13px;height:13px;"></i> Clear Individual Tables</div>
+      <div class="danger-btn" onclick="confirmClearTable('inputs')">
+        <div><div class="danger-btn-text">Clear Inputs</div><div class="danger-btn-sub">All feed entries — thoughts, links, voice notes</div></div>
+        <i data-lucide="trash-2" style="width:15px;height:15px;" class="danger-btn-icon"></i>
+      </div>
+      <div class="danger-btn" onclick="confirmClearTable('library')">
+        <div><div class="danger-btn-text">Clear Library</div><div class="danger-btn-sub">All topics and queued content</div></div>
+        <i data-lucide="trash-2" style="width:15px;height:15px;" class="danger-btn-icon"></i>
+      </div>
+      <div class="danger-btn" onclick="confirmClearTable('drafts')">
+        <div><div class="danger-btn-text">Clear Drafts</div><div class="danger-btn-sub">All generated and saved drafts</div></div>
+        <i data-lucide="trash-2" style="width:15px;height:15px;" class="danger-btn-icon"></i>
+      </div>
+      <div class="danger-btn" onclick="confirmClearTable('published')">
+        <div><div class="danger-btn-text">Clear Published Posts</div><div class="danger-btn-sub">All approved and published post history</div></div>
+        <i data-lucide="trash-2" style="width:15px;height:15px;" class="danger-btn-icon"></i>
+      </div>
+    </div>
+    <button class="nuke-btn" onclick="confirmNukeAll()">
+      <i data-lucide="zap" style="width:16px;height:16px;"></i> Clear All Data — Start Fresh
+    </button>
+  </div>
 </div>
 
 </div><!-- end main -->
 
-<!-- NAV BAR -->
-<nav class="nav-bar">
-  <button class="nav-item active" id="nav-home" onclick="goScreen('home')"><i data-lucide="home" style="width:20px;height:20px;"></i><span class="nav-label">Home</span></button>
-  <button class="nav-item" id="nav-feed" onclick="goScreen('feed')"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i><span class="nav-label">Feed</span><span class="nav-badge" id="feedBadge"></span></button>
-  <button class="nav-item" id="nav-library" onclick="goScreen('library')"><i data-lucide="library" style="width:20px;height:20px;"></i><span class="nav-label">Library</span></button>
-  <button class="nav-item" id="nav-studio" onclick="goScreen('studio')"><i data-lucide="pen-line" style="width:20px;height:20px;"></i><span class="nav-label">Studio</span></button>
-</nav>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--red);" id="deleteModalTitle">Clear table?</div>
+    <div class="notice" style="background:var(--red-bg);border-left:3px solid var(--red);color:var(--red);margin-bottom:16px;font-size:13px;" id="deleteModalMsg">This will permanently delete all records. This cannot be undone.</div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-red" id="deleteModalConfirmBtn" onclick="executeTableClear()">
+        <i data-lucide="trash-2" style="width:15px;height:15px;"></i> Delete Permanently
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- NUKE ALL MODAL -->
+<div class="modal-overlay" id="nukeModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--red);">Clear All Data</div>
+    <div class="notice" style="background:var(--red-bg);border-left:3px solid var(--red);color:var(--red);margin-bottom:16px;font-size:13px;">This will permanently delete ALL records across ALL tables — Inputs, Library, Drafts, and Published Posts. Your settings will be preserved. This cannot be undone.</div>
+    <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px;font-weight:700;">Type DELETE to confirm:</div>
+    <input type="text" class="nuke-input" id="nukeConfirmInput" placeholder="Type DELETE here..." oninput="checkNukeInput()">
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('nukeModal')">Cancel</button>
+      <button class="btn btn-red" id="nukeConfirmBtn" onclick="executeNukeAll()" disabled>
+        <i data-lucide="zap" style="width:15px;height:15px;"></i> Clear All Data
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- LOG MODAL -->
 <div class="modal-overlay" id="logModal">
@@ -736,8 +991,15 @@ function openLog(){
 
 // ── NAV ───────────────────────────────────────────────────────────────────
 function goScreen(name){
+  // Guard features that need setup complete
+  const guarded = ['feed','library','studio'];
+  if(guarded.includes(name) && !isOnboardingComplete()){
+    showOnboarding();
+    toast('Please complete setup first','alert-circle');
+    return;
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(n=>n.classList.remove('active'));
   const sc=document.getElementById('screen-'+name);
   if(sc) sc.classList.add('active');
   const ni=document.getElementById('nav-'+name);
@@ -1107,6 +1369,54 @@ function stopFieldVoice(){
 }
 
 // ── INPUT TYPE ────────────────────────────────────────────────────────────
+// ── FEED MODE ─────────────────────────────────────────────────────────────
+let currentFeedMode = 'thought';
+
+function setFeedMode(mode){
+  currentFeedMode = mode;
+  document.getElementById('feedModeThought').classList.toggle('active', mode==='thought');
+  document.getElementById('feedModeLink').classList.toggle('active', mode==='link');
+  document.getElementById('feedThoughtMode').style.display = mode==='thought' ? 'block' : 'none';
+  document.getElementById('feedLinkMode').style.display = mode==='link' ? 'block' : 'none';
+  hideErr('feedErr');
+  document.getElementById('feedResp').classList.remove('show');
+}
+
+function selThoughtType(btn){
+  document.querySelectorAll('.ttype-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('encounterBox').classList.toggle('show', btn.dataset.type==='Personal Encounter');
+}
+
+function getThoughtType(){
+  const sel = document.querySelector('.ttype-btn.active');
+  return sel ? sel.dataset.type : 'Random Thought';
+}
+
+function autoResizeFeed(el){
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 240) + 'px';
+}
+
+function handleFeedAttach(input){
+  const files = [...input.files].slice(0,3);
+  const el = document.getElementById('feedFileList');
+  el.innerHTML = files.map((f,i) =>
+    `<span class="attach-file-light">${f.name.slice(0,20)}${f.name.length>20?'...':''}<button onclick="this.parentElement.remove()">&#x2715;</button></span>`
+  ).join('');
+  lucide.createIcons();
+  input.value='';
+}
+
+function runBriefingGuarded(){
+  if(!isOnboardingComplete()){
+    showOnboarding();
+    toast('Please complete setup first','alert-circle');
+    return;
+  }
+  runBriefing();
+}
+
 function selType(btn){
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
@@ -1114,16 +1424,87 @@ function selType(btn){
 }
 function getType(){return(document.querySelector('.type-btn.sel')||{dataset:{type:'Random Thought'}}).dataset.type;}
 
+// ── SAVE LINK ─────────────────────────────────────────────────────────────
+async function saveLink(){
+  const url = document.getElementById('feedLinkUrl').value.trim();
+  const note = document.getElementById('feedLinkNote').value.trim();
+  hideErr('feedErr');
+  if(!url){ showErr('feedErr','Please paste a URL before saving.'); return; }
+
+  const btn = document.getElementById('feedLinkSaveBtn');
+  btn.disabled = true;
+
+  try{
+    const existingTopics = await atGet(AT.Q,100,"Status='Available'");
+    const topicTitles = existingTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,40).join('; ');
+
+    const prompt = `You are Hassan Khadra's content agent. Process this URL input.
+
+URL: "${url}"
+User note: "${note||'none'}"
+Existing topics: ${topicTitles||'none yet'}
+
+1. Identify what type of content this URL likely links to (article, video, podcast, LinkedIn post, report etc.)
+2. Extract or infer the title and topic from the URL
+3. Classify: Content Seed, Reference Material, or Topic Direction
+4. Detect which existing topic(s) this relates to (max 2)
+5. Write a 2-sentence response telling Hassan what you found and what you'll do with it
+
+Return ONLY valid JSON:
+{"classification":"<type>","inferredTitle":"<title>","relatedTopics":["<topic>"],"newTopicTitle":"<if no match>","response":"<2 sentences>","tags":["<tag1>","<tag2>"]}`;
+
+    const raw = await claude(prompt, 600);
+    const result = parseJSON(raw);
+
+    await atCreate(AT.IN,{
+      'Input ID':'IN-'+Date.now(),'Input Type':'Article URL',
+      'Raw Content': url + (note ? '\nNote: '+note : ''),
+      'Claude Classification': result.classification,
+      'Claude Notes': result.response,
+      'Status':'New','Used in Post':false
+    });
+
+    // Add to content queue
+    await atCreate(AT.Q,{
+      'Title': result.inferredTitle || url.slice(0,80),
+      'Source URL': url,
+      'Source':'Manual - Hassan',
+      'Topic Tags': result.tags||[],
+      'Summary': note || result.response,
+      'Priority':'Medium','Status':'Available','Used in Draft':false
+    });
+
+    // Cluster with existing topics
+    if(result.relatedTopics && result.relatedTopics.length){
+      for(const t of result.relatedTopics){
+        const match = existingTopics.find(r=>(r.fields['Title']||'').toLowerCase()===t.toLowerCase());
+        if(match) await atUpdate(AT.Q, match.id, {'Hassan Notes':(match.fields['Hassan Notes']||'')+'\n[Link] '+url});
+      }
+    }
+
+    document.getElementById('feedRespText').textContent = result.response;
+    document.getElementById('feedResp').classList.add('show');
+    document.getElementById('feedLinkUrl').value = '';
+    document.getElementById('feedLinkNote').value = '';
+    toast('Link saved'+(result.relatedTopics?.length ? ' · Linked to: '+result.relatedTopics[0] : ''),'link');
+    addLog('Link saved: '+url.slice(0,50),'link');
+    loadRecentFeed();
+    updateBadge();
+  }catch(e){
+    showErr('feedErr','Save failed: '+e.message);
+  }
+  btn.disabled = false;
+}
 // ── SAVE INPUT ────────────────────────────────────────────────────────────
 async function saveInput(){
   const content=document.getElementById('feedContent').value.trim();
-  const type=getType();
+  const type=getThoughtType();
   const tag=document.getElementById('encounterTag').value.trim();
   hideErr('feedErr');
   if(!content){showErr('feedErr','Please add some content before saving.');return;}
 
   const btn=document.getElementById('feedSaveBtn');
-  btn.disabled=true; btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div> Saving...';
+  btn.disabled=true;
 
   try{
     // Get existing topics to cluster against
@@ -1579,6 +1960,58 @@ Return ONLY the style note text, nothing else.`;
   }catch(e){alert('Could not save: '+e.message);}
 }
 
+// ── FILE ATTACHMENTS ──────────────────────────────────────────────────────
+const attachedFiles = { obStrategy:[], obCV:[] };
+const MAX_FILES = 5;
+const MAX_FILE_MB = 25;
+
+function triggerAttach(inputId){ document.getElementById(inputId).click(); }
+
+function handleAttach(input, listId){
+  const key = input.id.replace('Files','');
+  const files = [...input.files];
+  const existing = attachedFiles[key] || [];
+  const toAdd = files.filter(f => {
+    if(existing.length >= MAX_FILES){ toast('Maximum 5 files allowed','alert-circle'); return false; }
+    if(f.size > MAX_FILE_MB * 1024 * 1024){ toast(f.name+' exceeds 25MB limit','alert-circle'); return false; }
+    return true;
+  });
+  attachedFiles[key] = [...existing, ...toAdd].slice(0, MAX_FILES);
+  renderAttachList(key, listId);
+  input.value = '';
+}
+
+function renderAttachList(key, listId){
+  const el = document.getElementById(listId);
+  if(!el) return;
+  const isDark = listId.startsWith('ob');
+  el.innerHTML = (attachedFiles[key]||[]).map((f,i) =>
+    `<span class="${isDark?'attach-file':'attach-file-light'}">
+      <i data-lucide="file" style="width:11px;height:11px;"></i>
+      ${f.name.slice(0,25)}${f.name.length>25?'...':''}
+      <button onclick="removeAttach('${key}',${i},'${listId}')" title="Remove">&#x2715;</button>
+    </span>`
+  ).join('');
+  lucide.createIcons();
+}
+
+function removeAttach(key, idx, listId){
+  attachedFiles[key].splice(idx,1);
+  renderAttachList(key, listId);
+}
+
+async function readAttachedFiles(key){
+  const files = attachedFiles[key] || [];
+  const texts = [];
+  for(const f of files){
+    try{
+      const text = await f.text();
+      texts.push(`[Document: ${f.name}]\n${text.slice(0,3000)}`);
+    }catch(e){ texts.push(`[Document: ${f.name} - could not read]`); }
+  }
+  return texts.join('\n\n');
+}
+
 // ── ONBOARDING ────────────────────────────────────────────────────────────
 const STRATEGY_MAX_WORDS = 5000;
 
@@ -1595,6 +2028,29 @@ function showOnboarding(){
 
 function hideOnboarding(){
   document.getElementById('onboardingOverlay').classList.remove('show');
+}
+
+function exitOnboarding(){
+  hideOnboarding();
+  // Show setup incomplete banner on home
+  const banner = document.getElementById('setupBanner');
+  if(banner) banner.style.display = 'block';
+  loadHomeStats();
+  updateBadge();
+  addLog('Setup skipped - features limited until setup is complete','alert-circle');
+}
+
+function isSetupComplete(){
+  return isOnboardingComplete();
+}
+
+function guardFeature(featureName){
+  if(!isSetupComplete()){
+    showOnboarding();
+    toast('Please complete setup to use '+featureName,'alert-circle');
+    return false;
+  }
+  return true;
 }
 
 function obStrategyCount(){
@@ -1622,7 +2078,7 @@ function settingsStrategyCount(){
   bar.style.background = words > STRATEGY_MAX_WORDS ? 'var(--red)' : 'var(--teal)';
 }
 
-function completeOnboarding(){
+async function completeOnboarding(){
   const linkedin = document.getElementById('obLinkedIn').value.trim();
   const strategy = document.getElementById('obStrategy').value.trim();
   const cv = document.getElementById('obCV').value.trim();
@@ -1644,17 +2100,35 @@ function completeOnboarding(){
     err.classList.add('show'); return;
   }
 
-  // Save to settings
-  const existing = getSettings();
-  const s = { ...existing, LinkedIn:linkedin, Strategy:strategy, CV:cv, Website:website, onboardingComplete:true };
+  const btn = document.getElementById('obSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div> Saving...';
+
+  // Read any attached files
+  const strategyDocs = await readAttachedFiles('obStrategy');
+  const cvDocs = await readAttachedFiles('obCV');
+
+  const s = {
+    LinkedIn: linkedin,
+    Strategy: strategy + (strategyDocs ? '\n\n--- Attached Documents ---\n' + strategyDocs : ''),
+    CV: cv + (cvDocs ? '\n\n--- Attached Documents ---\n' + cvDocs : ''),
+    Website: website,
+    onboardingComplete: true
+  };
   localStorage.setItem('afc_s', JSON.stringify(s));
 
   hideOnboarding();
+  document.getElementById('setupBanner').style.display = 'none';
   toast('Setup complete — welcome to your content agent', 'check-circle');
   addLog('Initial setup completed', 'check-circle');
   loadHomeStats();
   loadRecentFeed();
+  loadSettingsForm();
   updateBadge();
+
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="arrow-right" style="width:18px;height:18px;"></i> Complete Setup &amp; Enter';
+  lucide.createIcons();
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
@@ -1697,6 +2171,123 @@ function saveSettings(){
   toast('Settings saved','save'); addLog('Settings updated','settings');
 }
 
+// ── DATA MANAGEMENT ───────────────────────────────────────────────────────
+let pendingClearTable = null;
+
+const TABLE_CONFIG = {
+  inputs:    { airtable: AT.IN,  label: 'Inputs',          sub: 'All feed entries — thoughts, links, voice notes' },
+  library:   { airtable: AT.Q,   label: 'Library',         sub: 'All topics and queued content' },
+  drafts:    { airtable: AT.D,   label: 'Drafts',          sub: 'All generated and saved drafts' },
+  published: { airtable: AT.PUB, label: 'Published Posts', sub: 'All approved and published post history' }
+};
+
+function confirmClearTable(tableKey){
+  const cfg = TABLE_CONFIG[tableKey];
+  if(!cfg) return;
+  pendingClearTable = tableKey;
+  document.getElementById('deleteModalTitle').textContent = 'Clear '+cfg.label+'?';
+  document.getElementById('deleteModalMsg').textContent = 'This will permanently delete all records from '+cfg.label+'. '+cfg.sub+'. This cannot be undone.';
+  openModal('deleteModal');
+}
+
+async function executeTableClear(){
+  if(!pendingClearTable) return;
+  const cfg = TABLE_CONFIG[pendingClearTable];
+  const confirmBtn = document.getElementById('deleteModalConfirmBtn');
+  confirmBtn.disabled = true;
+  confirmBtn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div> Deleting...';
+
+  try{
+    await clearAirtableTable(cfg.airtable);
+    closeModal('deleteModal');
+    toast(cfg.label+' cleared successfully','trash-2');
+    addLog(cfg.label+' permanently cleared','trash-2');
+
+    // Refresh relevant UI
+    if(pendingClearTable==='library'){ allTopics=[]; renderTopics(); loadSeries(); updateBadge(); }
+    if(pendingClearTable==='inputs'){ loadRecentFeed(); updateBadge(); }
+    if(pendingClearTable==='published'){ /* history view refreshes on next open */ }
+
+  }catch(e){
+    toast('Delete failed: '+e.message,'alert-circle');
+    addLog('Clear failed: '+e.message,'alert-circle');
+  }
+  confirmBtn.disabled = false;
+  confirmBtn.innerHTML = '<i data-lucide="trash-2" style="width:15px;height:15px;"></i> Delete Permanently';
+  lucide.createIcons();
+  pendingClearTable = null;
+}
+
+function confirmNukeAll(){
+  document.getElementById('nukeConfirmInput').value = '';
+  document.getElementById('nukeConfirmBtn').disabled = true;
+  openModal('nukeModal');
+}
+
+function checkNukeInput(){
+  const val = document.getElementById('nukeConfirmInput').value;
+  document.getElementById('nukeConfirmBtn').disabled = val !== 'DELETE';
+}
+
+async function executeNukeAll(){
+  const confirmBtn = document.getElementById('nukeConfirmBtn');
+  confirmBtn.disabled = true;
+  confirmBtn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div> Clearing all...';
+
+  try{
+    await Promise.all([
+      clearAirtableTable(AT.IN),
+      clearAirtableTable(AT.Q),
+      clearAirtableTable(AT.D),
+      clearAirtableTable(AT.PUB)
+    ]);
+    closeModal('nukeModal');
+    allTopics = [];
+    toast('All data cleared — starting fresh','check-circle');
+    addLog('All tables permanently cleared','zap');
+    loadHomeStats();
+    loadRecentFeed();
+    renderTopics();
+    updateBadge();
+  }catch(e){
+    toast('Clear all failed: '+e.message,'alert-circle');
+    addLog('Clear all failed: '+e.message,'alert-circle');
+  }
+  confirmBtn.disabled = false;
+  confirmBtn.innerHTML = '<i data-lucide="zap" style="width:15px;height:15px;"></i> Clear All Data';
+  lucide.createIcons();
+}
+
+async function clearAirtableTable(tableName){
+  // Fetch all records then delete in batches of 10 (Airtable limit)
+  let allRecords = [];
+  let offset = null;
+  do {
+    let path = `${AT_BASE}/${encodeURIComponent(tableName)}?maxRecords=100&fields[]=Created Time`;
+    if(offset) path += `&offset=${offset}`;
+    const r = await fetch('/functions/airtable-proxy',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({path,method:'GET'})
+    });
+    const d = await r.json();
+    allRecords = allRecords.concat(d.records||[]);
+    offset = d.offset || null;
+  } while(offset);
+
+  // Delete in batches of 10
+  for(let i=0;i<allRecords.length;i+=10){
+    const batch = allRecords.slice(i,i+10).map(r=>r.id);
+    const ids = batch.map(id=>`records[]=${id}`).join('&');
+    await fetch('/functions/airtable-proxy',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        path:`${AT_BASE}/${encodeURIComponent(tableName)}?${ids}`,
+        method:'DELETE'
+      })
+    });
+  }
+}
+
 // ── BADGE ─────────────────────────────────────────────────────────────────
 async function updateBadge(){
   try{
@@ -1710,18 +2301,18 @@ async function updateBadge(){
 function appInit(){
   lucide.createIcons();
 
-  // Migration: if settings exist from an old session without the explicit
-  // onboardingComplete flag, clear it so the onboarding gate fires correctly
-  const s = getSettings();
-  if(s.LinkedIn && !s.hasOwnProperty('onboardingComplete')){
-    // Old session data - remove the flag so onboarding re-runs
-    delete s.onboardingComplete;
-    localStorage.setItem('afc_s', JSON.stringify(s));
-  }
+  // Migration: clear stale sessions that lack the onboardingComplete flag
+  try {
+    const s = getSettings();
+    if(Object.keys(s).length > 0 && !s.hasOwnProperty('onboardingComplete')){
+      localStorage.removeItem('afc_s');
+    }
+  } catch(e){}
 
   if(!isOnboardingComplete()){
     showOnboarding();
   } else {
+    document.getElementById('setupBanner').style.display = 'none';
     loadHomeStats();
     loadRecentFeed();
     loadSettingsForm();
@@ -1729,20 +2320,19 @@ function appInit(){
   }
 }
 
-function lucideReady(){
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', appInit);
-  } else {
+// Wait for both DOM and Lucide to be ready before initialising
+function waitForLucide(){
+  if(typeof lucide !== 'undefined' && lucide.createIcons){
     appInit();
+  } else {
+    setTimeout(waitForLucide, 50);
   }
 }
 
-function lucideFallback(){
-  // Lucide CDN failed - try unpkg as backup
-  const s=document.createElement('script');
-  s.src='https://unpkg.com/lucide@0.363.0/dist/umd/lucide.min.js';
-  s.onload=lucideReady;
-  document.head.appendChild(s);
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', waitForLucide);
+} else {
+  waitForLucide();
 }
 </script>
 </body>
