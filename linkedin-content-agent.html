@@ -355,6 +355,24 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 .claude-send-btn:hover{background:var(--teal);}
 .claude-send-btn:disabled{opacity:.35;cursor:not-allowed;}
 
+/* TOPIC CONFIRM CARDS */
+.tc-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:10px;transition:border-color .2s;}
+.tc-card.approved{border-color:var(--green);background:var(--green-bg);}
+.tc-card.removed{opacity:.35;border-color:var(--border);background:var(--silver);pointer-events:none;}
+.tc-card-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.tc-card-title{font-size:14px;font-weight:700;color:var(--navy);flex:1;line-height:1.3;}
+.tc-card-status{flex-shrink:0;display:flex;gap:6px;}
+.tc-approve-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--green);background:transparent;color:var(--green);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.tc-approve-btn:hover,.tc-approve-btn.active{background:var(--green);color:#fff;}
+.tc-remove-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:transparent;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.tc-remove-btn:hover{border-color:var(--red);color:var(--red);}
+.tc-card-summary{font-size:13px;color:var(--text-mid);line-height:1.5;}
+.tc-card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+/* Memory mode button colour */
+.feed-mode-btn#feedModeMemory{border-color:rgba(83,74,183,.3);}
+.feed-mode-btn#feedModeMemory.active{border-color:var(--navy);background:#eeedfe;}
+.feed-mode-btn#feedModeMemory.active i{color:#534AB7;}
+
 /* DATA MANAGEMENT */
 .danger-zone{background:var(--red-bg);border:1px solid rgba(184,50,50,.2);border-radius:var(--radius);padding:16px;margin-top:8px;}
 .danger-zone-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
@@ -398,7 +416,6 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 .ob-exit{text-align:center;margin-top:16px;}
 .ob-exit-btn{background:transparent;border:none;color:rgba(255,255,255,.35);font-size:13px;font-family:var(--sans);cursor:pointer;text-decoration:underline;padding:4px;}
 .ob-exit-btn:hover{color:rgba(255,255,255,.6);}
-.settings-wc-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .2s;}
 </style>
 </head>
 <body>
@@ -588,20 +605,27 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
   </div>
   <div class="screen-sub">Drop a thought or a link. Claude classifies and stores it automatically.</div>
 
-  <!-- MODE SELECTOR - two clear options only -->
-  <div class="feed-mode-row">
+  <!-- MODE SELECTOR - three options -->
+  <div class="feed-mode-row" style="grid-template-columns:1fr 1fr 1fr;">
     <button class="feed-mode-btn active" id="feedModeThought" onclick="setFeedMode('thought')">
       <i data-lucide="lightbulb" style="width:18px;height:18px;"></i>
       <div>
         <div class="feed-mode-label">Thought / Encounter</div>
-        <div class="feed-mode-sub">Idea, reflection, meeting, strategy, or document</div>
+        <div class="feed-mode-sub">Idea, reflection, meeting, strategy</div>
       </div>
     </button>
     <button class="feed-mode-btn" id="feedModeLink" onclick="setFeedMode('link')">
       <i data-lucide="link" style="width:18px;height:18px;"></i>
       <div>
-        <div class="feed-mode-label">Article / Video / Link</div>
-        <div class="feed-mode-sub">URL from web, LinkedIn, YouTube, podcast</div>
+        <div class="feed-mode-label">Article / Link</div>
+        <div class="feed-mode-sub">URL from web, YouTube, podcast</div>
+      </div>
+    </button>
+    <button class="feed-mode-btn" id="feedModeMemory" onclick="setFeedMode('memory')">
+      <i data-lucide="brain" style="width:18px;height:18px;"></i>
+      <div>
+        <div class="feed-mode-label">Add to Memory</div>
+        <div class="feed-mode-sub">Docs, topics, past posts</div>
       </div>
     </button>
   </div>
@@ -674,6 +698,34 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     </div>
   </div>
 
+  <!-- MEMORY MODE -->
+  <div id="feedMemoryMode" style="display:none;">
+    <div class="notice notice-teal" style="font-size:13px;margin-bottom:14px;">
+      <strong>Add to Memory</strong> — paste text, previous posts, topic lists, or attach documents. Claude will analyse what you share, extract relevant topics, and ask you to confirm before saving anything to your Library.
+    </div>
+    <div class="claude-input-wrap">
+      <textarea id="feedMemoryContent" class="claude-input-textarea" placeholder="Paste topic ideas, previous LinkedIn posts, notes, a list of subjects you want to cover, or any content you want Claude to learn from..." rows="5" style="min-height:120px;"></textarea>
+      <div class="claude-input-toolbar">
+        <div class="claude-input-left">
+          <button class="claude-tool-btn" onclick="triggerAttach('feedMemoryFiles')" title="Attach documents">
+            <i data-lucide="paperclip" style="width:16px;height:16px;"></i>
+          </button>
+          <input type="file" id="feedMemoryFiles" multiple accept=".pdf,.doc,.docx,.txt" style="display:none;" onchange="handleMemoryAttach(this)">
+          <div class="attach-files" id="feedMemoryFileList" style="display:inline-flex;gap:5px;flex-wrap:wrap;"></div>
+        </div>
+        <div class="claude-input-right">
+          <button class="claude-tool-btn" id="feedMemoryVoiceBtn" onclick="toggleFieldVoice('feedMemoryContent','feedMemoryVoiceBtn')" title="Voice input">
+            <i data-lucide="mic" style="width:16px;height:16px;"></i>
+          </button>
+          <button class="claude-send-btn" onclick="analyseForMemory()" title="Analyse and extract topics">
+            <i data-lucide="arrow-up" style="width:16px;height:16px;"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="err-box" id="memoryErr"></div>
+  </div>
+
   <div class="err-box" id="feedErr"></div>
   <div class="feed-resp" id="feedResp">
     <div class="feed-resp-label"><i data-lucide="sparkles" style="width:11px;height:11px;"></i> Claude's response</div>
@@ -690,9 +742,14 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 <div class="screen" id="screen-library">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
     <div class="screen-title" style="margin-bottom:0;">Library</div>
-    <button class="clear-tab-btn" onclick="confirmClearTable('library')">
-      <i data-lucide="trash-2" style="width:11px;height:11px;"></i> Clear All
-    </button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="btn btn-outline btn-sm" onclick="loadLibrary()" id="libRefreshBtn" style="padding:7px 12px;">
+        <i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Refresh
+      </button>
+      <button class="clear-tab-btn" onclick="confirmClearTable('library')">
+        <i data-lucide="trash-2" style="width:11px;height:11px;"></i> Clear All
+      </button>
+    </div>
   </div>
   <div class="screen-sub">Your topic repository. Browse, filter, or get suggestions.</div>
 
@@ -822,6 +879,31 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
 </div>
 
 </div><!-- end main -->
+
+<!-- TOPIC CONFIRMATION MODAL -->
+<div class="modal-overlay" id="topicConfirmModal">
+  <div class="modal-sheet" style="max-height:92vh;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Review extracted topics</div>
+    <div style="font-size:13px;color:var(--text-soft);margin-bottom:6px;" id="topicConfirmSummary">Claude analysed your content and found the following topics.</div>
+    <div class="notice notice-teal" style="font-size:13px;margin-bottom:14px;" id="topicConfirmLearned"></div>
+    <div id="topicConfirmCards" style="overflow-y:auto;max-height:50vh;padding-right:4px;"></div>
+    <div style="margin-top:14px;">
+      <div class="voice-input-wrap" style="margin-bottom:10px;">
+        <textarea id="topicConfirmFeedback" rows="2" placeholder="Optional feedback — e.g. 'Remove the third one, it is too broad' or 'Add a topic about AI in healthcare'..." style="min-height:52px;font-size:14px;padding:11px 44px 11px 13px;"></textarea>
+        <button class="voice-input-btn" onclick="toggleFieldVoice('topicConfirmFeedback',this)"><i data-lucide="mic" style="width:14px;height:14px;"></i></button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="refineTopicConfirmation()" id="topicConfirmRefineBtn">
+          <i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Refine
+        </button>
+        <button class="btn btn-navy" onclick="confirmSaveTopics()" id="topicConfirmSaveBtn">
+          <i data-lucide="check" style="width:14px;height:14px;"></i> Save approved topics
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -1023,13 +1105,6 @@ function openLog(){
 
 // ── NAV ───────────────────────────────────────────────────────────────────
 function goScreen(name){
-  // Guard features that need setup complete
-  const guarded = ['feed','library','studio'];
-  if(guarded.includes(name) && !isOnboardingComplete()){
-    showOnboarding();
-    toast('Please complete setup first','alert-circle');
-    return;
-  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab-item').forEach(n=>n.classList.remove('active'));
   const sc=document.getElementById('screen-'+name);
@@ -1039,8 +1114,34 @@ function goScreen(name){
   if(name==='library') loadLibrary();
   if(name==='home') loadHomeStats();
   if(name==='studio') resetStudioIfClean();
+  if(name==='feed') loadRecentFeed();
+  // Show setup required notice inside tabs if setup not complete
+  if(!isOnboardingComplete() && ['feed','library','studio'].includes(name)){
+    showSetupNotice(name);
+  }
 }
-function goSettings(){goScreen('settings');}
+
+function showSetupNotice(screenName){
+  const noticeId = 'setupNotice-'+screenName;
+  if(document.getElementById(noticeId)) return;
+  const sc = document.getElementById('screen-'+screenName);
+  if(!sc) return;
+  const notice = document.createElement('div');
+  notice.id = noticeId;
+  notice.className = 'notice notice-gold';
+  notice.style.cssText = 'position:sticky;top:0;z-index:10;margin:-16px -16px 16px;border-radius:0;border-left:none;border-top:none;border-right:none;border-bottom:3px solid var(--gold);';
+  notice.innerHTML = '<strong>Setup not complete.</strong> Features are disabled until you complete your profile and strategy. <button onclick="showOnboarding()" style="background:var(--gold);border:none;color:#fff;padding:4px 12px;border-radius:4px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;margin-left:8px;">Complete Setup</button>';
+  sc.insertBefore(notice, sc.firstChild);
+}
+
+function goSettings(){
+  // Navigate to settings screen directly without going through tab logic
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(n=>n.classList.remove('active'));
+  const sc = document.getElementById('screen-settings');
+  if(sc) sc.classList.add('active');
+  loadSettingsForm();
+}
 
 // ── HOME ──────────────────────────────────────────────────────────────────
 async function loadHomeStats(){
@@ -1048,15 +1149,18 @@ async function loadHomeStats(){
   document.getElementById('homeGreeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Hassan';
   document.getElementById('homeDate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   try{
-    const [q,pub]=await Promise.all([atGet(AT.Q,100,"Status='Available'"),atGet(AT.PUB,100)]);
-    document.getElementById('statTopics').textContent=q.length;
-    const now=new Date();
-    document.getElementById('statPosts').textContent=pub.filter(r=>{
-      const d=r.fields['Published Date'];
-      if(!d)return false;
-      const pd=new Date(d);
-      return pd.getMonth()===now.getMonth()&&pd.getFullYear()===now.getFullYear();
-    }).length;
+    // Count all queue records regardless of status for topic count
+    const [q, pub] = await Promise.all([atGet(AT.Q,100), atGet(AT.PUB,100)]);
+    document.getElementById('statTopics').textContent = q.length;
+    const now = new Date();
+    const thisMonth = pub.filter(r=>{
+      // Count all published records - Published Date may not be set, so also count by creation
+      const d = r.fields['Published Date'] || r.fields['Created Time'];
+      if(!d) return true; // if no date, count it
+      const pd = new Date(d);
+      return pd.getMonth()===now.getMonth() && pd.getFullYear()===now.getFullYear();
+    });
+    document.getElementById('statPosts').textContent = pub.length > 0 ? thisMonth.length || pub.length : 0;
     checkCleanupNeeded(q.length);
   }catch(e){console.warn(e);}
 }
@@ -1408,10 +1512,232 @@ function setFeedMode(mode){
   currentFeedMode = mode;
   document.getElementById('feedModeThought').classList.toggle('active', mode==='thought');
   document.getElementById('feedModeLink').classList.toggle('active', mode==='link');
+  document.getElementById('feedModeMemory').classList.toggle('active', mode==='memory');
   document.getElementById('feedThoughtMode').style.display = mode==='thought' ? 'block' : 'none';
   document.getElementById('feedLinkMode').style.display = mode==='link' ? 'block' : 'none';
+  document.getElementById('feedMemoryMode').style.display = mode==='memory' ? 'block' : 'none';
   hideErr('feedErr');
   document.getElementById('feedResp').classList.remove('show');
+}
+
+// ── MEMORY MODE ───────────────────────────────────────────────────────────
+let pendingTopics = [];  // Topics awaiting user confirmation
+let memorySourceContent = '';  // Original content for refinement
+
+function handleMemoryAttach(input){
+  const files = [...input.files].slice(0, 5);
+  const el = document.getElementById('feedMemoryFileList');
+  el.innerHTML = files.map(f =>
+    `<span class="attach-file-light">${f.name.slice(0,22)}${f.name.length>22?'...':''}<button onclick="this.parentElement.remove()">&#x2715;</button></span>`
+  ).join('');
+  lucide.createIcons();
+  input.value = '';
+}
+
+async function analyseForMemory(){
+  const content = document.getElementById('feedMemoryContent').value.trim();
+  const fileInput = document.getElementById('feedMemoryFiles');
+  hideErr('memoryErr');
+
+  // Read attached files
+  let fileDocs = '';
+  if(attachedFiles && attachedFiles.feedMemory){
+    fileDocs = await readAttachedFiles('feedMemory');
+  }
+
+  const combined = content + (fileDocs ? '\n\n' + fileDocs : '');
+  if(!combined.trim()){ showErr('memoryErr','Please add some content or attach a document before analysing.'); return; }
+
+  memorySourceContent = combined;
+
+  const sendBtn = document.querySelector('#feedMemoryMode .claude-send-btn');
+  if(sendBtn){ sendBtn.disabled = true; sendBtn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;border-color:rgba(255,255,255,.5);border-top-color:#fff;"></div>'; }
+
+  try{
+    const existing = allTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,30).join('; ');
+    const settings = getSettings();
+
+    const prompt = `You are Hassan Khadra's content intelligence agent. Analyse this content and extract specific LinkedIn post topics from it.
+
+CONTENT TO ANALYSE:
+${combined.slice(0, 4000)}
+
+HASSAN'S CONTENT PILLARS: Agentic AI, AI-enabled delivery, Agile transformation, startup advisory, compounding improvement, Future of Work, LinkedIn personal brand.
+${settings.strategy ? 'HASSAN\'S STRATEGY: '+settings.strategy.slice(0,400) : ''}
+ALREADY IN LIBRARY (don't duplicate): ${existing || 'none yet'}
+
+Tasks:
+1. Identify what type of content this is (topic list, previous posts, notes, strategy doc, etc.)
+2. Extract 4-8 specific compelling LinkedIn post topics from it
+3. Write a 1-2 sentence summary of what you learned from this content
+
+Return ONLY valid JSON:
+{
+  "contentType": "<what this content is, e.g. 'topic list', 'previous posts', 'strategy notes'>",
+  "learned": "<1-2 sentences on key insights extracted>",
+  "topics": [
+    {
+      "title": "<specific post topic under 65 chars>",
+      "summary": "<1-2 sentences on what the post would cover>",
+      "tags": ["<tag1>","<tag2>"],
+      "priority": "<High|Medium|Low>",
+      "approved": true
+    }
+  ]
+}`;
+
+    const raw = await claude(prompt, 2000);
+    const result = parseJSON(raw);
+
+    pendingTopics = (result.topics || []).map((t, i) => ({ ...t, id: 'tc-'+i, approved: true }));
+
+    document.getElementById('topicConfirmSummary').textContent =
+      `Claude analysed your ${result.contentType || 'content'} and found ${pendingTopics.length} topics. Review each one — approve, remove, or give feedback to refine.`;
+    document.getElementById('topicConfirmLearned').innerHTML =
+      `<strong>What Claude learned:</strong> ${result.learned || ''}`;
+
+    renderTopicConfirmCards();
+    openModal('topicConfirmModal');
+    addLog(`Memory analysis complete: ${pendingTopics.length} topics extracted from ${result.contentType||'content'}`, 'brain');
+
+  }catch(e){
+    showErr('memoryErr', 'Analysis failed: '+e.message);
+    addLog('Memory analysis failed: '+e.message, 'alert-circle');
+  }
+
+  if(sendBtn){ sendBtn.disabled = false; sendBtn.innerHTML = '<i data-lucide="arrow-up" style="width:16px;height:16px;"></i>'; lucide.createIcons(); }
+}
+
+function renderTopicConfirmCards(){
+  const container = document.getElementById('topicConfirmCards');
+  container.innerHTML = pendingTopics.map((t, i) => `
+    <div class="tc-card ${t.approved ? 'approved' : 'removed'}" id="tc-card-${i}">
+      <div class="tc-card-header">
+        <div class="tc-card-title">${t.title}</div>
+        <div class="tc-card-status">
+          <button class="tc-approve-btn ${t.approved?'active':''}" onclick="toggleTopicApproval(${i})" title="${t.approved?'Approved':'Removed'}">
+            <i data-lucide="check" style="width:13px;height:13px;"></i>
+          </button>
+          <button class="tc-remove-btn" onclick="removeTopicCard(${i})" title="Remove this topic">
+            <i data-lucide="x" style="width:13px;height:13px;"></i>
+          </button>
+        </div>
+      </div>
+      <div class="tc-card-summary">${t.summary || ''}</div>
+      <div class="tc-card-tags">${(t.tags||[]).map(tag=>`<span class="pill pill-teal" style="font-size:11px;padding:2px 8px;">${tag}</span>`).join('')}</div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+
+  const approvedCount = pendingTopics.filter(t=>t.approved).length;
+  const saveBtn = document.getElementById('topicConfirmSaveBtn');
+  if(saveBtn) saveBtn.innerHTML = `<i data-lucide="check" style="width:14px;height:14px;"></i> Save ${approvedCount} approved topic${approvedCount!==1?'s':''}`;
+  lucide.createIcons();
+}
+
+function toggleTopicApproval(idx){
+  pendingTopics[idx].approved = !pendingTopics[idx].approved;
+  renderTopicConfirmCards();
+}
+
+function removeTopicCard(idx){
+  pendingTopics[idx].approved = false;
+  renderTopicConfirmCards();
+}
+
+async function refineTopicConfirmation(){
+  const feedback = document.getElementById('topicConfirmFeedback').value.trim();
+  if(!feedback){ document.getElementById('topicConfirmFeedback').focus(); return; }
+
+  const btn = document.getElementById('topicConfirmRefineBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;"></div>';
+
+  try{
+    const currentTitles = pendingTopics.map(t=>t.title).join('; ');
+    const prompt = `You are Hassan Khadra's content agent. Refine these extracted topics based on his feedback.
+
+ORIGINAL CONTENT:
+${memorySourceContent.slice(0, 2000)}
+
+CURRENT TOPICS:
+${currentTitles}
+
+HASSAN'S FEEDBACK:
+${feedback}
+
+Apply the feedback precisely. Return ONLY valid JSON:
+{
+  "topics": [
+    {
+      "title": "<topic under 65 chars>",
+      "summary": "<1-2 sentences>",
+      "tags": ["<tag>"],
+      "priority": "<High|Medium|Low>",
+      "approved": true
+    }
+  ]
+}`;
+
+    const raw = await claude(prompt, 1500);
+    const result = parseJSON(raw);
+    pendingTopics = (result.topics||[]).map((t,i)=>({...t, id:'tc-'+i, approved:t.approved!==false}));
+    document.getElementById('topicConfirmFeedback').value = '';
+    renderTopicConfirmCards();
+    addLog('Topics refined based on feedback: '+feedback.slice(0,50), 'refresh-cw');
+  }catch(e){ alert('Refinement failed: '+e.message); }
+
+  btn.disabled = false; btn.innerHTML = '<i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Refine'; lucide.createIcons();
+}
+
+async function confirmSaveTopics(){
+  const toSave = pendingTopics.filter(t => t.approved);
+  if(!toSave.length){ toast('No topics approved — toggle at least one to save','alert-circle'); return; }
+
+  const btn = document.getElementById('topicConfirmSaveBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div> Saving...';
+
+  try{
+    for(const t of toSave){
+      const rec = await atCreate(AT.Q, {
+        'Title': t.title,
+        'Source': 'Manual - Hassan',
+        'Topic Tags': t.tags || [],
+        'Summary': t.summary || '',
+        'Priority': t.priority || 'Medium',
+        'Status': 'Available',
+        'Used in Draft': false
+      });
+      if(rec && rec.id) allTopics.unshift(rec);
+    }
+
+    // Also save the raw content as an input record
+    await atCreate(AT.IN, {
+      'Input ID': 'MEM-'+Date.now(),
+      'Input Type': 'Document Extract',
+      'Raw Content': memorySourceContent.slice(0, 2000),
+      'Claude Classification': 'Content Seed',
+      'Claude Notes': `Extracted ${toSave.length} topics and saved to library`,
+      'Status': 'Processed',
+      'Used in Post': false
+    });
+
+    closeModal('topicConfirmModal');
+    document.getElementById('feedMemoryContent').value = '';
+    document.getElementById('feedMemoryFileList').innerHTML = '';
+    pendingTopics = [];
+    memorySourceContent = '';
+
+    toast(`${toSave.length} topic${toSave.length!==1?'s':''} saved to Library`, 'library');
+    addLog(`${toSave.length} topics confirmed and saved to library`, 'check-circle');
+    updateBadge();
+    checkCleanupNeeded(allTopics.length);
+  }catch(e){
+    alert('Save failed: '+e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="check" style="width:14px;height:14px;"></i> Save approved topics';
+  lucide.createIcons();
 }
 
 function selThoughtType(btn){
@@ -1745,13 +2071,15 @@ Already in library (don't repeat): ${existing||'none'}
 Return ONLY JSON: {"topics":[{"title":"<under 60 chars>","tags":["<tag>"],"priority":"<High|Medium|Low>","angle":"<1 sentence>"}]}`;
     const raw=await claude(prompt,1000);
     const result=parseJSON(raw);
-    for(const t of (result.topics||[])){
+    const topics = result.topics||[];
+    for(const t of topics){
       const rec=await atCreate(AT.Q,{'Title':t.title,'Source':'Manual - Hassan','Topic Tags':t.tags||[],'Summary':t.angle||'','Priority':t.priority||'Medium','Status':'Available','Used in Draft':false});
-      allTopics.unshift(rec);
+      // Only unshift if we got a valid record back with an id
+      if(rec && rec.id){ allTopics.unshift(rec); }
     }
     renderTopics(); updateBadge();
-    toast('Added '+result.topics.length+' topic suggestions','sparkles');
-    addLog('Suggested '+result.topics.length+' new topics','sparkles');
+    toast('Added '+topics.length+' topic suggestions','sparkles');
+    addLog('Suggested '+topics.length+' new topics','sparkles');
     checkCleanupNeeded(allTopics.length);
   }catch(e){alert('Could not generate suggestions: '+e.message);}
   btn.disabled=false;btn.innerHTML='<i data-lucide="sparkles" style="width:14px;height:14px;"></i> Suggest 5';lucide.createIcons();
@@ -2158,8 +2486,12 @@ async function completeOnboarding(){
 
   hideOnboarding();
   document.getElementById('setupBanner').style.display = 'none';
-  toast('Setup complete — welcome to your content agent', 'check-circle');
+  toast('Setup complete — extracting topics from your strategy...', 'check-circle');
   addLog('Initial setup completed', 'check-circle');
+
+  // Extract topics from strategy text and seed the Library
+  extractTopicsFromStrategy(strategy);
+
   loadHomeStats();
   loadRecentFeed();
   loadSettingsForm();
@@ -2168,6 +2500,54 @@ async function completeOnboarding(){
   btn.disabled = false;
   btn.innerHTML = '<i data-lucide="arrow-right" style="width:18px;height:18px;"></i> Complete Setup &amp; Enter';
   lucide.createIcons();
+}
+
+// ── TOPIC EXTRACTION FROM STRATEGY ───────────────────────────────────────
+async function extractTopicsFromStrategy(strategyText){
+  if(!strategyText || strategyText.trim().split(/\s+/).length < 20) return;
+  try{
+    const prompt = `You are Hassan Khadra's content agent. Read this strategy/context document and extract specific LinkedIn post topics that Hassan could write about.
+
+STRATEGY TEXT:
+${strategyText.slice(0, 3000)}
+
+Extract 8-12 specific, compelling LinkedIn post topic ideas based on what Hassan has described. Each topic should be a concrete post angle, not a vague category.
+
+Return ONLY valid JSON:
+{
+  "topics": [
+    {
+      "title": "<specific post topic under 70 chars>",
+      "summary": "<1-2 sentences on what the post would cover>",
+      "tags": ["<tag1>", "<tag2>"],
+      "priority": "<High|Medium|Low>"
+    }
+  ]
+}`;
+
+    const raw = await claude(prompt, 2000);
+    const result = parseJSON(raw);
+    const topics = result.topics || [];
+
+    for(const t of topics){
+      await atCreate(AT.Q, {
+        'Title': t.title,
+        'Source': 'Manual - Hassan',
+        'Topic Tags': t.tags || [],
+        'Summary': t.summary || '',
+        'Priority': t.priority || 'Medium',
+        'Status': 'Available',
+        'Used in Draft': false
+      });
+    }
+
+    toast(`Library seeded with ${topics.length} topics from your strategy`, 'library');
+    addLog(`Extracted ${topics.length} topics from strategy during setup`, 'sparkles');
+    updateBadge();
+  } catch(e){
+    console.warn('Topic extraction failed:', e.message);
+    addLog('Topic extraction from strategy failed: '+e.message, 'alert-circle');
+  }
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
@@ -2180,7 +2560,7 @@ function loadSettingsForm(){
   settingsStrategyCount();
 }
 
-function saveSettings(){
+async function saveSettings(){
   const linkedin = document.getElementById('sLinkedIn').value.trim();
   const strategy = document.getElementById('sStrategy').value.trim();
   const err_linkedin = !linkedin || !linkedin.includes('linkedin.com');
@@ -2208,6 +2588,13 @@ function saveSettings(){
   btn.style.background='var(--green)'; lucide.createIcons();
   setTimeout(()=>{btn.innerHTML='<i data-lucide="save" style="width:16px;height:16px;"></i> Save Settings';btn.style.background='';lucide.createIcons();},2000);
   toast('Settings saved','save'); addLog('Settings updated','settings');
+
+  // Check if library is empty - if so, auto-extract topics from strategy
+  const existing = await atGet(AT.Q, 1);
+  if(existing.length === 0){
+    toast('Library is empty — extracting topics from your strategy...','sparkles');
+    extractTopicsFromStrategy(strategy);
+  }
 }
 
 // ── DATA MANAGEMENT ───────────────────────────────────────────────────────
