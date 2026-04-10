@@ -53,15 +53,17 @@ body{font-family:var(--sans);background:var(--silver);color:var(--text);display:
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
 /* FILING CABINET TABS */
-.tab-bar{background:var(--navy);display:flex;align-items:flex-end;padding:0 12px;gap:3px;flex-shrink:0;border-bottom:3px solid var(--teal);}
-.tab-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 14px 8px;cursor:pointer;color:rgba(255,255,255,.45);transition:all .2s;border:none;background:rgba(255,255,255,.06);font-family:var(--sans);border-radius:var(--radius) var(--radius) 0 0;border:1px solid rgba(255,255,255,.08);border-bottom:none;margin-bottom:-1px;min-width:64px;}
-.tab-item:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.75);}
+.tab-bar{background:var(--navy);display:flex;align-items:flex-end;padding:0 8px;gap:2px;flex-shrink:0;border-bottom:3px solid var(--teal);overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 8px 8px;cursor:pointer;color:#fff;transition:all .2s;border:none;background:rgba(255,255,255,.1);font-family:var(--sans);border-radius:var(--radius) var(--radius) 0 0;border:1px solid rgba(255,255,255,.15);border-bottom:none;margin-bottom:-1px;}
+.tab-item:hover{background:rgba(255,255,255,.18);}
 .tab-item.active{background:var(--gold);color:#fff;border-color:var(--gold);border-bottom:3px solid var(--gold);z-index:2;}
 .tab-item.active .tab-label{color:#fff;font-weight:900;}
-.tab-item.active i{color:#fff !important;}
-.tab-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
-.tab-badge{position:absolute;top:5px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;}
+.tab-item i{color:#fff !important;}
+.tab-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;color:#fff;}
+.tab-badge{position:absolute;top:5px;right:4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;}
 .tab-badge.show{display:flex;}
+@media(max-width:380px){.tab-label{font-size:9px;letter-spacing:.01em;}.tab-item{padding:8px 5px 7px;}}
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
@@ -463,6 +465,19 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     <div class="ob-title">Let's set up your agent</div>
     <div class="ob-sub">Before your agent can draft posts in your voice, it needs to know who you are and what you stand for. This takes about 5 minutes and only happens once.</div>
 
+    <!-- REQUIRED: Name -->
+    <div class="ob-section">
+      <div class="ob-section-title">
+        <i data-lucide="user" style="width:13px;height:13px;"></i>
+        Your Name
+        <span class="ob-req">&#9733; REQUIRED</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="ob-field"><label>First name</label><input type="text" id="obFirstName" placeholder="e.g. Hassan" autocomplete="given-name"></div>
+        <div class="ob-field"><label>Last name</label><input type="text" id="obLastName" placeholder="e.g. Khadra" autocomplete="family-name"></div>
+      </div>
+    </div>
+
     <!-- REQUIRED: LinkedIn -->
     <div class="ob-section">
       <div class="ob-section-title">
@@ -575,24 +590,17 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
     </button>
   </div>
   <div id="briefingArea"></div>
-  <div class="sec-label" style="margin-top:4px;">Quick actions</div>
-  <div class="qa-grid">
-    <button class="qa-item" onclick="goScreen('feed')">
-      <div class="qa-icon" style="background:var(--teal-pale);"><i data-lucide="plus-circle" style="width:18px;height:18px;color:var(--teal);"></i></div>
-      <div class="qa-text"><h4>Feed the agent</h4><p>Drop a thought, link, voice note or document</p></div>
-      <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--text-soft);margin-left:auto;flex-shrink:0;"></i>
-    </button>
-    <button class="qa-item" onclick="goScreen('library')">
-      <div class="qa-icon" style="background:#eef2fb;"><i data-lucide="library" style="width:18px;height:18px;color:var(--navy);"></i></div>
-      <div class="qa-text"><h4>Browse Library</h4><p>Your topic repository and series</p></div>
-      <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--text-soft);margin-left:auto;flex-shrink:0;"></i>
-    </button>
-    <button class="qa-item" onclick="startFreshDraft()">
-      <div class="qa-icon" style="background:var(--green-bg);"><i data-lucide="pen-line" style="width:18px;height:18px;color:var(--green);"></i></div>
-      <div class="qa-text"><h4>Draft a post</h4><p>Jump straight into the Studio</p></div>
-      <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--text-soft);margin-left:auto;flex-shrink:0;"></i>
-    </button>
-  </div>
+
+  <!-- RECENT DRAFTS -->
+  <div class="sec-label" style="margin-top:8px;">Recent drafts</div>
+  <div id="homeDraftsList"><div style="font-size:13px;color:var(--text-soft);padding:4px 0;">No drafts yet.</div></div>
+
+  <!-- RECENT POSTS -->
+  <div class="sec-label" style="margin-top:16px;">Recent posts</div>
+  <div id="homePostsList"><div style="font-size:13px;color:var(--text-soft);padding:4px 0;">No published posts yet.</div></div>
+
+  <!-- NUDGES -->
+  <div id="homeNudges" style="margin-top:16px;"></div>
 </div>
 
 <!-- FEED -->
@@ -824,7 +832,11 @@ textarea{resize:vertical;min-height:100px;line-height:1.6;}
   <div class="screen-sub">Your foundation layer. Claude reads this before every drafting session.</div>
   <div class="settings-section">
     <div class="settings-section-title"><i data-lucide="user" style="width:15px;height:15px;color:var(--teal);"></i> Profile</div>
-    <div class="form-group"><label class="field-label">LinkedIn URL <span style="color:var(--red);font-size:10px;font-weight:700;"> REQUIRED</span></label><input type="url" id="sLinkedIn" placeholder="https://www.linkedin.com/in/hassankhadra"></div>
+    <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div><label class="field-label">First name <span style="color:var(--red);font-size:10px;font-weight:700;">REQUIRED</span></label><input type="text" id="sFirstName" placeholder="e.g. Hassan" autocomplete="given-name"></div>
+      <div><label class="field-label">Last name <span style="color:var(--red);font-size:10px;font-weight:700;">REQUIRED</span></label><input type="text" id="sLastName" placeholder="e.g. Khadra" autocomplete="family-name"></div>
+    </div>
+    <div class="form-group"><label class="field-label">LinkedIn URL <span style="color:var(--red);font-size:10px;font-weight:700;"> REQUIRED</span></label><input type="url" id="sLinkedIn" placeholder="https://www.linkedin.com/in/yourname"></div>
     <div class="form-group"><label class="field-label">Website URL <span style="color:var(--text-soft);font-size:10px;"> optional</span></label><input type="url" id="sWebsite" placeholder="https://agilefreedom.co.uk"></div>
   </div>
   <div class="settings-section">
@@ -1135,33 +1147,97 @@ function showSetupNotice(screenName){
 }
 
 function goSettings(){
-  // Navigate to settings screen directly without going through tab logic
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab-item').forEach(n=>n.classList.remove('active'));
-  const sc = document.getElementById('screen-settings');
+  const sc=document.getElementById('screen-settings');
   if(sc) sc.classList.add('active');
   loadSettingsForm();
+  window.scrollTo(0,0);
 }
 
 // ── HOME ──────────────────────────────────────────────────────────────────
 async function loadHomeStats(){
   const h=new Date().getHours();
-  document.getElementById('homeGreeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Hassan';
+  const s=getSettings();
+  const firstName = s.firstName || s.FirstName || 'there';
+  document.getElementById('homeGreeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', '+firstName;
   document.getElementById('homeDate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   try{
-    // Count all queue records regardless of status for topic count
-    const [q, pub] = await Promise.all([atGet(AT.Q,100), atGet(AT.PUB,100)]);
-    document.getElementById('statTopics').textContent = q.length;
-    const now = new Date();
-    const thisMonth = pub.filter(r=>{
-      // Count all published records - Published Date may not be set, so also count by creation
-      const d = r.fields['Published Date'] || r.fields['Created Time'];
-      if(!d) return true; // if no date, count it
-      const pd = new Date(d);
-      return pd.getMonth()===now.getMonth() && pd.getFullYear()===now.getFullYear();
+    const [q,pub,drafts]=await Promise.all([atGet(AT.Q,100),atGet(AT.PUB,100),atGet(AT.D,5)]);
+    document.getElementById('statTopics').textContent=q.length;
+    const now=new Date();
+    const thisMonth=pub.filter(r=>{
+      const d=r.fields['Published Date'];
+      if(!d) return true;
+      const pd=new Date(d);
+      return pd.getMonth()===now.getMonth()&&pd.getFullYear()===now.getFullYear();
     });
-    document.getElementById('statPosts').textContent = pub.length > 0 ? thisMonth.length || pub.length : 0;
+    document.getElementById('statPosts').textContent=pub.length>0?thisMonth.length||pub.length:0;
     checkCleanupNeeded(q.length);
+
+    // Recent drafts
+    const dEl=document.getElementById('homeDraftsList');
+    const recentDrafts=drafts.filter(r=>r.fields['Post Content']);
+    if(recentDrafts.length){
+      dEl.innerHTML=recentDrafts.map(r=>{
+        const f=r.fields;
+        const content=(f['Post Content']||'').slice(0,80);
+        const status=f['Status']||'Generated';
+        const statusCls=status==='Published'?'pill-green':status==='Approved'?'pill-teal':'pill-silver';
+        return `<div class="fi-item" style="cursor:pointer;" onclick="goScreen('studio')">
+          <div class="fi-icon" style="background:var(--teal-pale);"><i data-lucide="pen-line" style="width:14px;height:14px;color:var(--teal);"></i></div>
+          <div style="flex:1;min-width:0;">
+            <div class="fi-content">${content}...</div>
+            <div class="fi-meta"><span class="pill ${statusCls}" style="padding:2px 7px;font-size:10px;">${status}</span></div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      dEl.innerHTML='<div style="font-size:13px;color:var(--text-soft);padding:4px 0;">No drafts yet. Head to the Studio tab to write your first post.</div>';
+    }
+    lucide.createIcons();
+
+    // Recent posts
+    const pEl=document.getElementById('homePostsList');
+    const recentPosts=pub.slice(0,3);
+    if(recentPosts.length){
+      pEl.innerHTML=recentPosts.map(r=>{
+        const f=r.fields;
+        return `<div class="fi-item">
+          <div class="fi-icon" style="background:var(--green-bg);"><i data-lucide="check-circle" style="width:14px;height:14px;color:var(--green);"></i></div>
+          <div style="flex:1;min-width:0;">
+            <div class="fi-content">${(f['Post Title / Hook']||f['Full Post Content']||'Post').slice(0,80)}</div>
+            <div class="fi-meta"><span style="font-size:11px;color:var(--text-soft);">${f['Published Date']?new Date(f['Published Date']).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):''}</span></div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      pEl.innerHTML='<div style="font-size:13px;color:var(--text-soft);padding:4px 0;">No published posts yet.</div>';
+    }
+    lucide.createIcons();
+
+    // Nudges
+    const nudges=[];
+    if(!s.firstName) nudges.push({icon:'user',color:'var(--gold-bg)',icolor:'var(--gold)',text:'Add your name in Settings so the agent can greet you properly.',action:"goSettings()"});
+    if(!s.CV) nudges.push({icon:'file-text',color:'#eef2fb',icolor:'var(--navy)',text:'Add your CV in Settings to improve draft quality.',action:"goSettings()"});
+    if(q.length===0) nudges.push({icon:'library',color:'var(--teal-pale)',icolor:'var(--teal)',text:'Your Library is empty. Save your strategy in Settings to auto-generate topics.',action:"goSettings()"});
+    if(pub.length>0){
+      const lastPostDate=new Date(pub[0].fields['Published Date']||Date.now());
+      const daysSince=Math.floor((Date.now()-lastPostDate)/86400000);
+      if(daysSince>3) nudges.push({icon:'clock',color:'var(--red-bg)',icolor:'var(--red)',text:`You haven\'t posted in ${daysSince} days. Run Today\'s Brief to find fresh topics.`,action:"runBriefingGuarded()"});
+    }
+    const nEl=document.getElementById('homeNudges');
+    if(nudges.length){
+      nEl.innerHTML='<div class="sec-label">Suggested actions</div>'+nudges.map(n=>`
+        <div class="fi-item" style="cursor:pointer;margin-bottom:8px;" onclick="${n.action}">
+          <div class="fi-icon" style="background:${n.color};flex-shrink:0;"><i data-lucide="${n.icon}" style="width:14px;height:14px;color:${n.icolor};"></i></div>
+          <div style="flex:1;font-size:13px;color:var(--text-mid);line-height:1.45;">${n.text}</div>
+          <i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--text-soft);flex-shrink:0;"></i>
+        </div>`).join('');
+      lucide.createIcons();
+    } else {
+      nEl.innerHTML='';
+    }
   }catch(e){console.warn(e);}
 }
 
@@ -1174,84 +1250,84 @@ async function runBriefing(){
   const area=document.getElementById('briefingArea');
   const btn=document.getElementById('briefBtn');
   btn.disabled=true;
-  area.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Getting your brief...</div><div class="loading-sub">Searching for recent content</div></div></div>`;
+  area.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Getting your brief...</div><div class="loading-sub">Searching last 24-72 hours</div></div></div>`;
   addLog('Daily brief started','newspaper');
 
   try{
-    // Get discarded URLs to exclude
     const discarded=await atGet(AT.IN,50,"AND({Input Type}='Anti-Repetition Note',FIND('DISCARD:',{Raw Content})>0)");
     const discardedUrls=new Set(discarded.map(r=>(r.fields['Raw Content']||'').replace('DISCARD:','').trim()));
-
-    // Search for articles
     const settings=getSettings();
-    const prompt=`You are Hassan Khadra's content research agent. Search for the 5 most relevant recent articles published in the last 7 days.
+    const name=getUserName();
+    const today=new Date().toISOString().slice(0,10);
 
-Topics: Agentic AI, AI Strategy, AI-enabled delivery, Agile transformation, Startup advisory, Future of Work, Digital transformation.
+    const prompt=`You are ${name.full}'s LinkedIn content research agent. Today is ${today}.
+
+Search the web for the 5 most relevant articles published in the LAST 72 HOURS on these topics:
+Agentic AI, AI Strategy, AI-enabled delivery, Agile transformation, Startup advisory, Future of Work, Digital transformation.
+
+STRICT FRESHNESS RULES:
+- ONLY return articles published after ${new Date(Date.now()-72*60*60*1000).toISOString().slice(0,10)}
+- Prioritise last 24 hours first, then 48h, then 72h
+- If you cannot find 5 articles within 72 hours, return fewer — do NOT pad with older articles
+- NEVER return articles from 2024 or earlier under any circumstances
+
+URL RULES:
+- Only include the URL if you are highly confident it is a real, currently live URL from a real publication
+- If you are not certain the URL is live and accurate, set "urlConfident" to false
+- Do not guess or construct URLs
+
+Sources: TechCrunch, MIT Tech Review, Harvard Business Review, Forbes, McKinsey, Gartner, Wired, Fast Company, Reuters, BBC, FT, The Economist, LinkedIn News.
 Audience: CTOs, ops leaders, consultants, founders. North America and UK focus.
-Prioritise: Last 24 hours first, then 48h, then 72h, then up to 7 days.
-Exclude these URLs already seen: ${[...seenArticleUrls,...discardedUrls].join(', ')||'none'}
+Exclude these URLs: ${[...seenArticleUrls,...discardedUrls].join(', ')||'none'}
+${settings.Strategy?'User strategy context: '+settings.Strategy.slice(0,200):''}
 
-Return ONLY valid JSON - keep all string values concise to avoid truncation:
+Return ONLY valid JSON:
 {
   "articles": [
     {
       "title": "<title under 80 chars>",
-      "url": "<full URL>",
-      "source": "<publication>",
-      "age": "<e.g. 2 hours ago, yesterday, 3 days ago>",
-      "summary": "<2-3 sentences on what it covers and why it matters>",
-      "relevance": "<one short sentence on why Hassan should care>"
+      "url": "<full URL or empty string if not confident>",
+      "urlConfident": <true|false>,
+      "source": "<publication name>",
+      "publishedDate": "<YYYY-MM-DD or approximate like '2 hours ago'>",
+      "summary": "<2-3 sentences on content and relevance>",
+      "relevance": "<one sentence on why ${name.first||'you'} should care>",
+      "searchQuery": "<Google search query to find this article>"
     }
   ]
 }`;
 
     const raw=await claude(prompt,4000);
-
-    // Defensive parse - extract whatever articles came back even if truncated
     let articles=[];
     try{
       const result=parseJSON(raw);
       articles=result.articles||[];
     }catch(e){
-      // Try to extract partial results
       const matches=[...raw.matchAll(/"title"\s*:\s*"([^"]+)"/g)];
       if(matches.length){
-        matches.forEach((m,i)=>{
-          const urlM=raw.match(new RegExp('"url"\\s*:\\s*"([^"]+)"'));
-          const srcM=raw.match(new RegExp('"source"\\s*:\\s*"([^"]+)"'));
-          const sumM=raw.match(new RegExp('"summary"\\s*:\\s*"([^"]+)"'));
-          articles.push({title:m[1],url:urlM?urlM[1]:'',source:srcM?srcM[1]:'',age:'recent',summary:sumM?sumM[1]:'',relevance:'Relevant to your content pillars'});
+        matches.forEach(m=>{
+          articles.push({title:m[1],url:'',urlConfident:false,source:'',publishedDate:'recent',summary:'',relevance:'',searchQuery:m[1]});
         });
       }
       if(!articles.length) throw new Error('Could not parse search results. Please try again.');
     }
 
-    // Track seen
-    articles.forEach(a=>{ if(a.url) seenArticleUrls.add(a.url); });
+    articles.forEach(a=>{ if(a.url&&a.urlConfident) seenArticleUrls.add(a.url); });
 
-    // Get topic suggestions in a separate call
     const inputs=await atGet(AT.IN,25,"Status='New'");
     const queue=await atGet(AT.Q,50,"Status='Available'");
     const pub=await atGet(AT.PUB,20);
 
-    const topicPrompt=`Propose exactly 3 LinkedIn post topics for Hassan Khadra today.
-
-Hassan writes about: Agentic AI, AI delivery, Agile transformation, startup advisory, Future of Work.
-Audience: CTOs, ops leaders, consultants, founders. North America and UK.
-${settings.strategy?'His strategy: '+settings.strategy.slice(0,200):''}
+    const topicPrompt=`Propose exactly 3 LinkedIn post topics for ${name.full} today. Today is ${today}.
+${settings.Strategy?'Their strategy: '+settings.Strategy.slice(0,300):'Topics: Agentic AI, AI delivery, Agile transformation, startup advisory, Future of Work.'}
 Recent inputs: ${inputs.map(r=>(r.fields['Raw Content']||'').slice(0,80)).join(' | ').slice(0,400)||'none'}
 Avoid repeating: ${pub.map(r=>r.fields['Post Title / Hook']||'').filter(Boolean).slice(0,10).join(', ').slice(0,300)||'none'}
-Library topics available: ${queue.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,10).join(', ').slice(0,300)||'none'}
-
-Return ONLY this JSON with no extra text:
-{"topics":[{"title":"<under 60 chars>","summary":"<2-3 sentences on what the post covers and why today>","source":"<Library|News|Experience>","tags":["<tag1>","<tag2>"]}]}`;
+Library topics: ${queue.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,10).join(', ').slice(0,300)||'none'}
+Return ONLY JSON: {"topics":[{"title":"<under 60 chars>","summary":"<2-3 sentences>","source":"<Library|News|Experience>","tags":["<tag>"]}]}`;
 
     const topicRaw=await claude(topicPrompt,1200);
     let topics=[];
-    try{
-      const topicResult=parseJSON(topicRaw);
-      topics=topicResult.topics||[];
-    }catch(e){ console.warn('Topic parse failed:',e); }
+    try{ topics=(parseJSON(topicRaw).topics)||[]; }catch(e){ console.warn('Topic parse failed:',e); }
 
     renderBriefing(articles,topics,area);
     addLog(`Brief complete: ${articles.length} articles, ${topics.length} topics proposed`,'check-circle');
@@ -1273,7 +1349,7 @@ function renderBriefing(articles,topics,area){
           <div class="accord-icon" style="background:var(--teal-pale);"><i data-lucide="newspaper" style="width:16px;height:16px;color:var(--teal);"></i></div>
           <div class="accord-main">
             <div class="accord-title">${a.title||'Article'}</div>
-            <div class="accord-meta"><span>${a.source||''}</span><span>·</span><span>${a.age||''}</span></div>
+            <div class="accord-meta"><span>${a.source||''}</span><span>·</span><span>${a.publishedDate||a.age||''}</span></div>
           </div>
           <i data-lucide="chevron-down" style="width:16px;height:16px;" class="accord-chevron"></i>
         </div>
@@ -1285,7 +1361,15 @@ function renderBriefing(articles,topics,area){
             <button class="btn btn-teal btn-xs" onclick="articleAction('save',${i},${JSON.stringify(a).replace(/"/g,'&quot;')})"><i data-lucide="bookmark" style="width:12px;height:12px;"></i> Save for later</button>
             <button class="btn btn-outline btn-xs" onclick="briefDiscard(${i},'article')"><i data-lucide="x" style="width:12px;height:12px;"></i> Discard</button>
           </div>
-          ${a.url?`<div style="margin-top:8px;"><a href="${a.url}" target="_blank" style="font-size:12px;color:var(--teal);text-decoration:underline;">View article ↗</a></div>`:''}
+          ${a.url&&a.urlConfident
+            ? `<div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <a href="${a.url}" target="_blank" style="font-size:12px;color:var(--teal);text-decoration:underline;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="external-link" style="width:11px;height:11px;"></i> View article</a>
+                <a href="https://www.google.com/search?q=${encodeURIComponent(a.searchQuery||a.title+' '+a.source)}" target="_blank" style="font-size:12px;color:var(--text-soft);text-decoration:underline;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="search" style="width:11px;height:11px;"></i> Search for this</a>
+               </div>`
+            : `<div style="margin-top:8px;">
+                <a href="https://www.google.com/search?q=${encodeURIComponent(a.searchQuery||a.title+' '+a.source)}" target="_blank" style="font-size:12px;color:var(--teal);text-decoration:underline;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="search" style="width:11px;height:11px;"></i> Search for this article</a>
+               </div>`
+          }
         </div>
       </div>`).join('');
   }
@@ -1380,7 +1464,7 @@ async function topicAction(action,idx,topic){
   const card=document.getElementById('brief-top-'+idx);
   if(action==='select'){
     // Save to queue
-    await atCreate(AT.Q,{'Title':topic.title,'Source':'Manual - Hassan','Topic Tags':topic.tags||[],'Summary':topic.summary,'Priority':'High','Status':'Available','Used in Draft':false});
+    await atCreate(AT.Q,{'Title':topic.title,'Source':'Manual - '+getUserName().full,'Topic Tags':topic.tags||[],'Summary':topic.summary,'Priority':'High','Status':'Available','Used in Draft':false});
     loadStudioWithTopic(topic.title,topic.summary,topic.tags||[]);
     toast('Opening Studio for: '+topic.title.slice(0,40),'pen-line');
     addLog('Topic selected for drafting: '+topic.title,'pen-line');
@@ -1396,7 +1480,7 @@ async function generateMoreTopics(){
   area.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Generating more topics...</div></div></div>`;
   try{
     const pub=await atGet(AT.PUB,20);
-    const prompt=`Propose 3 more LinkedIn post topics for Hassan Khadra. Different from any already proposed this session.
+    const prompt=`Propose 3 more LinkedIn post topics for ${getUserName().full}. Different from any already proposed this session.
 ${STYLE}
 Published recently (avoid): ${pub.map(r=>r.fields['Post Title / Hook']||'').filter(Boolean).join(', ').slice(0,300)||'none'}
 Return ONLY valid JSON: {"topics":[{"title":"<under 70 chars>","summary":"<50-80 words>","source":"<Library|News|Your experience>","tags":["<tag>"]}]}`;
@@ -1557,7 +1641,7 @@ async function analyseForMemory(){
     const existing = allTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,30).join('; ');
     const settings = getSettings();
 
-    const prompt = `You are Hassan Khadra's content intelligence agent. Analyse this content and extract specific LinkedIn post topics from it.
+    const prompt = `You are ${getUserName().full}'s content intelligence agent. Analyse this content and extract specific LinkedIn post topics from it.
 
 CONTENT TO ANALYSE:
 ${combined.slice(0, 4000)}
@@ -1654,7 +1738,7 @@ async function refineTopicConfirmation(){
 
   try{
     const currentTitles = pendingTopics.map(t=>t.title).join('; ');
-    const prompt = `You are Hassan Khadra's content agent. Refine these extracted topics based on his feedback.
+    const prompt = `You are ${getUserName().full}'s content agent. Refine these extracted topics based on his feedback.
 
 ORIGINAL CONTENT:
 ${memorySourceContent.slice(0, 2000)}
@@ -1700,7 +1784,7 @@ async function confirmSaveTopics(){
     for(const t of toSave){
       const rec = await atCreate(AT.Q, {
         'Title': t.title,
-        'Source': 'Manual - Hassan',
+        'Source': 'Manual - '+getUserName().full,
         'Topic Tags': t.tags || [],
         'Summary': t.summary || '',
         'Priority': t.priority || 'Medium',
@@ -1806,7 +1890,7 @@ async function saveLink(){
     const existingTopics = await atGet(AT.Q,100,"Status='Available'");
     const topicTitles = existingTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,40).join('; ');
 
-    const prompt = `You are Hassan Khadra's content agent. Process this URL input.
+    const prompt = `You are ${getUserName().full}'s content agent. Process this URL input.
 
 URL: "${url}"
 User note: "${note||'none'}"
@@ -1816,7 +1900,7 @@ Existing topics: ${topicTitles||'none yet'}
 2. Extract or infer the title and topic from the URL
 3. Classify: Content Seed, Reference Material, or Topic Direction
 4. Detect which existing topic(s) this relates to (max 2)
-5. Write a 2-sentence response telling Hassan what you found and what you'll do with it
+5. Write a 2-sentence response telling ${getUserName().first||'you'} what you found and what you'll do with it
 
 Return ONLY valid JSON:
 {"classification":"<type>","inferredTitle":"<title>","relatedTopics":["<topic>"],"newTopicTitle":"<if no match>","response":"<2 sentences>","tags":["<tag1>","<tag2>"]}`;
@@ -1836,7 +1920,7 @@ Return ONLY valid JSON:
     await atCreate(AT.Q,{
       'Title': result.inferredTitle || url.slice(0,80),
       'Source URL': url,
-      'Source':'Manual - Hassan',
+      'Source':'Manual - '+getUserName().full,
       'Topic Tags': result.tags||[],
       'Summary': note || result.response,
       'Priority':'Medium','Status':'Available','Used in Draft':false
@@ -1846,7 +1930,7 @@ Return ONLY valid JSON:
     if(result.relatedTopics && result.relatedTopics.length){
       for(const t of result.relatedTopics){
         const match = existingTopics.find(r=>(r.fields['Title']||'').toLowerCase()===t.toLowerCase());
-        if(match) await atUpdate(AT.Q, match.id, {'Hassan Notes':(match.fields['Hassan Notes']||'')+'\n[Link] '+url});
+        if(match) await atUpdate(AT.Q, match.id, {'User Notes':(match.fields['User Notes']||'')+'\n[Link] '+url});
       }
     }
 
@@ -1879,7 +1963,7 @@ async function saveInput(){
     const existingTopics=await atGet(AT.Q,100,"Status='Available'");
     const topicTitles=existingTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,50).join('; ');
 
-    const prompt=`You are Hassan Khadra's content intelligence agent. Process this new input.
+    const prompt=`You are ${getUserName().full}'s content intelligence agent. Process this new input.
 
 Input type: ${type}
 Content: "${content.slice(0,1000)}"
@@ -1891,7 +1975,7 @@ Tasks:
 1. Classify this input: Content Seed, Style Update, Topic Direction, Reference Material, Avoid / Anti-repeat, Strategy Update
 2. Detect which existing topic(s) this relates to (max 3, by exact title from the list above)
 3. If no match, suggest a new topic title this should create
-4. Write a 2-3 sentence response to Hassan about what you extracted and what you'll do with it
+4. Write a 2-3 sentence response to ${getUserName().first||'you'} about what you extracted and what you'll do with it
 5. If this could relate to multiple topics, list all that match
 
 Return ONLY valid JSON:
@@ -1922,14 +2006,14 @@ Return ONLY valid JSON:
       for(const relTitle of result.relatedTopics){
         const match=existingTopics.find(r=>(r.fields['Title']||'').toLowerCase()===relTitle.toLowerCase());
         if(match){
-          const existingNotes=match.fields['Hassan Notes']||'';
-          await atUpdate(AT.Q,match.id,{'Hassan Notes':existingNotes+'\n\n['+new Date().toLocaleDateString('en-GB')+'] '+content.slice(0,200)});
+          const existingNotes=match.fields['User Notes']||'';
+          await atUpdate(AT.Q,match.id,{'User Notes':existingNotes+'\n\n['+new Date().toLocaleDateString('en-GB')+'] '+content.slice(0,200)});
           linked.push(relTitle);
         }
       }
     }
     if(result.newTopicTitle&&!linked.length){
-      await atCreate(AT.Q,{'Title':result.newTopicTitle,'Source':'Manual - Hassan','Topic Tags':result.tags||[],'Summary':content.slice(0,300),'Hassan Notes':result.response,'Priority':'Medium','Status':'Available','Used in Draft':false});
+      await atCreate(AT.Q,{'Title':result.newTopicTitle,'Source':'Manual - '+getUserName().full,'Topic Tags':result.tags||[],'Summary':content.slice(0,300),'User Notes':result.response,'Priority':'Medium','Status':'Available','Used in Draft':false});
       linked.push(result.newTopicTitle+' (new)');
     }
     // Also add as content seed if applicable
@@ -2000,13 +2084,30 @@ let allTopics=[]; let activeFilter='all'; let rejectedIds=new Set();
 
 async function loadLibrary(){
   const el=document.getElementById('topicList');
+  const btn=document.getElementById('libRefreshBtn');
+  if(btn){ btn.disabled=true; btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div>'; }
   el.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Loading library...</div></div></div>`;
   try{
-    allTopics=await atGet(AT.Q,100,"Status='Available'");
+    // Fetch all non-rejected records
+    allTopics=await atGet(AT.Q,100);
+    allTopics=allTopics.filter(r=>r.fields['Status']!=='Rejected'&&r.fields['Status']!=='Used');
     renderTopics();
     loadSeries();
     checkCleanupNeeded(allTopics.length);
+    // If empty, auto-extract from strategy
+    if(allTopics.length===0){
+      const s=getSettings();
+      if(s.Strategy && s.Strategy.trim().split(/\s+/).length>=20){
+        el.innerHTML=`<div class="loading-row"><div class="spinner"></div><div><div class="loading-text">Library empty — extracting topics from your strategy...</div></div></div>`;
+        await extractTopicsFromStrategy(s.Strategy);
+        allTopics=await atGet(AT.Q,100);
+        allTopics=allTopics.filter(r=>r.fields['Status']!=='Rejected'&&r.fields['Status']!=='Used');
+        renderTopics();
+        checkCleanupNeeded(allTopics.length);
+      }
+    }
   }catch(e){el.innerHTML=`<div class="err-box show">Could not load: ${e.message}</div>`;}
+  if(btn){ btn.disabled=false; btn.innerHTML='<i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Refresh'; lucide.createIcons(); }
 }
 
 function renderTopics(){
@@ -2031,7 +2132,7 @@ function renderTopics(){
       </div>
       <div class="accord-body">
         ${f['Summary']?`<div class="accord-summary">${f['Summary'].slice(0,180)}</div>`:''}
-        ${f['Hassan Notes']?`<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px;font-style:italic;">${f['Hassan Notes'].slice(0,120)}</div>`:''}
+        ${f['User Notes']?`<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px;font-style:italic;">${f['User Notes'].slice(0,120)}</div>`:''}
         <div class="tags-wrap" style="margin-bottom:10px;">${(f['Topic Tags']||[]).map(t=>`<span class="pill pill-teal" style="font-size:11px;">${t}</span>`).join('')}</div>
         <div class="accord-actions">
           <button class="btn btn-navy btn-xs" onclick="draftFromLib('${r.id}')"><i data-lucide="pen-line" style="width:12px;height:12px;"></i> Draft</button>
@@ -2063,21 +2164,34 @@ async function suggestTopics(){
   const btn=document.getElementById('suggestBtn');
   btn.disabled=true;btn.innerHTML='<div class="spinner spinner-sm" style="margin:0;"></div>';
   try{
+    const name=getUserName();
     const existing=allTopics.map(r=>r.fields['Title']||'').filter(Boolean).slice(0,30).join(', ');
-    const prompt=`Suggest 5 specific compelling LinkedIn post topics for Hassan Khadra.
-Pillars: Agentic AI, AI delivery, Agile transformation, startup advisory, compounding improvement, Future of Work.
+    const s=getSettings();
+    const prompt=`Suggest 5 specific compelling LinkedIn post topics for ${name.full}.
+${s.Strategy?'Their strategy: '+s.Strategy.slice(0,300):'Pillars: Agentic AI, AI delivery, Agile transformation, startup advisory, compounding improvement, Future of Work.'}
 ${theme?'Focus on: '+theme:''}
-Already in library (don't repeat): ${existing||'none'}
+Already in library (don\'t repeat): ${existing||'none'}
 Return ONLY JSON: {"topics":[{"title":"<under 60 chars>","tags":["<tag>"],"priority":"<High|Medium|Low>","angle":"<1 sentence>"}]}`;
     const raw=await claude(prompt,1000);
     const result=parseJSON(raw);
-    const topics = result.topics||[];
+    const topics=result.topics||[];
+    // Create all records
     for(const t of topics){
-      const rec=await atCreate(AT.Q,{'Title':t.title,'Source':'Manual - Hassan','Topic Tags':t.tags||[],'Summary':t.angle||'','Priority':t.priority||'Medium','Status':'Available','Used in Draft':false});
-      // Only unshift if we got a valid record back with an id
-      if(rec && rec.id){ allTopics.unshift(rec); }
+      await atCreate(AT.Q,{
+        'Title':t.title,
+        'Source':'Manual - '+name.full,
+        'Topic Tags':t.tags||[],
+        'Summary':t.angle||'',
+        'Priority':t.priority||'Medium',
+        'Status':'Available',
+        'Used in Draft':false
+      });
     }
-    renderTopics(); updateBadge();
+    // Reload from Airtable to ensure display is accurate
+    allTopics=await atGet(AT.Q,100);
+    allTopics=allTopics.filter(r=>r.fields['Status']!=='Rejected'&&r.fields['Status']!=='Used');
+    renderTopics();
+    updateBadge();
     toast('Added '+topics.length+' topic suggestions','sparkles');
     addLog('Suggested '+topics.length+' new topics','sparkles');
     checkCleanupNeeded(allTopics.length);
@@ -2219,7 +2333,7 @@ async function generateDraft(){
     const pubCtx=pub.map(r=>`Hook: ${r.fields['Post Title / Hook']||''} | Argument: ${r.fields['Core Argument']||''}`).join('\n');
     const styleNotes=pub.map(r=>r.fields['Style Notes']||'').filter(Boolean).slice(0,5).join(' | ');
 
-    const prompt=`You are Hassan Khadra's LinkedIn content writer. Write one post now.
+    const prompt=`You are ${getUserName().full}'s LinkedIn content writer. Write one post now.
 
 ${STYLE}
 ${settings.cv?'Background: '+settings.cv.slice(0,400):''}
@@ -2262,7 +2376,7 @@ async function refineDraft(){
   document.getElementById('studioDraftArea').style.opacity='0.5';
 
   try{
-    const prompt=`You are Hassan Khadra's LinkedIn content writer. Refine this post based on his feedback.
+    const prompt=`You are ${getUserName().full}'s LinkedIn content writer. Refine this post based on his feedback.
 
 ${STYLE}
 
@@ -2446,13 +2560,19 @@ function settingsStrategyCount(){
 }
 
 async function completeOnboarding(){
-  const linkedin = document.getElementById('obLinkedIn').value.trim();
-  const strategy = document.getElementById('obStrategy').value.trim();
-  const cv = document.getElementById('obCV').value.trim();
-  const website = document.getElementById('obWebsite').value.trim();
+  const firstName = (document.getElementById('obFirstName').value||'').trim();
+  const lastName  = (document.getElementById('obLastName').value||'').trim();
+  const linkedin  = document.getElementById('obLinkedIn').value.trim();
+  const strategy  = document.getElementById('obStrategy').value.trim();
+  const cv        = document.getElementById('obCV').value.trim();
+  const website   = document.getElementById('obWebsite').value.trim();
   const err = document.getElementById('obErr');
   err.classList.remove('show');
 
+  if(!firstName){
+    err.textContent = 'Please enter your first name to continue.';
+    err.classList.add('show'); return;
+  }
   if(!linkedin || !linkedin.includes('linkedin.com')){
     err.textContent = 'Please enter a valid LinkedIn profile URL to continue.';
     err.classList.add('show'); return;
@@ -2471,11 +2591,11 @@ async function completeOnboarding(){
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner spinner-sm" style="margin:0;border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div> Saving...';
 
-  // Read any attached files
   const strategyDocs = await readAttachedFiles('obStrategy');
   const cvDocs = await readAttachedFiles('obCV');
 
   const s = {
+    firstName, lastName,
     LinkedIn: linkedin,
     Strategy: strategy + (strategyDocs ? '\n\n--- Attached Documents ---\n' + strategyDocs : ''),
     CV: cv + (cvDocs ? '\n\n--- Attached Documents ---\n' + cvDocs : ''),
@@ -2486,10 +2606,9 @@ async function completeOnboarding(){
 
   hideOnboarding();
   document.getElementById('setupBanner').style.display = 'none';
-  toast('Setup complete — extracting topics from your strategy...', 'check-circle');
+  toast(`Welcome, ${firstName}! Extracting topics from your strategy...`, 'check-circle');
   addLog('Initial setup completed', 'check-circle');
 
-  // Extract topics from strategy text and seed the Library
   extractTopicsFromStrategy(strategy);
 
   loadHomeStats();
@@ -2505,13 +2624,14 @@ async function completeOnboarding(){
 // ── TOPIC EXTRACTION FROM STRATEGY ───────────────────────────────────────
 async function extractTopicsFromStrategy(strategyText){
   if(!strategyText || strategyText.trim().split(/\s+/).length < 20) return;
+  const name = getUserName();
   try{
-    const prompt = `You are Hassan Khadra's content agent. Read this strategy/context document and extract specific LinkedIn post topics that Hassan could write about.
+    const prompt = `You are ${name.full}'s LinkedIn content agent. Read this strategy/context document and extract specific LinkedIn post topics they could write about.
 
 STRATEGY TEXT:
 ${strategyText.slice(0, 3000)}
 
-Extract 8-12 specific, compelling LinkedIn post topic ideas based on what Hassan has described. Each topic should be a concrete post angle, not a vague category.
+Extract 8-12 specific, compelling LinkedIn post topic ideas. Each topic should be a concrete post angle, not a vague category.
 
 Return ONLY valid JSON:
 {
@@ -2532,7 +2652,7 @@ Return ONLY valid JSON:
     for(const t of topics){
       await atCreate(AT.Q, {
         'Title': t.title,
-        'Source': 'Manual - Hassan',
+        'Source': 'Manual - '+name.full,
         'Topic Tags': t.tags || [],
         'Summary': t.summary || '',
         'Priority': t.priority || 'Medium',
@@ -2542,38 +2662,50 @@ Return ONLY valid JSON:
     }
 
     toast(`Library seeded with ${topics.length} topics from your strategy`, 'library');
-    addLog(`Extracted ${topics.length} topics from strategy during setup`, 'sparkles');
+    addLog(`Extracted ${topics.length} topics from strategy`, 'sparkles');
     updateBadge();
   } catch(e){
     console.warn('Topic extraction failed:', e.message);
-    addLog('Topic extraction from strategy failed: '+e.message, 'alert-circle');
+    addLog('Topic extraction failed: '+e.message, 'alert-circle');
   }
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────
 function getSettings(){try{return JSON.parse(localStorage.getItem('afc_s')||'{}');}catch{return {};}}
 
+function getUserName(){
+  const s=getSettings();
+  return {
+    first: s.firstName || s.FirstName || '',
+    last:  s.lastName  || s.LastName  || '',
+    full:  ((s.firstName||s.FirstName||'')+' '+(s.lastName||s.LastName||'')).trim() || 'there'
+  };
+}
+
 function loadSettingsForm(){
   const s=getSettings();
   const map = {LinkedIn:'sLinkedIn', Website:'sWebsite', CV:'sCV', Strategy:'sStrategy', Avoid:'sAvoid', Goals:'sGoals'};
   Object.entries(map).forEach(([k,id])=>{ const el=document.getElementById(id); if(el&&s[k]) el.value=s[k]; });
+  // Name fields
+  const fn=document.getElementById('sFirstName'); if(fn) fn.value=s.firstName||s.FirstName||'';
+  const ln=document.getElementById('sLastName');  if(ln) ln.value=s.lastName||s.LastName||'';
   settingsStrategyCount();
 }
 
 async function saveSettings(){
-  const linkedin = document.getElementById('sLinkedIn').value.trim();
-  const strategy = document.getElementById('sStrategy').value.trim();
-  const err_linkedin = !linkedin || !linkedin.includes('linkedin.com');
-  const err_strategy = !strategy || strategy.split(/\s+/).length < 20;
+  const firstName = (document.getElementById('sFirstName').value||'').trim();
+  const lastName  = (document.getElementById('sLastName').value||'').trim();
+  const linkedin  = document.getElementById('sLinkedIn').value.trim();
+  const strategy  = document.getElementById('sStrategy').value.trim();
 
-  if(err_linkedin || err_strategy){
-    toast('LinkedIn URL and Strategy are required','alert-circle');
-    return;
-  }
+  if(!firstName){ toast('Please enter your first name','alert-circle'); return; }
+  if(!linkedin || !linkedin.includes('linkedin.com')){ toast('LinkedIn URL is required','alert-circle'); return; }
+  if(!strategy || strategy.split(/\s+/).length < 20){ toast('Strategy must be at least 20 words','alert-circle'); return; }
   const words = strategy.split(/\s+/).length;
   if(words > STRATEGY_MAX_WORDS){ toast('Strategy exceeds 5,000 word limit','alert-circle'); return; }
 
   const s={
+    firstName, lastName,
     LinkedIn:linkedin,
     Website:document.getElementById('sWebsite').value,
     CV:document.getElementById('sCV').value,
@@ -2589,7 +2721,7 @@ async function saveSettings(){
   setTimeout(()=>{btn.innerHTML='<i data-lucide="save" style="width:16px;height:16px;"></i> Save Settings';btn.style.background='';lucide.createIcons();},2000);
   toast('Settings saved','save'); addLog('Settings updated','settings');
 
-  // Check if library is empty - if so, auto-extract topics from strategy
+  // Check if library is empty - auto-extract topics from strategy
   const existing = await atGet(AT.Q, 1);
   if(existing.length === 0){
     toast('Library is empty — extracting topics from your strategy...','sparkles');
@@ -2755,6 +2887,14 @@ function waitForLucide(){
   } else {
     setTimeout(waitForLucide, 50);
   }
+}
+
+function lucideFallback(){
+  // Backup CDN if jsdelivr fails
+  const s=document.createElement('script');
+  s.src='https://unpkg.com/lucide@0.363.0/dist/umd/lucide.min.js';
+  s.onload=waitForLucide;
+  document.head.appendChild(s);
 }
 
 if(document.readyState === 'loading'){
